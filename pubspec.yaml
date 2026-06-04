@@ -13,8 +13,8 @@ dependencies:
   # State management
   provider: ^6.1.2
 
-  # Audio 🎵
-  audioplayers: ^6.0.0          # Sons et musiques
+  # Audio
+  audioplayers: ^6.0.0
 
   # Animations
   flutter_animate: ^4.5.0
@@ -24,15 +24,9 @@ dependencies:
   # Storage
   shared_preferences: ^2.2.3
 
-  # Firebase (optionnel - pour sauvegarde cloud)
-  # firebase_core: ^2.24.0
-  # cloud_firestore: ^4.14.0
-  # firebase_auth: ^4.16.0
-
   # UI
   cupertino_icons: ^1.0.6
   flutter_svg: ^2.0.9
-  cached_network_image: ^3.3.1
 
 dev_dependencies:
   flutter_test:

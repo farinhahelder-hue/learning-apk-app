@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 
 class SubjectCard extends StatelessWidget {
   final String title;
@@ -51,12 +50,14 @@ class SubjectCard extends StatelessWidget {
                     color: Colors.white.withOpacity(0.85), fontSize: 12, fontWeight: FontWeight.w500,
                   )),
                   const SizedBox(height: 10),
-                  LinearPercentIndicator(
-                    percent: pct, lineHeight: 8,
-                    backgroundColor: Colors.white.withOpacity(0.3),
-                    progressColor: Colors.white,
-                    barRadius: const Radius.circular(10),
-                    padding: EdgeInsets.zero,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: pct,
+                      minHeight: 8,
+                      backgroundColor: Colors.white.withOpacity(0.3),
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text('$points pts', style: TextStyle(
