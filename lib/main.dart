@@ -9,8 +9,11 @@ import 'screens/math/math_menu_screen.dart';
 import 'screens/french/french_menu_screen.dart';
 import 'screens/science/science_menu_screen.dart';
 import 'screens/parental/parental_dashboard_screen.dart';
+import 'screens/game/world_map_screen.dart';
+import 'screens/achievement/achievements_screen.dart';
 import 'services/progress_service.dart';
 import 'services/audio_service.dart';
+import 'services/game_service.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
@@ -38,6 +41,7 @@ class EmilieApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProgressService(prefs)),
+        ChangeNotifierProvider(create: (_) => GameService(prefs)),
         Provider(create: (_) => AudioService()),
       ],
       child: MaterialApp(
@@ -52,6 +56,8 @@ class EmilieApp extends StatelessWidget {
           '/french': (context) => const FrenchMenuScreen(),
           '/science': (context) => const ScienceMenuScreen(),
           '/parental': (context) => const ParentalDashboardScreen(),
+          '/worldmap': (context) => const WorldMapScreen(),
+          '/achievements': (context) => const AchievementsScreen(),
         },
       ),
     );

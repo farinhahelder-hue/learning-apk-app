@@ -77,5 +77,57 @@ class MathExercises {
         options: ['14', '15', '16', '17'], correctAnswer: '16', difficulty: 2, points: 15),
     Exercise(id: 'logic_5', subject: 'math', type: 'qcm', question: 'Quel est la moitié de 20 ?',
         options: ['8', '9', '10', '11'], correctAnswer: '10', difficulty: 2, points: 15),
+
+    // --- CE2 : NOMBRES JUSQU'À 1000 ---
+    Exercise(id: 'ce2_nombres_1', subject: 'math', type: 'qcm', question: 'Combien y a-t-il de centaines dans 400 ?',
+        options: ['2', '3', '4', '5'], correctAnswer: '4', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_nombres_2', subject: 'math', type: 'qcm', question: 'Quel nombre vient juste après 999 ?',
+        options: ['1000', '1001', '998', '9990'], correctAnswer: '1000', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_nombres_3', subject: 'math', type: 'qcm', question: 'Dans 735, quel est le chiffre des centaines ?',
+        options: ['7', '3', '5', '735'], correctAnswer: '7', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_nombres_4', subject: 'math', type: 'qcm', question: '600 + 80 + 9 = ?',
+        options: ['689', '6089', '6809', '609'], correctAnswer: '689', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_nombres_5', subject: 'math', type: 'qcm', question: 'Quel est le plus grand nombre : 456 / 546 / 465 / 654 ?',
+        options: ['456', '546', '465', '654'], correctAnswer: '654', difficulty: 3, points: 20),
+
+    // --- CE2 : TABLES DE MULTIPLICATION 6 À 9 ---
+    Exercise(id: 'ce2_mult_1', subject: 'math', type: 'qcm', question: 'Combien font 6 × 7 ?',
+        options: ['42', '48', '36', '54'], correctAnswer: '42', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_mult_2', subject: 'math', type: 'qcm', question: 'Combien font 8 × 9 ?',
+        options: ['72', '81', '63', '56'], correctAnswer: '72', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_mult_3', subject: 'math', type: 'qcm', question: 'Combien font 7 × 8 ?',
+        options: ['56', '63', '49', '42'], correctAnswer: '56', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_mult_4', subject: 'math', type: 'qcm', question: 'Combien font 9 × 9 ?',
+        options: ['81', '72', '90', '99'], correctAnswer: '81', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_mult_5', subject: 'math', type: 'qcm', question: 'Si j\'ai 6 boîtes de 8 crayons, combien de crayons ?',
+        options: ['42', '48', '56', '14'], correctAnswer: '48', difficulty: 3, points: 20),
+
+    // --- CE2 : DIVISIONS ---
+    Exercise(id: 'ce2_div_1', subject: 'math', type: 'qcm', question: 'Combien font 12 ÷ 3 ?',
+        options: ['3', '4', '5', '6'], correctAnswer: '4', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_div_2', subject: 'math', type: 'qcm', question: '20 partagé en 4, ça fait ?',
+        options: ['4', '5', '6', '3'], correctAnswer: '5', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_div_3', subject: 'math', type: 'qcm', question: 'Combien font 24 ÷ 6 ?',
+        options: ['3', '4', '5', '6'], correctAnswer: '4', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_div_4', subject: 'math', type: 'qcm', question: 'Je distribue 18 cartes à 3 amis. Combien chacun ?',
+        options: ['5', '6', '7', '4'], correctAnswer: '6', difficulty: 3, points: 20),
+    Exercise(id: 'ce2_div_5', subject: 'math', type: 'qcm', question: 'Combien font 36 ÷ 4 ?',
+        options: ['7', '8', '9', '10'], correctAnswer: '9', difficulty: 3, points: 20),
+
+    // --- CE2 : PÉRIMÈTRE ---
+    Exercise(id: 'ce2_perim_1', subject: 'math', type: 'qcm', question: 'Quel est le périmètre d\'un carré de 5 cm de côté ?',
+        options: ['15 cm', '20 cm', '25 cm', '10 cm'], correctAnswer: '20 cm', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_perim_2', subject: 'math', type: 'qcm', question: 'Un rectangle fait 6 cm de long et 4 cm de large. Quel périmètre ?',
+        options: ['10 cm', '20 cm', '24 cm', '12 cm'], correctAnswer: '20 cm', difficulty: 3, points: 20),
+    Exercise(id: 'ce2_perim_3', subject: 'math', type: 'qcm', question: 'Le périmètre d\'un carré est 24 cm. Combien mesure un côté ?',
+        options: ['4 cm', '5 cm', '6 cm', '8 cm'], correctAnswer: '6 cm', difficulty: 3, points: 20),
+
+    // --- CE2 : FRACTIONS ---
+    Exercise(id: 'ce2_frac_1', subject: 'math', type: 'qcm', question: 'Quelle fraction représente la partie colorée d\'un gâteau coupé en 4 parts égales dont 1 est prise ?',
+        options: ['1/2', '1/4', '2/4', '3/4'], correctAnswer: '1/4', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_frac_2', subject: 'math', type: 'qcm', question: '1/2 est-il plus grand ou plus petit que 1/4 ?',
+        options: ['Plus petit', 'Plus grand', 'Égal', 'On ne peut pas comparer'], correctAnswer: 'Plus grand', difficulty: 2, points: 15),
+    Exercise(id: 'ce2_frac_3', subject: 'math', type: 'qcm', question: 'Deux quartiers de pizza sur quatre, c\'est la moitié. Vrai ou faux ?',
+        options: ['Vrai', 'Faux', 'Ça dépend', 'Ni l\'un ni l\'autre'], correctAnswer: 'Vrai', difficulty: 2, points: 15),
   ];
 }
