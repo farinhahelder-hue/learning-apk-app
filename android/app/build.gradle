@@ -12,16 +12,13 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) flutterVersionCode = '2'
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) flutterVersionName = '2.0.0'
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '2'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '2.0.0'
 
 android {
     namespace "com.emilieapp.education"
-    compileSdk 34
-    ndkVersion flutter.ndkVersion
+    compileSdk 36
+    ndkVersion "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -39,7 +36,7 @@ android {
     defaultConfig {
         applicationId "com.emilieapp.education"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -47,13 +44,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug   // signature debug pour tests
+            signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
-        }
-        debug {
-            applicationIdSuffix ".debug"
-            debuggable true
         }
     }
 }
