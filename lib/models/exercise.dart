@@ -9,18 +9,31 @@ class Exercise {
   final int points;
   final String? hint;
   final String? imageAsset;
+  // New fields
+  final dynamic mascot;
+  final String? prompt;
+  final String? instruction;
+  final String? displayWord;
+  final String? phoneticTarget;
+  final String? audioWord;
 
   const Exercise({
     required this.id,
     required this.subject,
     required this.type,
     required this.question,
-    required this.options,
+    this.options = const [],
     required this.correctAnswer,
     this.difficulty = 1,
     this.points = 10,
     this.hint,
     this.imageAsset,
+    this.mascot,
+    this.prompt,
+    this.instruction,
+    this.displayWord,
+    this.phoneticTarget,
+    this.audioWord,
   });
 }
 
