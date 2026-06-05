@@ -32,6 +32,50 @@ class AppTheme {
     begin: Alignment.topCenter, end: Alignment.bottomCenter,
   );
 
+  // ── Styles de texte accessibles (dyslexie / neurodivergences) ──
+  static const TextStyle headingStyle = TextStyle(
+    fontFamily: 'Nunito',
+    fontSize: 26,
+    fontWeight: FontWeight.w800,
+    color: textDark,
+    height: 1.6,
+    letterSpacing: 0.3,
+  );
+
+  static const TextStyle subheadingStyle = TextStyle(
+    fontFamily: 'Nunito',
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: textDark,
+    height: 1.6,
+    letterSpacing: 0.2,
+  );
+
+  static const TextStyle bodyStyle = TextStyle(
+    fontFamily: 'Nunito',
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: textDark,
+    height: 1.6,
+    letterSpacing: 0.1,
+  );
+
+  static const TextStyle captionStyle = TextStyle(
+    fontFamily: 'Nunito',
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: textGrey,
+    height: 1.5,
+  );
+
+  static const TextStyle buttonStyle = TextStyle(
+    fontFamily: 'Nunito',
+    fontSize: 18,
+    fontWeight: FontWeight.w800,
+    height: 1.4,
+    letterSpacing: 0.5,
+  );
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -41,6 +85,14 @@ class AppTheme {
       ),
       fontFamily: 'Nunito',
       scaffoldBackgroundColor: backgroundLight,
+      textTheme: const TextTheme(
+        displayLarge:  headingStyle,
+        titleLarge:    subheadingStyle,
+        bodyLarge:     bodyStyle,
+        bodyMedium:    bodyStyle,
+        labelLarge:    buttonStyle,
+        bodySmall:     captionStyle,
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -48,15 +100,16 @@ class AppTheme {
         titleTextStyle: TextStyle(
           fontFamily: 'Nunito', fontSize: 22,
           fontWeight: FontWeight.w800, color: textDark,
+          height: 1.4,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 60),
+          minimumSize: const Size(double.infinity, 64),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          textStyle: const TextStyle(
-            fontFamily: 'Nunito', fontSize: 18, fontWeight: FontWeight.w700,
-          ),
+          textStyle: buttonStyle,
+          elevation: 4,
+          shadowColor: primaryBlue.withOpacity(0.4),
         ),
       ),
       cardTheme: CardTheme(
