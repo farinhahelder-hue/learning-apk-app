@@ -42,26 +42,26 @@ class AudioService extends ChangeNotifier {
 
   // Mapping effets sonores → fichier assets/sounds/
   static const Map<SoundEffect, String> _sfxPaths = {
-    SoundEffect.correct:       'sounds/correct.mp3',
-    SoundEffect.wrong:         'sounds/wrong.mp3',
-    SoundEffect.combo:         'sounds/combo.mp3',
-    SoundEffect.levelUp:       'sounds/level_up.mp3',
-    SoundEffect.starEarned:    'sounds/star.mp3',
-    SoundEffect.buttonTap:     'sounds/tap.mp3',
-    SoundEffect.challengeDone: 'sounds/challenge_done.mp3',
-    SoundEffect.unlock:        'sounds/unlock.mp3',
-    SoundEffect.countdown:     'sounds/countdown.mp3',
-    SoundEffect.perfect:       'sounds/perfect.mp3',
+    SoundEffect.correct:       'sounds/correct.wav',
+    SoundEffect.wrong:         'sounds/wrong.wav',
+    SoundEffect.combo:         'sounds/combo.wav',
+    SoundEffect.levelUp:       'sounds/level_up.wav',
+    SoundEffect.starEarned:    'sounds/star.wav',
+    SoundEffect.buttonTap:     'sounds/tap.wav',
+    SoundEffect.challengeDone: 'sounds/challenge_done.wav',
+    SoundEffect.unlock:        'sounds/unlock.wav',
+    SoundEffect.countdown:     'sounds/countdown.wav',
+    SoundEffect.perfect:       'sounds/perfect.wav',
   };
 
   // Mapping musiques → fichier assets/sounds/music/
   static const Map<BackgroundMusic, String> _musicPaths = {
-    BackgroundMusic.home:      'sounds/music/music_home.mp3',
-    BackgroundMusic.math:      'sounds/music/music_math.mp3',
-    BackgroundMusic.french:    'sounds/music/music_french.mp3',
-    BackgroundMusic.science:   'sounds/music/music_science.mp3',
-    BackgroundMusic.results:   'sounds/music/music_results.mp3',
-    BackgroundMusic.challenge: 'sounds/music/music_challenge.mp3',
+    BackgroundMusic.home:      'sounds/music/music_home.wav',
+    BackgroundMusic.math:      'sounds/music/music_math.wav',
+    BackgroundMusic.french:    'sounds/music/music_french.wav',
+    BackgroundMusic.science:   'sounds/music/music_science.wav',
+    BackgroundMusic.results:   'sounds/music/music_results.wav',
+    BackgroundMusic.challenge: 'sounds/music/music_challenge.wav',
   };
 
   AudioService() {
