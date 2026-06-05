@@ -111,7 +111,7 @@ class Mascots {
     emoji: '🪼',
     assetPath: 'assets/images/mascots/monika_jellyfish.png',
     personality: 'Dramaturge ! Fait des reproches avec "pipipipi" quand c\'est faux',
-    wrongSound: 'sounds/wrong.wav',   // à remplacer par pipipipi
+    wrongSound: 'sounds/wrong.wav',
     correctSound: 'sounds/star.wav',
     color: Color(0xFFCE93D8),
     idlePhrases: [
@@ -198,29 +198,29 @@ class Mascots {
   static const Mascot barbeNoire = Mascot(
     id: 'barbenoire_cat',
     name: 'Barbe Noire 😼',
-    emoji: '🏴‍☠️',
+    emoji: '🏴\u200d☠️',
     assetPath: 'assets/images/mascots/barbenoire_cat.png',
     personality: 'Chat pirate musclé, donne des défis et motive à fond',
     wrongSound: 'sounds/wrong.wav',
     correctSound: 'sounds/level_up.wav',
     color: Color(0xFF263238),
     idlePhrases: [
-      'Moussaillon ! On attaque ? ⚔️🏴‍☠️',
+      'Moussaillon ! On attaque ? ⚔️🏴\u200d☠️',
       'Les pirates apprennent aussi ! 😼',
-      'Prêt pour le défi du jour ? 💪🏴‍☠️',
+      'Prêt pour le défi du jour ? 💪🏴\u200d☠️',
     ],
     correctPhrases: [
-      'Ahoy ! Tu es une vraie pirate ! 🏴‍☠️💪',
+      'Ahoy ! Tu es une vraie pirate ! 🏴\u200d☠️💪',
       'Sacrebleu ! Quelle réponse ! ⭐😼',
       'Tu rejoins mon équipage d\'élite ! 🚢',
     ],
     wrongPhrases: [
-      'Tonnerre de Brest ! Réessaie moussaillon ! 🏴‍☠️',
+      'Tonnerre de Brest ! Réessaie moussaillon ! 🏴\u200d☠️',
       'Même les pirates se trompent ! Courage ! 😼',
       'Bateau en vue ! Concentre-toi ! ⚔️',
     ],
     thinkPhrases: [
-      'Un pirate réfléchit avant d\'agir ! 🏴‍☠️',
+      'Un pirate réfléchit avant d\'agir ! 🏴\u200d☠️',
       'Prends la barre... et réfléchis ! 🚢',
     ],
   );
@@ -255,6 +255,39 @@ class Mascots {
     ],
   );
 
+  // 🐦 LA NOUVELLE MASCOTTE — Billy l'oiseau !
+  static const Mascot billyBird = Mascot(
+    id: 'billy_bird',
+    name: 'Billy 🐦',
+    emoji: '🐦',
+    assetPath: 'assets/images/mascots/billy_bird.png',
+    personality: 'Oiseau bavard et curieux, toujours prêt à chanter et poser des questions',
+    wrongSound: 'sounds/wrong.wav',
+    correctSound: 'sounds/correct.wav',
+    color: Color(0xFFFFB300),  // jaune canari vif
+    idlePhrases: [
+      'Cui cui ! On apprend quoi aujourd\'hui ? 🐦',
+      'Billy est là, Billy est prêt ! 🌟',
+      'Cui cui cui... j\'attends ta réponse ! 🐦✨',
+    ],
+    correctPhrases: [
+      'CUI CUI CUI !!! Incroyable ! 🐦🎉',
+      'Billy chante pour toi ! Tu as tout bon ! 🎵🐦',
+      'Fantastique ! Billy fait la danse de la victoire ! 💃🐦',
+      'Cui cui ! Tu es la meilleure Emilie ! ⭐🐦',
+    ],
+    wrongPhrases: [
+      'Cui... Oups ! Ce n\'était pas ça 🐦',
+      'Billy a du mal aussi parfois ! On réessaie 🐦💪',
+      'Cui cui cui... Réfléchis encore ! 🌈🐦',
+    ],
+    thinkPhrases: [
+      'Cui cui... Billy réfléchit avec toi 🐦🤔',
+      'Hmm... Billy penche la tête et cherche ! 🐦💭',
+      'Silence... Billy écoute ta réponse intérieure 🐦',
+    ],
+  );
+
   /// Toutes les mascottes disponibles
   static const List<Mascot> all = [
     papaSeal,
@@ -264,20 +297,22 @@ class Mascots {
     ainyCrab,
     barbeNoire,
     ninonDolphin,
+    billyBird,   // 🐦 nouveau !
   ];
 
   /// Mascotte par défaut selon la matière
   static Mascot forSubject(String subject) {
     switch (subject) {
-      case 'math':    return barbeNoire;   // défi !
-      case 'french':  return ninonDolphin; // chanteuse = linguiste
+      case 'math':    return barbeNoire;
+      case 'french':  return ninonDolphin;
       case 'science': return nightSquirrel;
       case 'geo':     return ainyCrab;
-      case 'animals': return babySeal;
+      case 'animals': return billyBird;    // 🐦 Billy pour les animaux !
       case 'emotions':return papaSeal;
       case 'history': return barbeNoire;
       case 'universe':return nightSquirrel;
       case 'amazing': return monikaJellyfish;
+      case 'music':   return billyBird;    // 🐦 Billy pour la musique aussi
       default:        return papaSeal;
     }
   }
