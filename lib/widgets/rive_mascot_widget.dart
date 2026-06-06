@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:rive/rive.dart';
 import '../models/mascot.dart';
 
@@ -133,13 +134,13 @@ class _RiveMascotWidgetState extends State<RiveMascotWidget> {
           ),
         const SizedBox(height: 8),
 
-        // Corps : Rive si chargé, sinon fallback émoji
+        // Corps : Rive si chargé, sinon fallback émoji avec animations
         SizedBox(
           width: widget.size,
           height: widget.size,
           child: _riveLoaded && _artboard != null
               ? Rive(artboard: _artboard!, fit: BoxFit.contain)
-              : _EmojiMascot(mascot: widget.mascot, size: widget.size),
+              : _AnimatedEmojiMascot(mascot: widget.mascot, mood: widget.mood, size: widget.size),
         ),
 
         const SizedBox(height: 4),
@@ -157,25 +158,98 @@ class _RiveMascotWidgetState extends State<RiveMascotWidget> {
   }
 }
 
-/// Fallback émoji quand le .riv n'est pas encore créé
-class _EmojiMascot extends StatelessWidget {
+/// Fallback émoji animé quand le .riv n'est pas encore créé
+/// Animations: idle (respiration + clignement), success (saut), error (secousse), celebrate (danse)
+class _AnimatedEmojiMascot extends StatelessWidget {
   final Mascot mascot;
+  final MascotMood mood;
   final double size;
-  const _EmojiMascot({required this.mascot, required this.size});
+
+  const _AnimatedEmojiMascot({
+    required this.mascot,
+    required this.mood,
+    required this.size,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    Widget emoji = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         color: mascot.color.withOpacity(0.15),
         shape: BoxShape.circle,
         border: Border.all(color: mascot.color.withOpacity(0.4), width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: mascot.color.withOpacity(0.2),
+            blurRadius: 12,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       alignment: Alignment.center,
       child: Text(mascot.emoji, style: TextStyle(fontSize: size * 0.52)),
     );
+
+    // Applique l'animation selon le mood
+    switch (mood) {
+      case MascotMood.happy:
+        // Saut de joie + étoiles
+        return emoji
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .moveY(begin: 0, end: -15, duration: 200.ms)
+            .scale(begin: 1.0, end: 1.15, duration: 200.ms)
+            .then()
+            .scale(begin: 1.15, end: 1.0, duration: 200.ms)
+            .shake(duration: 300.ms, hz: 4);
+
+      case MascotMood.wrong:
+        // Petite secousse + expression triste
+        return emoji
+            .animate()
+            .shake(duration: 400.ms, hz: 3, delay: 100.ms)
+            .scale(begin: 1.0, end: 0.9, duration: 100.ms)
+            .then()
+            .scale(begin: 0.9, end: 1.0, duration: 200.ms);
+
+      case MascotMood.celebrate:
+        // Danse / rotation
+        return emoji
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .rotate(begin: -0.05, end: 0.05, duration: 150.ms)
+            .scale(begin: 1.0, end: 1.2, duration: 200.ms)
+            .then()
+            .scale(begin: 1.2, end: 1.0, duration: 200.ms)
+            .rotate(begin: 0.05, end: -0.05, duration: 150.ms);
+
+      case MascotMood.thinking:
+        // Tête penchée
+        return emoji
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .rotate(begin: 0, end: 0.08, duration: 800.ms)
+            .moveY(begin: 0, end: -3, duration: 1000.ms);
+
+      case MascotMood.sleepy:
+        // Respiration lente
+        return emoji
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .scale(begin: 0.95, end: 1.0, duration: 2000.ms)
+            .fade(begin: 0.7, end: 1.0, duration: 1500.ms);
+
+      case MascotMood.encourage:
+      case MascotMood.idle:
+      default:
+        // Respiration douce + clignement occasionnel
+        return emoji
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .scale(begin: 1.0, end: 1.05, duration: 1500.ms)
+            .moveY(begin: 0, end: -5, duration: 2000.ms)
+            .then(delay: 3000.ms)
+            .scale(begin: 1.05, end: 0.98, duration: 100.ms)
+            .then()
+            .scale(begin: 0.98, end: 1.0, duration: 100.ms);
+    }
   }
 }
 

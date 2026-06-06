@@ -8,8 +8,15 @@ import '../../widgets/bounce_button.dart';
 import '../../widgets/rive_mascot_widget.dart';
 import '../../models/mascot.dart';
 
-/// Écran de tables de multiplication avec 4 niveaux (2, 3, 4, 5)
-/// 10 exercices par niveau avec timer 30s et score 1-3 étoiles
+/// Mode de jeu pour les tables de multiplication
+enum MultiplicationMode {
+  separated,  // Une table à la fois (×2, ×3, ×4, ×5)
+  mixed,       // Mélange de toutes les tables
+}
+
+/// Écran de tables de multiplication avec 2 modes:
+/// - Mode séparé: une table à la fois
+/// - Mode mixte: mélange de toutes les tables
 class MultiplicationTablesScreen extends StatefulWidget {
   const MultiplicationTablesScreen({super.key});
 
@@ -18,6 +25,7 @@ class MultiplicationTablesScreen extends StatefulWidget {
 }
 
 class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen> {
+  MultiplicationMode _mode = MultiplicationMode.separated;
   int? _selectedTable;
   List<MultiplicationExercise> _exercises = [];
   int _current = 0;
@@ -29,6 +37,10 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   int _remainingSeconds = 30;
   late ConfettiController _confetti;
   final Mascot _mascot = Mascots.barbeNoire;
+  
+  // Compteur de série (streak)
+  int _streak = 0;
+  bool _showStreakBadge = false;
 
   static const List<String> _encouragements = [
     "C'est bien, Emilie ! Continue comme ça ! 💪",
@@ -58,6 +70,58 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     super.dispose();
   }
 
+  void _selectMode(MultiplicationMode mode) {
+    setState(() {
+      _mode = mode;
+      if (mode == MultiplicationMode.mixed) {
+        _startMixedMode();
+      }
+    });
+  }
+
+  void _startMixedMode() {
+    final random = Random();
+    final exercises = <MultiplicationExercise>[];
+    final tables = [2, 3, 4, 5];
+    
+    // Générer 15 exercices pour le mode mixte (plus dynamique)
+    for (int i = 0; i < 15; i++) {
+      final table = tables[random.nextInt(tables.length)];
+      final multiplier = random.nextInt(9) + 1;
+      final correctAnswer = table * multiplier;
+      
+      final distractors = <int>{};
+      while (distractors.length < 3) {
+        final offset = random.nextInt(5) - 2;
+        final distractor = correctAnswer + offset;
+        if (distractor > 0 && distractor != correctAnswer && !distractors.contains(distractor)) {
+          distractors.add(distractor);
+        }
+      }
+      
+      final options = [correctAnswer, ...distractors].toList()..shuffle();
+      
+      exercises.add(MultiplicationExercise(
+        table: table,
+        multiplier: multiplier,
+        correctAnswer: correctAnswer,
+        options: options,
+      ));
+    }
+    
+    setState(() {
+      _exercises = exercises;
+      _selectedTable = null; // Mixte n'a pas de table spécifique
+      _current = 0;
+      _score = 0;
+      _finished = false;
+      _streak = 0;
+      _selectedAnswer = null;
+      _isCorrect = null;
+    });
+    _startTimer();
+  }
+
   void _startTable(int table) {
     setState(() {
       _selectedTable = table;
@@ -66,6 +130,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
       _current = 0;
       _score = 0;
       _finished = false;
+      _streak = 0;
       _selectedAnswer = null;
       _isCorrect = null;
     });
@@ -126,6 +191,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     setState(() {
       _selectedAnswer = null;
       _isCorrect = false;
+      _streak = 0;
     });
     _timer?.cancel();
     Future.delayed(const Duration(milliseconds: 1500), () {
@@ -141,7 +207,20 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     setState(() {
       _selectedAnswer = answer.toString();
       _isCorrect = correct;
-      if (correct) _score++;
+      if (correct) {
+        _score++;
+        _streak++;
+        // Confettis pour bonne réponse
+        if (_streak >= 3) {
+          _confetti.play();
+          _showStreakBadge = true;
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) setState(() => _showStreakBadge = false);
+          });
+        }
+      } else {
+        _streak = 0;
+      }
     });
     
     if (!correct) {
@@ -149,7 +228,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
         if (mounted) _nextQuestion();
       });
     } else {
-      Future.delayed(const Duration(milliseconds: 800), () {
+      Future.delayed(const Duration(milliseconds: 600), () {
         if (mounted) _nextQuestion();
       });
     }
@@ -170,7 +249,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
 
   void _finish() {
     _timer?.cancel();
-    if (_score == _exercises.length) {
+    // Animation boss final si score parfait ou > 80%
+    final pct = _score / _exercises.length;
+    if (pct >= 0.8) {
       _confetti.play();
     }
     setState(() => _finished = true);
@@ -185,9 +266,11 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
 
   void _returnToMenu() {
     setState(() {
+      _mode = MultiplicationMode.separated;
       _selectedTable = null;
       _exercises = [];
       _finished = false;
+      _streak = 0;
     });
   }
 
@@ -202,12 +285,13 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
             ),
           ),
           SafeArea(
-            child: _selectedTable == null
-                ? _buildTableSelection()
+            child: _selectedTable == null && _exercises.isEmpty
+                ? _buildModeSelection()
                 : _finished
                     ? _buildResults()
                     : _buildExercise(),
           ),
+          // Confettis
           Align(
             alignment: Alignment.topCenter,
             child: ConfettiWidget(
@@ -216,69 +300,214 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
               colors: const [Colors.yellow, Colors.orange, Colors.pink, Colors.blue, Colors.green],
             ),
           ),
+          // Badge streak
+          if (_showStreakBadge)
+            Positioned(
+              top: 100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withOpacity(0.5),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 24)),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$_streak de suite !',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                    .animate()
+                    .scale(begin: const Offset(0, 0), curve: Curves.elasticOut)
+                    .shake(duration: 500.ms, hz: 3),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildTableSelection() {
+  Widget _buildModeSelection() {
     return Column(
       children: [
         const SizedBox(height: 40),
         const Text(
-          '📚 Tables de multiplication',
+          '🎯 Maths Express',
           style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
             color: Colors.white,
           ),
         ).animate().fadeIn().slideY(begin: -0.2),
         const SizedBox(height: 8),
         const Text(
-          'Choisis la table que tu veux réviser',
+          'Choisis ton défi !',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             color: Colors.white70,
           ),
         ).animate().fadeIn(delay: 200.ms),
         const SizedBox(height: 40),
-        Expanded(
-          child: GridView.count(
-            crossAxisCount: 2,
-            padding: const EdgeInsets.all(20),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            children: [2, 3, 4, 5].map((table) {
-              return BounceButton(
-                onTap: () => _startTable(table),
-                color: Colors.white,
-                shadowColor: AppTheme.primaryBlue,
-                borderRadius: BorderRadius.circular(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Table',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.primaryBlue,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '× $table',
-                      style: TextStyle(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w900,
-                        color: AppTheme.primaryBlue,
-                      ),
-                    ),
-                  ],
+        
+        // Mode Séparé
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: BounceButton(
+            onTap: () => _selectMode(MultiplicationMode.separated),
+            color: Colors.white,
+            shadowColor: AppTheme.primaryBlue,
+            borderRadius: BorderRadius.circular(24),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text('🎯', style: TextStyle(fontSize: 32)),
                 ),
-              ).animate(delay: Duration(milliseconds: 100 * table)).fadeIn().scale();
-            }).toList(),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Mode Séparé',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Choisis une table (×2, ×3, ×4 ou ×5)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: AppTheme.primaryBlue),
+              ],
+            ),
           ),
-        ),
+        ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.1),
+        
+        const SizedBox(height: 16),
+        
+        // Mode Mixte
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: BounceButton(
+            onTap: () => _selectMode(MultiplicationMode.mixed),
+            color: Colors.amber,
+            shadowColor: Colors.orange,
+            borderRadius: BorderRadius.circular(24),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text('⚡', style: TextStyle(fontSize: 32)),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Mode Mixte',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '15 questions de toutes les tables !',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: Colors.orange),
+              ],
+            ),
+          ),
+        ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.1),
+        
+        const SizedBox(height: 40),
+        
+        // Si mode séparé, montrer les tables
+        if (_mode == MultiplicationMode.separated)
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(20),
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              children: [2, 3, 4, 5].map((table) {
+                return BounceButton(
+                  onTap: () => _startTable(table),
+                  color: Colors.white,
+                  shadowColor: AppTheme.primaryBlue,
+                  borderRadius: BorderRadius.circular(24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Table',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppTheme.primaryBlue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '× $table',
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.primaryBlue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate(delay: Duration(milliseconds: 100 * table)).fadeIn().scale();
+              }).toList(),
+            ),
+          ),
+        
         const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.all(20),
@@ -317,21 +546,54 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
               Expanded(
                 child: Column(
                   children: [
-                    Text(
-                      'Table × $_selectedTable',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Indicateur streak
+                        if (_streak > 0)
+                          Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.amber,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text('🔥', style: TextStyle(fontSize: 14)),
+                                Text(
+                                  '$_streak',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ).animate().scale(),
+                        Text(
+                          _selectedTable != null 
+                              ? 'Table × $_selectedTable' 
+                              : 'Mode Mixte ⚡',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4),
-                    LinearProgressIndicator(
-                      value: (_current + 1) / _exercises.length,
-                      backgroundColor: Colors.white30,
-                      color: Colors.white,
-                      minHeight: 6,
-                      borderRadius: BorderRadius.circular(3),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: (_current + 1) / _exercises.length,
+                        backgroundColor: Colors.white30,
+                        color: Colors.white,
+                        minHeight: 6,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -355,7 +617,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                     fontSize: 18,
                   ),
                 ),
-              ),
+              )
+                  .animate(target: _remainingSeconds <= 5 ? 1 : 0)
+                  .shake(duration: 300.ms),
             ],
           ),
         ),
@@ -381,7 +645,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                     mood: MascotMood.happy,
                     size: 80,
                     showSpeechBubble: true,
-                    speechText: 'Bravo Emilie ! 🎉',
+                    speechText: _streak >= 3 ? 'Incroyable Emilie ! 🔥' : 'Bravo Emilie ! 🎉',
                   ).animate().scale()
                 else
                   RiveMascotWidget(
@@ -411,14 +675,42 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        '$_selectedTable × ${exercise.multiplier} = ?',
-                        style: const TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.w900,
-                          color: AppTheme.textDark,
-                        ),
-                        textAlign: TextAlign.center,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${exercise.table}',
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.primaryBlue,
+                            ),
+                          ),
+                          const Text(
+                            ' × ',
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.textLight,
+                            ),
+                          ),
+                          Text(
+                            '${exercise.multiplier}',
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.primaryBlue,
+                            ),
+                          ),
+                          const Text(
+                            ' = ?',
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.textLight,
+                            ),
+                          ),
+                        ],
                       ).animate().fadeIn().scale(begin: const Offset(0.8, 0.8)),
                       
                       // Feedback
@@ -440,8 +732,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                               const SizedBox(width: 8),
                               Text(
                                 _isCorrect!
-                                    ? 'Correct ! La réponse était $_selectedTable × ${exercise.multiplier} = ${exercise.correctAnswer}'
-                                    : 'La bonne réponse était ${exercise.correctAnswer}',
+                                    ? 'Correct ! ${exercise.table} × ${exercise.multiplier} = ${exercise.correctAnswer}'
+                                    : 'La réponse était ${exercise.correctAnswer}',
                                 style: TextStyle(
                                   color: _isCorrect! ? Colors.green.shade700 : Colors.red.shade700,
                                   fontWeight: FontWeight.w700,
@@ -495,15 +787,17 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   Widget _buildResults() {
     final stars = _getStars();
     final pct = _score / _exercises.length;
+    final isPerfect = pct == 1.0;
+    final isBossDefeated = pct >= 0.8;
     
     String message;
     String emoji;
-    if (pct == 1) {
+    if (isPerfect) {
       message = "Parfait Emilie ! Tu es une star ! ⭐⭐⭐";
       emoji = '🏆';
     } else if (pct >= 0.8) {
-      message = "Très bien ! Continue comme ça ! 🌟";
-      emoji = '🌟';
+      message = "Boss vaincu ! Excellent travail ! 🎉";
+      emoji = '🎉';
     } else if (pct >= 0.6) {
       message = "C'est bien, entraîne-toi encore ! 💪";
       emoji = '👍';
@@ -518,6 +812,45 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Animation boss final si réussi
+            if (isBossDefeated)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.amber, Colors.orange],
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.amber.withOpacity(0.5),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Text('⚔️', style: TextStyle(fontSize: 24)),
+                    SizedBox(width: 8),
+                    Text(
+                      'BOSS VAINCU !',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+                  .animate()
+                  .scale(begin: const Offset(0, 0), curve: Curves.elasticOut, delay: 200.ms)
+                  .shake(duration: 800.ms, hz: 2),
+
+            const SizedBox(height: 24),
+
             // Mascotte
             RiveMascotWidget(
               mascot: _mascot,
@@ -534,7 +867,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
 
             const SizedBox(height: 16),
 
-            // Étoiles
+            // Étoiles animées
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(3, (i) {
@@ -584,6 +917,15 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                         color: Colors.white54,
                       ),
                     ),
+                  ] else ...[
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Mode Mixte ⚡',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white54,
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -594,14 +936,22 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
             // Boutons
             BounceButton(
               onTap: () {
-                setState(() {
-                  _current = 0;
-                  _score = 0;
-                  _finished = false;
-                  _selectedAnswer = null;
-                  _isCorrect = null;
-                  _exercises.shuffle();
-                });
+                if (_selectedTable != null) {
+                  // Mode séparé : rejouer la même table
+                  setState(() {
+                    _current = 0;
+                    _score = 0;
+                    _finished = false;
+                    _streak = 0;
+                    _selectedAnswer = null;
+                    _isCorrect = null;
+                    _exercises.shuffle();
+                  });
+                } else {
+                  // Mode mixte : recommencer
+                  _startMixedMode();
+                  return;
+                }
                 _startTimer();
               },
               color: Colors.white,
