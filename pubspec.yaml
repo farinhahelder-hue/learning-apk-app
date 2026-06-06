@@ -26,7 +26,7 @@ dependencies:
   shared_preferences: ^2.2.3
 
   # Speech recognition (dictée interactive)
-  speech_to_text: ^7.4.0
+  speech_to_text: ^6.5.0
 
   # UI
   cupertino_icons: ^1.0.6

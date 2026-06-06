@@ -40,6 +40,17 @@ class Mascot {
     required this.thinkPhrases,
     required this.color,
   });
+
+  // Membres statiques pour compatibilité avec les exercices existants
+  static const Mascot seal       = Mascots.papaSeal;
+  static const Mascot babySeal   = Mascots.babySeal;
+  static const Mascot jellyfish  = Mascots.monikaJellyfish;
+  static const Mascot squirrel   = Mascots.nightSquirrel;
+  static const Mascot crab       = Mascots.ainyCrab;
+  static const Mascot cat        = Mascots.barbeNoire;
+  static const Mascot dolphin    = Mascots.ninonDolphin;
+  static const Mascot bird       = Mascots.billyBird;
+  static const List<Mascot> all  = Mascots.all;
 }
 
 /// Toutes les mascottes de l'app
