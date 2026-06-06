@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/app_theme.dart';
 import '../utils/constants.dart';
 import '../services/progress_service.dart';
+import '../services/audio_service.dart';
 import '../widgets/subject_card.dart';
 import '../widgets/progress_banner.dart';
 
@@ -13,6 +14,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = context.watch<ProgressService>().progress;
+    final audio = context.watch<AudioService>();
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: AppTheme.homeGradient),
@@ -45,22 +47,65 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () => _showParentalCodeDialog(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 10, offset: const Offset(0, 4),
+                    Row(
+                      children: [
+                        // Bouton musique ON/OFF
+                        GestureDetector(
+                          onTap: () => audio.toggleMusic(),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: audio.musicEnabled 
+                                  ? Colors.green.withOpacity(0.1) 
+                                  : Colors.grey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10, offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ],
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  audio.musicEnabled ? '🎵' : '🔇',
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  audio.musicEnabled ? 'ON' : 'OFF',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: audio.musicEnabled ? Colors.green : Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ).animate().fadeIn().scale(begin: const Offset(0.8, 0.8)),
+                        const SizedBox(width: 8),
+                        // Bouton code parental
+                        GestureDetector(
+                          onTap: () => _showParentalCodeDialog(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10, offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Text('🔒', style: TextStyle(fontSize: 24)),
+                          ),
                         ),
-                        child: const Text('🔒', style: TextStyle(fontSize: 24)),
-                      ),
+                      ],
                     ),
                   ],
                 ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.2),

@@ -15,6 +15,7 @@ dependencies:
 
   # Audio
   audioplayers: ^6.0.0
+  just_audio: ^0.9.40  # Audio léger pour sons et musique
 
   # Animations
   flutter_animate: ^4.5.0
@@ -42,6 +43,8 @@ flutter:
   assets:
     - assets/sounds/
     - assets/sounds/music/
+    - assets/audio/sounds/
+    - assets/audio/music/
     - assets/images/
     - assets/animations/
     - assets/rive/

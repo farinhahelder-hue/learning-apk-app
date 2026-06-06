@@ -3,10 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:confetti/confetti.dart';
+import 'package:provider/provider.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/bounce_button.dart';
 import '../../widgets/rive_mascot_widget.dart';
 import '../../models/mascot.dart';
+import '../../services/audio_service.dart';
 
 /// Mode de jeu pour les tables de multiplication
 enum MultiplicationMode {
@@ -204,22 +206,28 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     _timer?.cancel();
     
     final correct = answer == _exercises[_current].correctAnswer;
+    final audio = context.read<AudioService>();
+    
     setState(() {
       _selectedAnswer = answer.toString();
       _isCorrect = correct;
       if (correct) {
         _score++;
         _streak++;
-        // Confettis pour bonne réponse
+        // Sons et confettis pour bonne réponse
         if (_streak >= 3) {
           _confetti.play();
+          audio.onStreak(); // Son confettis
           _showStreakBadge = true;
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) setState(() => _showStreakBadge = false);
           });
+        } else {
+          audio.onCorrectAnswer(); // Son succès
         }
       } else {
         _streak = 0;
+        audio.onWrongAnswer(); // Son erreur
       }
     });
     
@@ -249,10 +257,12 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
 
   void _finish() {
     _timer?.cancel();
+    final audio = context.read<AudioService>();
     // Animation boss final si score parfait ou > 80%
     final pct = _score / _exercises.length;
     if (pct >= 0.8) {
       _confetti.play();
+      audio.onPerfect(); // Son niveau terminé + applaudissements
     }
     setState(() => _finished = true);
   }
