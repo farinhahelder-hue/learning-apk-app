@@ -44,6 +44,7 @@ class AudioService extends ChangeNotifier {
   double get sfxVolume   => _sfxVolume;
 
   // Mapping effets sonores → fichier assets/sounds/
+  // Note: Certains fichiers sont renommés ou inexistants, on utilise des fallbacks
   static const Map<SoundEffect, String> _sfxPaths = {
     SoundEffect.correct:       'sounds/correct.wav',
     SoundEffect.wrong:         'sounds/wrong.wav',
@@ -51,13 +52,14 @@ class AudioService extends ChangeNotifier {
     SoundEffect.levelUp:       'sounds/level_up.wav',
     SoundEffect.starEarned:    'sounds/star.wav',
     SoundEffect.buttonTap:     'sounds/tap.wav',
-    SoundEffect.challengeDone: 'sounds/challenge_done.wav',
+    SoundEffect.challengeDone: 'sounds/celebrate.wav',  // fallback: celebrate.wav
     SoundEffect.unlock:        'sounds/unlock.wav',
     SoundEffect.countdown:     'sounds/countdown.wav',
     SoundEffect.perfect:       'sounds/perfect.wav',
-    SoundEffect.success:       'sounds/short-success-sound-glockenspiel.mp3',
-    SoundEffect.birdChirp:     'sounds/morning-bird-chirping.m4a',
-    SoundEffect.last5sec:      'sounds/5-second-countdown-sound.wav',
+    // Nouveaux sons: fallback vers fichiers existants
+    SoundEffect.success:       'sounds/celebrate.wav',  // fallback
+    SoundEffect.birdChirp:     'sounds/mascot_hello_bubulle.wav',  // fallback
+    SoundEffect.last5sec:      'sounds/countdown.wav',  // fallback
   };
 
   // Mapping musiques → fichier assets/sounds/music/
@@ -147,12 +149,13 @@ class AudioService extends ChangeNotifier {
     await _sfxPlayer.play(AssetSource(assetPath));
   }
 
-  // Jouer musique de fond (Timber_and_Tide.mp3)
+  // Jouer musique de fond (fallback: music_home.wav si Timber_and_Tide.mp3 absent)
   Future<void> playBackgroundMusic() async {
     if (!_musicEnabled) return;
     await _bgPlayer.stop();
     await _bgPlayer.setVolume(_musicVolume);
-    await _bgPlayer.play(AssetSource('sounds/music/Timber_and_Tide.mp3'));
+    // Utiliser music_home.wav comme fallback (Timber_and_Tide.mp3 à ajouter plus tard)
+    await _bgPlayer.play(AssetSource('sounds/music/music_home.wav'));
   }
 
   // ── Paramètres ────────────────────────────────────────────────
