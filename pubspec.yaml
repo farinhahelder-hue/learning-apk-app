@@ -24,6 +24,9 @@ dependencies:
   # Storage
   shared_preferences: ^2.2.3
 
+  # Speech recognition (dictée interactive)
+  speech_to_text: ^7.4.0
+
   # UI
   cupertino_icons: ^1.0.6
   flutter_svg: ^2.0.9

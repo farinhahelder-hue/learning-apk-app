@@ -11,6 +11,8 @@ import 'screens/science/science_menu_screen.dart';
 import 'screens/parental/parental_dashboard_screen.dart';
 import 'services/progress_service.dart';
 import 'services/audio_service.dart';
+import 'services/audio_settings_service.dart';
+import 'services/tts_service.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
@@ -38,7 +40,9 @@ class EmilieApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProgressService(prefs)),
-        Provider(create: (_) => AudioService()),
+        ChangeNotifierProvider(create: (_) => AudioSettingsService(prefs)),
+        ChangeNotifierProvider(create: (_) => AudioService()),
+        ChangeNotifierProvider(create: (_) => TtsService()),
       ],
       child: MaterialApp(
         title: 'Emilie App',

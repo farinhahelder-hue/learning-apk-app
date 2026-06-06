@@ -13,6 +13,9 @@ enum SoundEffect {
   unlock,       // avatar débloqué
   countdown,    // dernières secondes
   perfect,      // score parfait 3 étoiles
+  success,      // son de succès glockenspiel
+  birdChirp,    // chant d'oiseau (pour Billy)
+  last5sec,     // 5 dernières secondes
 }
 
 enum BackgroundMusic {
@@ -52,6 +55,9 @@ class AudioService extends ChangeNotifier {
     SoundEffect.unlock:        'sounds/unlock.wav',
     SoundEffect.countdown:     'sounds/countdown.wav',
     SoundEffect.perfect:       'sounds/perfect.wav',
+    SoundEffect.success:       'sounds/short-success-sound-glockenspiel.mp3',
+    SoundEffect.birdChirp:     'sounds/morning-bird-chirping.m4a',
+    SoundEffect.last5sec:      'sounds/5-second-countdown-sound.wav',
   };
 
   // Mapping musiques → fichier assets/sounds/music/
@@ -129,6 +135,25 @@ class AudioService extends ChangeNotifier {
   void onUnlock()         => playSound(SoundEffect.unlock);
   void onChallengeDone()  => playSound(SoundEffect.challengeDone);
   void onCountdown()      => playSound(SoundEffect.countdown);
+
+  // Nouveaux sons demandés
+  void onBillyGreeting() => playSound(SoundEffect.birdChirp);
+  void onLast5Seconds()  => playSound(SoundEffect.last5sec);
+
+  // Jouer un son SFX personnalisé
+  Future<void> playSfx(String assetPath) async {
+    if (!_soundEnabled) return;
+    await _sfxPlayer.setVolume(_sfxVolume);
+    await _sfxPlayer.play(AssetSource(assetPath));
+  }
+
+  // Jouer musique de fond (Timber_and_Tide.mp3)
+  Future<void> playBackgroundMusic() async {
+    if (!_musicEnabled) return;
+    await _bgPlayer.stop();
+    await _bgPlayer.setVolume(_musicVolume);
+    await _bgPlayer.play(AssetSource('sounds/music/Timber_and_Tide.mp3'));
+  }
 
   // ── Paramètres ────────────────────────────────────────────────
   Future<void> toggleMusic() async {
