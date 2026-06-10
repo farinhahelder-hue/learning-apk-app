@@ -8,6 +8,420 @@ let streak = 1;
 let combo = 0;
 let muted = false;
 
+// === MINI-GAMES STATE ===
+let rocketGame = {
+  active: false,
+  questions: [],
+  currentQ: 0,
+  score: 0,
+  emilieProgress: 0,
+  bulleProgress: 0,
+  timeLeft: 60,
+  timerInterval: null
+};
+
+let wordHuntGame = {
+  active: false,
+  theme: '',
+  words: [],
+  foundWords: [],
+  grid: [],
+  selectedCells: [],
+  themeIndex: 0
+};
+
+let stickerAlbum = {
+  stickers: [], // array of sticker objects
+  unlockedCount: 0,
+  gamesCompleted: { rocket: false, wordHunt: false }
+};
+
+let dailyChallenge = {
+  completed: false,
+  date: '',
+  title: '',
+  description: '',
+  reward: '⭐'
+};
+
+// === WORD HUNT THEMES ===
+const wordHuntThemes = [
+  {
+    name: 'Animaux',
+    words: ['CHAT', 'CHIEN', 'OISEAU', 'POISSON', 'Lapin'.toUpperCase()],
+    hint: '🐾 Trouve les animaux cachés !'
+  },
+  {
+    name: 'École',
+    words: ['CRAYON', 'GOMME', 'CARTABLE', 'Cahier'.toUpperCase(), 'Stylo'.toUpperCase()],
+    hint: '📚 Trouve les objets de l\'école !'
+  },
+  {
+    name: 'Famille',
+    words: ['MAMAN', 'PAPY', 'SOEUR', 'FRÈRE', 'Bébé'.toUpperCase()],
+    hint: '👨‍👩‍👧 Trouve les mots de la famille !'
+  }
+];
+
+// === STICKER DEFINITIONS ===
+const stickerDefinitions = [
+  { id: 1, emoji: '🐿️', name: 'Noisette Joyeuse', desc: 'Noisette fait la fête !' },
+  { id: 2, emoji: '🐿️', name: 'Noisette淑', desc: 'Noisette mange des noisettes' },
+  { id: 3, emoji: '🐿️', name: 'Noisette Endormie', desc: 'Noisette fait la sieste' },
+  { id: 4, emoji: '🐿️', name: 'Noisette Danse', desc: 'Noisette groove !' },
+  { id: 5, emoji: '🐿️', name: 'Noisette Champion', desc: 'Noisette gagne !' },
+  { id: 6, emoji: '🪼', name: 'Bulle Heureuse', desc: 'Bulle sourit' },
+  { id: 7, emoji: '🪼', name: 'Bulle Nage', desc: 'Bulle fait la brasse' },
+  { id: 8, emoji: '🪼', name: 'Bulle Scintille', desc: 'Bulle brille !' },
+  { id: 9, emoji: '🪼', name: 'Bulle Tranquille', desc: 'Bulle se repose' },
+  { id: 10, emoji: '🪼', name: 'Bulle Fleur', desc: 'Bulle a une fleur' },
+  { id: 11, emoji: '🦭', name: 'Câlin Câlin', desc: 'Câlin donne un câlin' },
+  { id: 12, emoji: '🦭', name: 'Câlin Joyeux', desc: 'Câlin rit' },
+  { id: 13, emoji: '🦭', name: 'Câlin Nageur', desc: 'Câlin plonge' },
+  { id: 14, emoji: '🦭', name: 'Câlin Dodo', desc: 'Câlin baille' },
+  { id: 15, emoji: '🦭', name: 'Câlin Star', desc: 'Câlin fait la star' },
+  { id: 16, emoji: '⭐', name: 'Étoile Dorée', desc: 'Une étoile brillante' },
+  { id: 17, emoji: '🏆', name: 'Trophée', desc: 'Tu as gagné !' },
+  { id: 18, emoji: '🌈', name: 'Arc-en-ciel', desc: 'Un arc-en-ciel coloré' },
+  { id: 19, emoji: '🎈', name: 'Ballon', desc: 'Un ballon gonflé' },
+  { id: 20, emoji: '🎁', name: 'Cadeau', desc: 'Un cadeau sorpresa' }
+];
+
+// === DAILY CHALLENGES ===
+const dailyChallengesList = [
+  { title: 'Course de Fusées', desc: 'Gagne la course de fusées !', reward: '⭐ + Sticker' },
+  { title: 'Chasse aux Mots', desc: 'Trouve tous les mots !', reward: '⭐ + Sticker' },
+  { title: 'Quiz Maths', desc: 'Réponds à 10 questions', reward: '⭐ + Sticker' },
+  { title: 'Quiz Français', desc: 'Réponds à 10 questions', reward: '⭐ + Sticker' }
+];
+
+// === ROCKET GAME QUESTIONS ===
+const rocketQuestions = [
+  { q: '🪼 3 × 4 = ?', c: [10, 12, 14, 8], a: 12 },
+  { q: '🐿️ 5 × 5 = ?', c: [20, 25, 30, 15], a: 25 },
+  { q: '🦭 7 × 2 = ?', c: [12, 14, 16, 18], a: 14 },
+  { q: '🪼 6 × 4 = ?', c: [24, 20, 28, 22], a: 24 },
+  { q: '🐿️ 8 × 3 = ?', c: [21, 24, 27, 30], a: 24 },
+  { q: '🦭 9 × 2 = ?', c: [16, 18, 20, 22], a: 18 },
+  { q: '🪼 4 × 7 = ?', c: [26, 28, 30, 32], a: 28 },
+  { q: '🐿️ 6 × 6 = ?', c: [30, 36, 42, 24], a: 36 },
+  { q: '🦭 3 × 8 = ?', c: [21, 24, 27, 30], a: 24 },
+  { q: '🪼 5 × 7 = ?', c: [30, 35, 40, 25], a: 35 }
+];
+
+// Initialize sticker album
+function initStickerAlbum() {
+  stickerAlbum.stickers = new Array(20).fill(null);
+  checkDailyChallenge();
+}
+
+// Check and set daily challenge
+function checkDailyChallenge() {
+  const today = new Date().toDateString();
+  if (dailyChallenge.date !== today) {
+    dailyChallenge.date = today;
+    dailyChallenge.completed = false;
+    const challenge = dailyChallengesList[Math.floor(Math.random() * dailyChallengesList.length)];
+    dailyChallenge.title = challenge.title;
+    dailyChallenge.description = challenge.desc;
+    dailyChallenge.reward = challenge.reward;
+  }
+}
+
+// === ROCKET RACE GAME ===
+function startRocketRace() {
+  rocketGame.active = true;
+  rocketGame.questions = shuffle([...rocketQuestions]);
+  rocketGame.currentQ = 0;
+  rocketGame.score = 0;
+  rocketGame.emilieProgress = 0;
+  rocketGame.bulleProgress = 0;
+  rocketGame.timeLeft = 60;
+  
+  screen = 'rocketRace';
+  playBeep(800, 0.2, 'sine');
+  render();
+  
+  // Start timer
+  rocketGame.timerInterval = setInterval(() => {
+    rocketGame.timeLeft--;
+    updateRocketTimer();
+    if (rocketGame.timeLeft <= 0) {
+      endRocketRace();
+    }
+  }, 1000);
+}
+
+function updateRocketTimer() {
+  const timerEl = document.getElementById('rocketTimer');
+  if (timerEl) {
+    timerEl.textContent = `${rocketGame.timeLeft}s`;
+    if (rocketGame.timeLeft <= 10) {
+      timerEl.classList.add('warning');
+    }
+  }
+}
+
+function handleRocketChoice(answer) {
+  const correct = answer === rocketGame.questions[rocketGame.currentQ].a;
+  
+  if (correct) {
+    rocketGame.score++;
+    rocketGame.emilieProgress = Math.min(100, rocketGame.emilieProgress + 10);
+    playCorrectSound();
+  } else {
+    rocketGame.bulleProgress = Math.min(100, rocketGame.bulleProgress + 10);
+    playWrongSound();
+  }
+  
+  render();
+  
+  setTimeout(() => {
+    rocketGame.currentQ++;
+    if (rocketGame.currentQ >= rocketGame.questions.length) {
+      endRocketRace();
+    } else {
+      render();
+    }
+  }, 800);
+}
+
+function endRocketRace() {
+  clearInterval(rocketGame.timerInterval);
+  rocketGame.active = false;
+  
+  const emilieWon = rocketGame.emilieProgress > rocketGame.bulleProgress;
+  const emoji = emilieWon ? '🏆' : (rocketGame.emilieProgress === rocketGame.bulleProgress ? '🤝' : '😢');
+  const title = emilieWon ? 'Victoire ! 🚀' : 'Course terminée !';
+  const stats = `Score: ${rocketGame.score}/${rocketGame.questions.length}\nFusée Emilie: ${rocketGame.emilieProgress}% | Fusée Bulle: ${rocketGame.bulleProgress}%`;
+  
+  document.getElementById('rocketResultEmoji').textContent = emoji;
+  document.getElementById('rocketResultTitle').textContent = title;
+  document.getElementById('rocketResultStats').textContent = stats;
+  document.getElementById('rocketResultOverlay').classList.add('show');
+  
+  if (emilieWon) {
+    spawnConfetti(25);
+    playLevelUp();
+    addStars(5);
+    
+    // Unlock sticker for Emilie
+    if (!stickerAlbum.gamesCompleted.rocket) {
+      stickerAlbum.gamesCompleted.rocket = true;
+      unlockRandomSticker();
+    }
+    
+    // Complete daily challenge if applicable
+    if (dailyChallenge.title === 'Course de Fusées' && !dailyChallenge.completed) {
+      dailyChallenge.completed = true;
+      addStars(3);
+      spawnConfetti(15);
+    }
+  }
+}
+
+function closeRocketResult() {
+  document.getElementById('rocketResultOverlay').classList.remove('show');
+  screen = 'home';
+  render();
+}
+
+// === WORD HUNT GAME ===
+function startWordHunt() {
+  wordHuntGame.active = true;
+  wordHuntGame.themeIndex = Math.floor(Math.random() * wordHuntThemes.length);
+  const theme = wordHuntThemes[wordHuntGame.themeIndex];
+  wordHuntGame.theme = theme.name;
+  wordHuntGame.words = [...theme.words];
+  wordHuntGame.foundWords = [];
+  wordHuntGame.selectedCells = [];
+  
+  generateWordHuntGrid();
+  
+  screen = 'wordHunt';
+  playBeep(700, 0.2, 'sine');
+  render();
+}
+
+function generateWordHuntGrid() {
+  const theme = wordHuntThemes[wordHuntGame.themeIndex];
+  const grid = [];
+  const words = theme.words;
+  
+  // Create empty 6x6 grid
+  for (let i = 0; i < 36; i++) {
+    grid.push({ letter: '', isPartOfWord: false, wordIndex: -1, found: false });
+  }
+  
+  // Place words in grid
+  const directions = [
+    { dr: 0, dc: 1 },  // horizontal
+    { dr: 1, dc: 0 },  // vertical
+    { dr: 1, dc: 1 }   // diagonal
+  ];
+  
+  words.forEach((word, wordIndex) => {
+    let placed = false;
+    let attempts = 0;
+    
+    while (!placed && attempts < 50) {
+      const dir = directions[Math.floor(Math.random() * directions.length)];
+      const maxRow = dir.dr === 0 ? 6 : 6 - word.length;
+      const maxCol = dir.dc === 0 ? 6 : 6 - word.length;
+      const startRow = Math.floor(Math.random() * maxRow);
+      const startCol = Math.floor(Math.random() * maxCol);
+      
+      let canPlace = true;
+      const cells = [];
+      
+      for (let i = 0; i < word.length; i++) {
+        const r = startRow + i * dir.dr;
+        const c = startCol + i * dir.dc;
+        const idx = r * 6 + c;
+        
+        if (grid[idx].letter !== '' && grid[idx].letter !== word[i]) {
+          canPlace = false;
+          break;
+        }
+        cells.push(idx);
+      }
+      
+      if (canPlace) {
+        cells.forEach(idx => {
+          grid[idx].letter = word[i];
+          grid[idx].isPartOfWord = true;
+          grid[idx].wordIndex = wordIndex;
+        });
+        placed = true;
+      }
+      attempts++;
+    }
+  });
+  
+  // Fill remaining cells with random letters
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for (let i = 0; i < 36; i++) {
+    if (grid[i].letter === '') {
+      grid[i].letter = letters[Math.floor(Math.random() * letters.length)];
+    }
+  }
+  
+  wordHuntGame.grid = grid;
+}
+
+function toggleWordHuntCell(index) {
+  const cell = wordHuntGame.grid[index];
+  if (cell.found) return;
+  
+  const selectedIdx = wordHuntGame.selectedCells.indexOf(index);
+  if (selectedIdx > -1) {
+    wordHuntGame.selectedCells.splice(selectedIdx, 1);
+  } else {
+    wordHuntGame.selectedCells.push(index);
+  }
+  
+  render();
+}
+
+function clearWordHuntSelection() {
+  wordHuntGame.selectedCells = [];
+  render();
+}
+
+function submitWordHunt() {
+  if (wordHuntGame.selectedCells.length === 0) return;
+  
+  const selectedWord = wordHuntGame.selectedCells
+    .map(idx => wordHuntGame.grid[idx].letter)
+    .join('');
+  
+  const reversedWord = selectedWord.split('').reverse().join('');
+  
+  const matchedWordIndex = wordHuntGame.words.findIndex(w => 
+    w === selectedWord || w === reversedWord
+  );
+  
+  if (matchedWordIndex > -1 && !wordHuntGame.foundWords.includes(matchedWordIndex)) {
+    wordHuntGame.foundWords.push(matchedWordIndex);
+    wordHuntGame.selectedCells.forEach(idx => {
+      wordHuntGame.grid[idx].found = true;
+    });
+    playCorrectSound();
+    
+    // Check if all words found
+    if (wordHuntGame.foundWords.length === wordHuntGame.words.length) {
+      setTimeout(() => {
+        completeWordHunt();
+      }, 500);
+    }
+  } else {
+    playWrongSound();
+  }
+  
+  wordHuntGame.selectedCells = [];
+  render();
+}
+
+function completeWordHunt() {
+  addStars(5);
+  spawnConfetti(20);
+  playLevelUp();
+  
+  // Unlock sticker
+  if (!stickerAlbum.gamesCompleted.wordHunt) {
+    stickerAlbum.gamesCompleted.wordHunt = true;
+    unlockRandomSticker();
+  }
+  
+  // Complete daily challenge
+  if (dailyChallenge.title === 'Chasse aux Mots' && !dailyChallenge.completed) {
+    dailyChallenge.completed = true;
+    addStars(3);
+    spawnConfetti(15);
+  }
+  
+  showReward('🪼🦭', 'Mots trouvés !', 'Tu as trouvé tous les mots, quel champion ! 🎉');
+}
+
+// === STICKER SYSTEM ===
+function unlockRandomSticker() {
+  const emptySlots = [];
+  stickerAlbum.stickers.forEach((s, i) => {
+    if (s === null) emptySlots.push(i);
+  });
+  
+  if (emptySlots.length > 0) {
+    const slotIndex = emptySlots[Math.floor(Math.random() * emptySlots.length)];
+    const sticker = stickerDefinitions[slotIndex];
+    stickerAlbum.stickers[slotIndex] = sticker;
+    stickerAlbum.unlockedCount++;
+    
+    setTimeout(() => {
+      showReward(sticker.emoji, 'Nouveau Sticker !', `${sticker.name}: ${sticker.desc}`);
+    }, 500);
+  }
+}
+
+function showStickerDetail(index) {
+  const sticker = stickerAlbum.stickers[index];
+  if (!sticker) return;
+  
+  document.getElementById('stickerDetailEmoji').textContent = sticker.emoji;
+  document.getElementById('stickerDetailName').textContent = sticker.name;
+  document.getElementById('stickerDetailDesc').textContent = sticker.desc;
+  document.getElementById('stickerDetailOverlay').classList.add('show');
+}
+
+function closeStickerDetail() {
+  document.getElementById('stickerDetailOverlay').classList.remove('show');
+}
+
+function playWordFoundSound() {
+  playBeep(880, 0.15, 'sine');
+  setTimeout(() => playBeep(1100, 0.15, 'sine'), 100);
+  setTimeout(() => playBeep(1320, 0.2, 'sine'), 200);
+}
+
 // === SONS (Web Audio API) ===
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
@@ -459,12 +873,16 @@ function getMascotTip(moduleName) {
 function render() {
   const app = document.getElementById('app');
   if (screen === 'home') app.innerHTML = homeHTML();
+  else if (screen === 'rocketRace') app.innerHTML = rocketRaceHTML();
+  else if (screen === 'wordHunt') app.innerHTML = wordHuntHTML();
+  else if (screen === 'stickers') app.innerHTML = stickerAlbumHTML();
   else if (screen === 'math' || screen === 'french' || screen === 'science') {
     if (done) app.innerHTML = resultHTML();
     else app.innerHTML = quizHTML();
   } else if (screen === 'trophy') app.innerHTML = trophyHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   attachListeners();
+  initStickerAlbum();
 }
 
 function homeHTML() {
@@ -514,10 +932,40 @@ function homeHTML() {
     <div class="streak-animals">🐿️🪼🦭</div>
   </div>
   
-  <div class="daily-challenge" data-action="math">
-    <h3>⚡ Défi du jour !</h3>
-    <p>Résous 5 additions avec Noisette 🐿️</p>
-    <div class="challenge-animals">🐿️✨</div>
+  <div class="daily-challenge-detail ${dailyChallenge.completed ? 'completed' : ''}" onclick="handleDailyChallenge()">
+    <div class="challenge-header">
+      <span class="challenge-badge">⚡ DÉFI DU JOUR</span>
+      ${dailyChallenge.completed ? '<span class="challenge-badge" style="background: rgba(255,255,255,0.5)">✓ Complété</span>' : ''}
+    </div>
+    <div class="challenge-title">${dailyChallenge.title}</div>
+    <div class="challenge-desc">${dailyChallenge.description}</div>
+    <div class="challenge-reward">
+      <span class="challenge-reward-icon">${dailyChallenge.completed ? '✅' : '🎁'}</span>
+      <span>${dailyChallenge.completed ? 'Récompense collectée !' : dailyChallenge.reward}</span>
+    </div>
+    <div class="challenge-animals-large">🐿️🪼🦭</div>
+  </div>
+  
+  <div class="mini-games-section screen-transition">
+    <div class="mini-games-title">🎮 Mini-Jeux Ludiques</div>
+    <div class="mini-games-grid">
+      <button class="mini-game-btn rocket" onclick="startRocketRace()">
+        <span class="emoji">🚀</span>
+        <span>Course de Fusées</span>
+      </button>
+      <button class="mini-game-btn word-hunt" onclick="startWordHunt()">
+        <span class="emoji">🔤</span>
+        <span>Chasse aux Mots</span>
+      </button>
+      <button class="mini-game-btn stickers" onclick="screen='stickers';render()">
+        <span class="emoji">🏷️</span>
+        <span>Mes Stickers</span>
+      </button>
+      <button class="mini-game-btn stickers" onclick="screen='stickers';render()">
+        <span class="emoji">${stickerAlbum.unlockedCount}/20</span>
+        <span>Album</span>
+      </button>
+    </div>
   </div>
   
   <div class="grid">
@@ -612,6 +1060,165 @@ function trophyHTML() {
     ${badges.length ? `<div class="badges-list">${badges.map(b => `<div class="badge-item">${b}</div>`).join('')}</div>` : `<p class="empty-msg">Continue les exercices pour gagner des badges ! 💪🐿️🪼🦭</p>`}
   </div>
   <div style="text-align:center;padding:20px;font-size:1.5rem;">🐿️🪼🦭</div>`;
+}
+
+// === ROCKET RACE HTML ===
+function rocketRaceHTML() {
+  const q = rocketGame.questions[rocketGame.currentQ];
+  const progressPct = Math.round((rocketGame.currentQ / rocketGame.questions.length) * 100);
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="endRocketRace();screen='home';render();">✕</button>
+    <h2 class="module-title" style="color: #667eea;">🚀 Course de Fusées</h2>
+    <span class="badge-count badge-math">${rocketGame.currentQ + 1}/${rocketGame.questions.length}</span>
+  </div>
+  
+  <div class="rocket-race-container">
+    <div class="rocket-race-header">
+      <div style="font-weight: bold;">👩 Emilie vs 🪼 Bulle</div>
+      <div class="rocket-race-timer ${rocketGame.timeLeft <= 10 ? 'warning' : ''}" id="rocketTimer">${rocketGame.timeLeft}s</div>
+    </div>
+    
+    <div class="rocket-track">
+      <div class="rocket-lane emilie">
+        <div class="rocket-label">👩 Emilie</div>
+        <div class="rocket-bar-container">
+          <div class="rocket-bar emilie" style="width: ${rocketGame.emilieProgress}%">
+            <span class="rocket-emoji">🚀</span>
+          </div>
+        </div>
+      </div>
+      <div class="rocket-lane bulle">
+        <div class="rocket-label">🪼 Bulle</div>
+        <div class="rocket-bar-container">
+          <div class="rocket-bar bulle" style="width: ${rocketGame.bulleProgress}%">
+            <span class="rocket-emoji">🪁</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: ${progressPct}%"></div>
+    </div>
+    
+    <div class="rocket-question">
+      <p>${q.q}</p>
+      <div class="rocket-choices">
+        ${q.c.map(ans => `<button class="rocket-choice" onclick="handleRocketChoice(${ans})">${ans}</button>`).join('')}
+      </div>
+    </div>
+    
+    <div class="rocket-score">
+      Score: ${rocketGame.score} bonnes réponses | Progrès: ${rocketGame.emilieProgress}%
+    </div>
+  </div>
+  
+  <div class="mascot-tip" style="text-align: center;">
+    <em>🪼 Bulle essaie de gagner aussi ! Réponds vite !</em>
+  </div>`;
+}
+
+// === WORD HUNT HTML ===
+function wordHuntHTML() {
+  const theme = wordHuntThemes[wordHuntGame.themeIndex];
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='home';render();">✕</button>
+    <h2 class="module-title" style="color: #db2777;">🔤 Chasse aux Mots</h2>
+    <span class="badge-count badge-french">${wordHuntGame.foundWords.length}/${wordHuntGame.words.length}</span>
+  </div>
+  
+  <div class="word-hunt-container">
+    <div class="word-hunt-header">
+      <div class="word-hunt-theme">📚 Thème: ${wordHuntGame.theme}</div>
+      <div class="word-hunt-progress">${wordHuntGame.foundWords.length}/${wordHuntGame.words.length} mots</div>
+    </div>
+    
+    <div class="word-hunt-words">
+      ${wordHuntGame.words.map((w, i) => `<span class="word-to-find ${wordHuntGame.foundWords.includes(i) ? 'found' : ''}">${w}</span>`).join('')}
+    </div>
+    
+    <div class="word-hunt-grid">
+      ${wordHuntGame.grid.map((cell, i) => `
+        <div class="word-hunt-cell ${wordHuntGame.selectedCells.includes(i) ? 'selected' : ''} ${cell.found ? 'found' : ''}" 
+             onclick="toggleWordHuntCell(${i})">${cell.letter}</div>
+      `).join('')}
+    </div>
+    
+    <div class="word-hunt-actions">
+      <button class="word-hunt-btn clear" onclick="clearWordHuntSelection()">🗑️ Effacer</button>
+      <button class="word-hunt-btn submit" onclick="submitWordHunt()">✓ Valider</button>
+    </div>
+  </div>
+  
+  <div class="mascot-tip" style="text-align: center;">
+    <em>🦭 Câlin dit : Clique sur les lettres pour former un mot, puis valide !</em>
+  </div>`;
+}
+
+// === STICKER ALBUM HTML ===
+function stickerAlbumHTML() {
+  const progress = (stickerAlbum.unlockedCount / 20) * 100;
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" data-action="back">⬅️</button>
+    <h2 class="module-title" style="color: #ca8a04;">🏷️ Mon Album de Stickers</h2>
+    <span class="badge-count" style="background: #fef9c3; color: #ca8a04;">${stickerAlbum.unlockedCount}/20</span>
+  </div>
+  
+  <div class="sticker-album-container">
+    <div class="sticker-album-header">
+      <h2>🐿️🪼🦭 Mes Mascottes</h2>
+      <p class="sticker-count">${stickerAlbum.unlockedCount} stickers collectés sur 20</p>
+    </div>
+    
+    <div class="sticker-grid">
+      ${stickerAlbum.stickers.map((sticker, i) => {
+        if (sticker) {
+          return `<div class="sticker-slot filled" onclick="showStickerDetail(${i})">${sticker.emoji}</div>`;
+        } else {
+          return `<div class="sticker-slot empty locked">❓</div>`;
+        }
+      }).join('')}
+    </div>
+    
+    <div class="sticker-progress-bar">
+      <div class="sticker-progress-fill" style="width: ${progress}%"></div>
+    </div>
+    
+    <div class="sticker-unlock-hint">
+      ${stickerAlbum.unlockedCount < 2 ? '🎮 Complète des mini-jeux pour débloquer des stickers !' : '⭐ Continue à jouer pour compléter ton album !'}
+    </div>
+  </div>
+  
+  <div class="card" style="text-align: center;">
+    <h3 style="margin-bottom: 10px;">Comment gagner des stickers ?</h3>
+    <p style="color: #666;">
+      🏆 Gagne la Course de Fusées → 1 sticker !<br>
+      🔤 Termine la Chasse aux Mots → 1 sticker !<br>
+      ⭐ Complète un Défi quotidien → Étoiles bonus !
+    </p>
+    <div style="font-size: 2rem; margin-top: 15px;">🐿️🪼🦭</div>
+  </div>`;
+}
+
+// === DAILY CHALLENGE HANDLER ===
+function handleDailyChallenge() {
+  if (dailyChallenge.completed) {
+    showFeedback(true, 'Tu as déjà complété ce défi aujourd\'hui ! 🎉', '✅');
+    return;
+  }
+  
+  if (dailyChallenge.title === 'Course de Fusées') {
+    startRocketRace();
+  } else if (dailyChallenge.title === 'Chasse aux Mots') {
+    startWordHunt();
+  } else if (dailyChallenge.title === 'Quiz Maths') {
+    startModule('math');
+  } else if (dailyChallenge.title === 'Quiz Français') {
+    startModule('french');
+  }
 }
 
 function parentalHTML() {
