@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Emilie App 🌟</title>
+  <!-- Fix #9: Meta description SEO -->
+  <meta name="description" content="Emilie App 🌟 - Application d'apprentissage ludique pour enfants CE1 : Maths, Français, Sciences avec mascottes animées, badges et stickers. Apprendre en s'amusant !">
+  <meta name="keywords" content="apprentissage enfants, CE1, maths, français, sciences, révision, éducatif, école primaire, Emilie">
+  <meta name="author" content="Emilie App">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="Emilie App 🌟 - Apprendre en s'amusant">
+  <meta property="og:description" content="Application d'apprentissage ludique pour enfants CE1 avec mascottes animées, exercises interactifs et système de récompenses.">
+  <meta property="og:type" content="website">
+  
+  <title>Emilie App 🌟 - Apprentissage Ludique pour Enfants CE1</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -320,6 +331,13 @@
       overflow-x: auto;
       scrollbar-width: none;
       margin-bottom: 16px;
+      /* Fix BUG #9: Ensure all filters are accessible */
+      padding-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .category-tabs::-webkit-scrollbar {
+      display: none;
     }
 
     .category-tab {
@@ -719,6 +737,8 @@
       border-radius: 24px;
       padding: 20px;
       margin-bottom: 16px;
+      /* Fix BUG #10: Prevent horizontal scrollbar */
+      overflow-x: hidden;
     }
 
     .sticker-album-header {
