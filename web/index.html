@@ -320,6 +320,13 @@
       overflow-x: auto;
       scrollbar-width: none;
       margin-bottom: 16px;
+      /* Fix BUG #9: Ensure all filters are accessible */
+      padding-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .category-tabs::-webkit-scrollbar {
+      display: none;
     }
 
     .category-tab {
@@ -719,6 +726,8 @@
       border-radius: 24px;
       padding: 20px;
       margin-bottom: 16px;
+      /* Fix BUG #10: Prevent horizontal scrollbar */
+      overflow-x: hidden;
     }
 
     .sticker-album-header {

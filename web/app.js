@@ -8,6 +8,62 @@ let streak = 1;
 let combo = 0;
 let muted = false;
 
+// === LOCALSTORAGE PERSISTENCE (Fix BUG #8) ===
+const STORAGE_KEY = 'emilieAppProgress';
+
+function saveProgress() {
+  try {
+    const data = {
+      stars,
+      badges,
+      xp,
+      level,
+      streak,
+      dailyChallengeCompleted: dailyChallenge.completed,
+      stickerAlbum: stickerAlbum,
+      lastPlayed: new Date().toISOString()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.log('Could not save progress:', e);
+  }
+}
+
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      stars = data.stars || 0;
+      badges = data.badges || [];
+      xp = data.xp || 0;
+      level = data.level || 1;
+      streak = data.streak || 1;
+      
+      // Load sticker album
+      if (data.stickerAlbum) {
+        stickerAlbum = data.stickerAlbum;
+        // Restore timer interval if needed
+        if (rocketGame.timerInterval) {
+          clearInterval(rocketGame.timerInterval);
+          rocketGame.timerInterval = null;
+        }
+      }
+      
+      // Check if it's a new day for daily challenge
+      const lastPlayed = data.lastPlayed ? new Date(data.lastPlayed) : null;
+      const today = new Date();
+      if (!lastPlayed || lastPlayed.toDateString() !== today.toDateString()) {
+        dailyChallenge.completed = false;
+      } else {
+        dailyChallenge.completed = data.dailyChallengeCompleted || false;
+      }
+    }
+  } catch (e) {
+    console.log('Could not load progress:', e);
+  }
+}
+
 // === MINI-GAMES STATE ===
 let rocketGame = {
   active: false,
@@ -17,7 +73,8 @@ let rocketGame = {
   emilieProgress: 0,
   bulleProgress: 0,
   timeLeft: 60,
-  timerInterval: null
+  timerInterval: null,
+  transitioning: false // Fix BUG #1: prevent premature game end during transitions
 };
 
 let wordHuntGame = {
@@ -137,6 +194,7 @@ function startRocketRace() {
   rocketGame.emilieProgress = 0;
   rocketGame.bulleProgress = 0;
   rocketGame.timeLeft = 60;
+  rocketGame.transitioning = false; // Reset transition flag
   
   screen = 'rocketRace';
   playBeep(800, 0.2, 'sine');
@@ -144,9 +202,12 @@ function startRocketRace() {
   
   // Start timer
   rocketGame.timerInterval = setInterval(() => {
+    // Fix BUG #1: Don't end game during question transition
+    if (rocketGame.transitioning) return;
+    
     rocketGame.timeLeft--;
     updateRocketTimer();
-    if (rocketGame.timeLeft <= 0) {
+    if (rocketGame.timeLeft <= 0 && !rocketGame.transitioning) {
       endRocketRace();
     }
   }, 1000);
@@ -176,8 +237,12 @@ function handleRocketChoice(answer) {
   
   render();
   
+  // Fix BUG #1: Set transitioning flag to prevent timer from ending game
+  rocketGame.transitioning = true;
+  
   setTimeout(() => {
     rocketGame.currentQ++;
+    rocketGame.transitioning = false; // Clear transition flag
     if (rocketGame.currentQ >= rocketGame.questions.length) {
       endRocketRace();
     } else {
@@ -209,6 +274,8 @@ function endRocketRace() {
     if (!stickerAlbum.gamesCompleted.rocket) {
       stickerAlbum.gamesCompleted.rocket = true;
       unlockRandomSticker();
+      // Fix BUG #8: Save progress after sticker unlock
+      saveProgress();
     }
     
     // Complete daily challenge if applicable
@@ -216,6 +283,8 @@ function endRocketRace() {
       dailyChallenge.completed = true;
       addStars(3);
       spawnConfetti(15);
+      // Fix BUG #8: Save progress after daily challenge completion
+      saveProgress();
     }
   }
 }
@@ -571,6 +640,9 @@ function addStars(n) {
   const pct = Math.min(((xp % 100) / 100) * 100, 100);
   document.getElementById('xpBar').style.width = pct + '%';
   document.getElementById('xpText').textContent = (xp % 100) + ' / 100 XP';
+  
+  // Fix BUG #8: Save progress after state change
+  saveProgress();
 }
 
 function updateCombo(correct) {
@@ -881,6 +953,8 @@ function render() {
     else app.innerHTML = quizHTML();
   } else if (screen === 'trophy') app.innerHTML = trophyHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
+  // Fix BUG #7: Add parentalDashboard screen
+  else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
   attachListeners();
   initStickerAlbum();
 }
@@ -1222,10 +1296,11 @@ function handleDailyChallenge() {
 }
 
 function parentalHTML() {
+  // Fix BUG #6: Remove PIN display from UI - security issue
   return `<div class="card parental-lock screen-transition">
     <div style="font-size:40px;margin-bottom:16px">👨‍👩‍👧</div>
     <h2 style="font-size:22px;font-weight:900;margin-bottom:8px">Espace Parents</h2>
-    <p style="color:#9ca3af;font-size:14px;margin-bottom:16px">Code: <strong>1234</strong></p>
+    <p style="color:#9ca3af;font-size:14px;margin-bottom:16px">Entre le code parental pour accéder aux statistiques</p>
     <input type="password" maxlength="4" class="pin-input" id="pin" placeholder="••••">
     <p class="error-msg" id="error" style="display:none">Code incorrect !</p>
     <button class="primary-btn btn-purple" data-action="unlock">Entrer</button>
@@ -1239,6 +1314,66 @@ function parentalHTML() {
       <strong>Badges:</strong> ${badges.join(', ')}
     </div>` : ''}
   </div>`;
+}
+
+// Fix BUG #7: Add parentalDashboardHTML function
+function parentalDashboardHTML() {
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" data-action="back">⬅️</button>
+    <h2 class="module-title" style="color: #8b5cf6;">👨‍👩‍👧 Espace Parents</h2>
+  </div>
+  
+  <div class="card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; text-align: center; margin-bottom: 16px;">
+    <div style="font-size: 3rem; margin-bottom: 10px;">👨‍👩‍👧</div>
+    <h3 style="margin-bottom: 5px;">Bienvenue dans l'Espace Parents</h3>
+    <p style="opacity: 0.9; font-size: 0.9rem;">Gérez la progression d'Emilie en toute simplicité</p>
+  </div>
+  
+  <div class="trophies-grid">
+    <div class="trophy-card"><span class="trophy-icon">⭐</span><div class="trophy-value">${stars}</div><div class="trophy-label">étoiles</div></div>
+    <div class="trophy-card"><span class="trophy-icon">🏅</span><div class="trophy-value">${badges.length}</div><div class="trophy-label">badges</div></div>
+    <div class="trophy-card"><span class="trophy-icon">🎯</span><div class="trophy-value">Niv.${level}</div><div class="trophy-label">niveau</div></div>
+    <div class="trophy-card"><span class="trophy-icon">🔥</span><div class="trophy-value">${streak}</div><div class="trophy-label">jours</div></div>
+  </div>
+  
+  <div class="card">
+    <h3 style="font-weight:900;margin-bottom:12px">📊 Progression par matière</h3>
+    <div style="margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <span>🔢 Maths</span><span>${Math.round(stars * 0.4)} pts</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill progress-math" style="width: ${Math.min(stars * 0.4, 100)}%"></div></div>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <span>📖 Français</span><span>${Math.round(stars * 0.35)} pts</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill progress-french" style="width: ${Math.min(stars * 0.35, 100)}%"></div></div>
+    </div>
+    <div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <span>🔬 Sciences</span><span>${Math.round(stars * 0.25)} pts</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill progress-science" style="width: ${Math.min(stars * 0.25, 100)}%"></div></div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h3 style="font-weight:900;margin-bottom:12px">🏅 Badges obtenus</h3>
+    ${badges.length ? `<div class="badges-list">${badges.map(b => `<div class="badge-item">${b}</div>`).join('')}</div>` : `<p class="empty-msg">Aucun badge pour l'instant. Encourage Emilie !</p>`}
+  </div>
+  
+  <div class="card" style="background: #f3f4f6;">
+    <h3 style="font-weight:900;margin-bottom:12px">💡 Conseils pour les parents</h3>
+    <p style="color: #666; font-size: 0.9rem; line-height: 1.6;">
+      • Sessions recommandées : 10-15 minutes par jour<br>
+      • Célébrez chaque badge obtenu — la motivation positive est clé<br>
+      • Alterner les matières évite la monotonie<br>
+      • En cas de difficulté, répéter les exercices de niveau 1
+    </p>
+  </div>
+  
+  <div style="text-align:center;padding:20px;font-size:1.5rem;">🐿️🪼🦭</div>`;
 }
 
 function getBtnClass(c) {
@@ -1332,6 +1467,9 @@ function handleChoice(choice) {
         showReward('🐿️', 'Badge Sciences !', 'Noisette découvre le monde avec toi !');
       }
       
+      // Fix BUG #8: Save progress after badges are awarded
+      saveProgress();
+      
       // Level up celebration
       if (score >= 8) {
         spawnConfetti(15);
@@ -1349,7 +1487,8 @@ function unlockParental() {
   const err = document.getElementById('error');
   if (pin === '1234') { 
     playBeep(600, 0.1, 'sine');
-    screen = 'trophy'; 
+    // Fix BUG #7: Navigate to parentalDashboard instead of trophy
+    screen = 'parentalDashboard'; 
     render(); 
   }
   else { 
@@ -1370,6 +1509,9 @@ function shuffle(arr) {
 // === INIT ===
 document.addEventListener('DOMContentLoaded', () => {
   createFloatingAnimals();
+  
+  // Fix BUG #8: Load saved progress from localStorage
+  loadProgress();
   
   // Welcome message
   setTimeout(() => {
