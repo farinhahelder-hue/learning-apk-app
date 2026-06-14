@@ -553,14 +553,14 @@ function addStars(n) {
   xp += n * 10;
   
   // Update UI
-  document.getElementById('totalStars').textContent = stars;
+  document.getElementById('totalStars')?.textContent = stars;
   
   // Level up check
   if (xp >= level * 100) {
     level++;
     if (!badges.includes('🏆 Niveau ' + level + ' !')) badges.push('🏆 Niveau ' + level + ' !');
-    document.getElementById('totalBadges').textContent = badges.length;
-    document.getElementById('levelDisplay').textContent = 'Niv.' + level;
+    document.getElementById('totalBadges')?.textContent = badges.length;
+    document.getElementById('levelDisplay')?.textContent = 'Niv.' + level;
     playLevelUp();
     showReward('🐿️🪼🦭', 'Niveau ' + level + ' !',
       'Tu as gagné un nouveau badge ! Les animaux sont fous de joie ! 🎉');
@@ -569,8 +569,8 @@ function addStars(n) {
   
   // XP bar
   const pct = Math.min(((xp % 100) / 100) * 100, 100);
-  document.getElementById('xpBar').style.width = pct + '%';
-  document.getElementById('xpText').textContent = (xp % 100) + ' / 100 XP';
+  document.getElementById('xpBar')?.style.width = pct + '%';
+  document.getElementById('xpText')?.textContent = (xp % 100) + ' / 100 XP';
 }
 
 function updateCombo(correct) {
@@ -995,7 +995,7 @@ function quizHTML() {
     return `<div class="module-header screen-transition">
       <button class="back-btn" data-action="back">⬅️</button>
       <h2 class="module-title math">🔢 Maths avec 🪼 Bulle</h2>
-      <span class="badge-count badge-math" id="mathProgress">0/10</span>
+                  <span class='badge-count badge-math' id='mathProgress'>${score}/10</span>
     </div>
     
     <div id="mathExerciseArea"></div>`;
@@ -1225,7 +1225,6 @@ function parentalHTML() {
   return `<div class="card parental-lock screen-transition">
     <div style="font-size:40px;margin-bottom:16px">👨‍👩‍👧</div>
     <h2 style="font-size:22px;font-weight:900;margin-bottom:8px">Espace Parents</h2>
-    <p style="color:#9ca3af;font-size:14px;margin-bottom:16px">Code: <strong>1234</strong></p>
     <input type="password" maxlength="4" class="pin-input" id="pin" placeholder="••••">
     <p class="error-msg" id="error" style="display:none">Code incorrect !</p>
     <button class="primary-btn btn-purple" data-action="unlock">Entrer</button>
@@ -1253,6 +1252,9 @@ function getBtnClass(c) {
 function attachListeners() {
   document.querySelectorAll('[data-subject]').forEach(btn => {
     btn.onclick = () => startModule(btn.dataset.subject);
+  });
+    document.querySelectorAll('[data-category]').forEach(btn => {
+    btn.onclick = () => loadMathExercice(btn.dataset.category);
   });
   document.querySelectorAll('[data-choice]').forEach(btn => {
     btn.onclick = () => handleChoice(JSON.parse(btn.dataset.choice));
@@ -1295,7 +1297,7 @@ function startModule(sub) {
 }
 
 function handleChoice(choice) {
-  if (sel) return;
+    if (sel !== null) return;
   sel = choice;
   const ex = exercises[qIdx];
   const correct = JSON.stringify(choice) === JSON.stringify(ex.a);
@@ -1307,9 +1309,11 @@ function handleChoice(choice) {
     updateCombo(true);
     playCorrectSound();
     spawnConfetti(5);
+        showFeedback(correct);
   } else {
     updateCombo(false);
     playWrongSound();
+        showFeedback(correct);
   }
   
   render();
@@ -1349,7 +1353,7 @@ function unlockParental() {
   const err = document.getElementById('error');
   if (pin === '1234') { 
     playBeep(600, 0.1, 'sine');
-    screen = 'trophy'; 
+        screen = 'parental';
     render(); 
   }
   else { 
