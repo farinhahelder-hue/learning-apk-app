@@ -551,28 +551,33 @@ function showFeedback(correct, customMsg, customEmoji) {
 function addStars(n) {
   stars += n;
   xp += n * 10;
-  
-  // Update UI
-  document.getElementById('totalStars')?.textContent = stars;
-  
+
+  // Update UI - null-safe
+  const elStars = document.getElementById('totalStars');
+  const elBadges = document.getElementById('totalBadges');
+  const elLevel = document.getElementById('levelDisplay');
+  const elXpBar = document.getElementById('xpBar');
+  const elXpText = document.getElementById('xpText');
+
+  if (elStars) elStars.textContent = stars;
+
   // Level up check
   if (xp >= level * 100) {
     level++;
     if (!badges.includes('🏆 Niveau ' + level + ' !')) badges.push('🏆 Niveau ' + level + ' !');
-    document.getElementById('totalBadges')?.textContent = badges.length;
-    document.getElementById('levelDisplay')?.textContent = 'Niv.' + level;
+    if (elBadges) elBadges.textContent = badges.length;
+    if (elLevel) elLevel.textContent = 'Niv.' + level;
     playLevelUp();
-    showReward('🐿️🪼🦭', 'Niveau ' + level + ' !',
+    showReward('🐿️🪼🦦', 'Niveau ' + level + ' !',
       'Tu as gagné un nouveau badge ! Les animaux sont fous de joie ! 🎉');
     spawnConfetti(20);
   }
-  
+
   // XP bar
   const pct = Math.min(((xp % 100) / 100) * 100, 100);
-  document.getElementById('xpBar')?.style.width = pct + '%';
-  document.getElementById('xpText')?.textContent = (xp % 100) + ' / 100 XP';
+  if (elXpBar) elXpBar.style.width = pct + '%';
+  if (elXpText) elXpText.textContent = (xp % 100) + ' / 100 XP';
 }
-
 function updateCombo(correct) {
   if (correct) {
     combo++;
