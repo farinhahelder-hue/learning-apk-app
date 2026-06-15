@@ -130,5 +130,60 @@ class MathExercises {
       difficulty: 2, points: 15,
       hint: '4 000 - 1 = ?'
     ),
+    Exercise(
+      id: 'num13_7', subject: 'math', type: 'qcm',
+      question: 'Num 13 - Exercice 7 : Le nombre 8 291 est composé de :',
+      options: [
+        '8 milliers + 2 centaines + 9 dizaines + 1 unité',
+        '8 milliers + 2 centaines + 9 dizaines + 0 unité',
+        '8 milliers + 2 centaines + 1 dizaine + 9 unités',
+        '8 milliers + 9 centaines + 2 dizaines + 1 unité'
+      ],
+      correctAnswer: '8 milliers + 2 centaines + 9 dizaines + 1 unité',
+      difficulty: 2, points: 15,
+      hint: '8 291 = 8 000 + 200 + 90 + 1'
+    ),
+    Exercise(
+      id: 'num13_8', subject: 'math', type: 'qcm',
+      question: 'Num 13 - Exercice 8 : Quel est le plus grand nombre ?',
+      options: ['3456', '3546', '3645', '3465'], correctAnswer: '3645',
+      difficulty: 2, points: 15,
+      hint: 'Compare d\'abord les milliers, puis les centaines...'
+    ),
+    Exercise(
+      id: 'num13_9', subject: 'math', type: 'qcm',
+      question: 'Num 13 - Exercice 9 : Encadre 2 580 entre les centaines les plus proches :',
+      options: [
+        '2 500 et 2 600',
+        '2 580 et 2 590',
+        '2 000 et 3 000',
+        '2 500 et 2 700'
+      ],
+      correctAnswer: '2 500 et 2 600',
+      difficulty: 3, points: 20,
+      hint: '2 580 est entre 2 500 et 2 600'
+    ),
+    Exercise(
+      id: 'num13_10', subject: 'math', type: 'qcm',
+      question: 'Num 13 - Exercice 10 : Combien de chiffres a le nombre "six mille huit cent quarante-trois" ?',
+      options: ['3', '4', '5', '6'], correctAnswer: '4',
+      difficulty: 2, points: 15,
+      hint: '6 8 4 3 = 4 chiffres'
+    ),
+    Exercise(
+      id: 'num13_11', subject: 'math', type: 'qcm',
+      question: 'Num 13 - Exercice 11 : Dans 7 654, le chiffre 6 représente :',
+      options: ['6 unités', '6 dizaines', '6 centaines', '6 milliers'],
+      correctAnswer: '6 centaines',
+      difficulty: 2, points: 15,
+      hint: '7 6 5 4 = 7 milliers, 6 centaines, 5 dizaines, 4 unités'
+    ),
+    Exercise(
+      id: 'num13_12', subject: 'math', type: 'qcm',
+      question: 'Num 13 - Exercice 12 : 3 000 + 500 + 40 + 9 = ?',
+      options: ['3549', '3594', '3495', '3459'], correctAnswer: '3549',
+      difficulty: 2, points: 15,
+      hint: '3 000 + 500 + 40 + 9 = 3 549'
+    ),
   ];
 }

@@ -368,5 +368,87 @@ class FrenchExercises {
       prompt: 'Écris : fenêtre', correctAnswer: 'fenêtre', difficulty: 2, points: 20,
       mascot: Mascot.seal, hint: 'F-E-N-Ê-T-R-E'
     ),
+    Exercise(
+      id: 'mots24_19', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 9/12 : Quel est le bon mot ? "Le ___ a des épines." (rose/rôse)',
+      options: ['rôse', 'rose', 'roze', 'rôsse'],
+      correctAnswer: 'rose', difficulty: 1, points: 10,
+      mascot: Mascot.seal, hint: 'La ROSE est une fleur'
+    ),
+    Exercise(
+      id: 'mots24_20', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 10/12 : Quel mot prend un accent ? "Le ___ est jaune." (soleil/soléil)',
+      options: ['soléil', 'soleil', 'soli', 'soleil'],
+      correctAnswer: 'soleil', difficulty: 1, points: 10,
+      mascot: Mascot.seal, hint: 'SOLEIL = grand O, pas d\'accent'
+    ),
+    Exercise(
+      id: 'mots24_21', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 11/12 : Complète : "Le ___ est un fruit rouge." (fraise/fèrèse)',
+      options: ['fèrèse', 'fraisse', 'fraise', 'frèse'],
+      correctAnswer: 'fraise', difficulty: 1, points: 10,
+      mascot: Mascot.squirrel, hint: 'La FRAISE = F-R-A-I-S-E'
+    ),
+    Exercise(
+      id: 'mots24_22', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 12/12 : Quel mot est correct ? "La ___ est noire." (nüit/nuit)',
+      options: ['nüe', 'nuitt', 'nuit', 'nuitte'],
+      correctAnswer: 'nuit', difficulty: 1, points: 10,
+      mascot: Mascot.squirrel, hint: 'La NUIT = N-U-I-T'
+    ),
+
+    // Dictée mots supplémentaires (13-18)
+    Exercise(
+      id: 'mots24_23', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 9 : Écris le mot "plage" (lieu au bord de la mer)',
+      prompt: 'Écris : plage', correctAnswer: 'plage', difficulty: 1, points: 15,
+      mascot: Mascot.seal, hint: 'P-L-A-G-E'
+    ),
+    Exercise(
+      id: 'mots24_24', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 10 : Écris le mot "village" (petit village)',
+      prompt: 'Écris : village', correctAnswer: 'village', difficulty: 1, points: 15,
+      mascot: Mascot.seal, hint: 'V-I-L-L-A-G-E'
+    ),
+    Exercise(
+      id: 'mots24_25', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 11 : Écris le mot "nuage" (dans le ciel)',
+      prompt: 'Écris : nuage', correctAnswer: 'nuage', difficulty: 1, points: 15,
+      mascot: Mascot.seal, hint: 'N-U-A-G-E'
+    ),
+    Exercise(
+      id: 'mots24_26', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 12 : Écris le mot "sorcière" (personnage de conte)',
+      prompt: 'Écris : sorcière', correctAnswer: 'sorcière', difficulty: 3, points: 25,
+      mascot: Mascot.seal, hint: 'S-O-R-C-I-È-R-E (accent!)'
+    ),
+    Exercise(
+      id: 'mots24_27', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 13 : Écris le mot "sèvre" (rivière en France)',
+      prompt: 'Écris : siège', correctAnswer: 'siège', difficulty: 2, points: 20,
+      mascot: Mascot.seal, hint: 'S-I-È-G-E'
+    ),
+    Exercise(
+      id: 'mots24_28', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 14 : Écris le mot "cinquante" (5 × 10)',
+      prompt: 'Écris : cinquante', correctAnswer: 'cinquante', difficulty: 2, points: 20,
+      mascot: Mascot.seal, hint: 'C-I-N-Q-U-A-N-T-E'
+    ),
+
+    // Exercices de révision - Phonétique
+    Exercise(
+      id: 'mots24_29', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - Révision : Quel mot contient le son [wa] ?',
+      options: ['violon', 'moineau', 'camion', 'cheval'],
+      correctAnswer: 'moineau', difficulty: 2, points: 15,
+      mascot: Mascot.jellyfish, hint: 'MOINEAU = M + OIN +EAU (son [wa])'
+    ),
+    Exercise(
+      id: 'mots24_30', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - Révision : Quel mot est mal orthographié ?',
+      options: ['forêt', 'fenêtre', 'ecureuil', 'village'],
+      correctAnswer: 'ecureuil', difficulty: 2, points: 15,
+      mascot: Mascot.jellyfish, hint: 'ECUREUIL a besoin d\'accents : É-C-U-R-E-U-I-L'
+    ),
   ];
 }
