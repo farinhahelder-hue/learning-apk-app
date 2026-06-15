@@ -238,5 +238,135 @@ class FrenchExercises {
         question: '"un" est un article...',
         options: ['masculin', 'féminin', 'pluriel', 'possessif'],
         correctAnswer: 'masculin', difficulty: 1, points: 10, mascot: Mascot.seal),
+
+    // ============================================================
+    // EXERCICES "MOTS 24 BLEU" (Laura Diaz - CE2)
+    // Liste de 24 mots de la "liste bleue" pour dictée
+    // ============================================================
+    // Partie 1 : Mots à choisir (QCM)
+    Exercise(
+      id: 'mots24_1', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 1/4 : Quel est le bon mot ? "Le ___ a chanté toute la nuit." (oiseau/oiseau)',
+      options: ['osEAU', 'oIsEAU', 'oiseau', 'OIZO'],
+      correctAnswer: 'oiseau', difficulty: 1, points: 10,
+      mascot: Mascot.seal, hint: 'O-I-S-E-A-U'
+    ),
+    Exercise(
+      id: 'mots24_2', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 2/4 : Quel est le bon mot ? "J\'ai ___ à la campagne." (allé/alé)',
+      options: ['alé', 'allé', 'allez', 'alée'],
+      correctAnswer: 'allé', difficulty: 1, points: 10,
+      mascot: Mascot.seal, hint: 'Aller au passé composé : j\'ai allé... NON ! j\'ai ALLÉ'
+    ),
+    Exercise(
+      id: 'mots24_3', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 3/4 : Quel mot prend un accent ? "Le petit ___ vole dans le ciel." (herisson/hérisson)',
+      options: ['herisson', 'hérisson', 'hérisson', 'herisson'],
+      correctAnswer: 'hérisson', difficulty: 2, points: 15,
+      mascot: Mascot.seal, hint: 'HÉRISSON = accent sur le E'
+    ),
+    Exercise(
+      id: 'mots24_4', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 4/4 : "Un ___ de beurre" - Quel mot complète la phrase ? (morceau/morço)',
+      options: ['morço', 'morceau', 'morçau', 'morso'],
+      correctAnswer: 'morceau', difficulty: 2, points: 15,
+      mascot: Mascot.seal, hint: 'MORCEAU = un bout, un fragment'
+    ),
+
+    // Partie 2 : Compléter les phrases
+    Exercise(
+      id: 'mots24_5', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 5/8 : Complète : "La ___ est pleine de étoiles." (nüe/nuit)',
+      options: ['nüe', 'nuitt', 'nuit', 'nuitte'],
+      correctAnswer: 'nuit', difficulty: 1, points: 10,
+      mascot: Mascot.squirrel, hint: 'La NUIT tombe quand le soleil se couche'
+    ),
+    Exercise(
+      id: 'mots24_6', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 6/8 : Complète : "Mon ___ s\'appelle Léo." (chatchat/chien)',
+      options: ['chat', 'chatchat', 'chats', 'chatt'],
+      correctAnswer: 'chat', difficulty: 1, points: 10,
+      mascot: Mascot.squirrel, hint: 'Animal qui fait "miaou"'
+    ),
+    Exercise(
+      id: 'mots24_7', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 7/8 : Complète : "Le ___ est rouge." (soré/soir)',
+      options: ['soir', 'soré', 'sware', 'soirr'],
+      correctAnswer: 'soir', difficulty: 1, points: 10,
+      mascot: Mascot.squirrel, hint: 'Le SOIR, le soleil se couche'
+    ),
+    Exercise(
+      id: 'mots24_8', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - 8/8 : Complète : "Le ___ a chanté ce matin." (oijoiseau/oiseau)',
+      options: ['oizo', 'oijoiseau', 'oiseau', 'oiseaus'],
+      correctAnswer: 'oiseau', difficulty: 1, points: 10,
+      mascot: Mascot.squirrel, hint: 'O-I-S-E-A-U'
+    ),
+
+    // Partie 3 : Phonique - sons à distinguer
+    Exercise(
+      id: 'mots24_9', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - Phonétique 1 : Quel mot contient le son [wa] ?',
+      options: ['loin', 'lion', 'lundi', 'lampe'],
+      correctAnswer: 'loin', difficulty: 2, points: 15,
+      mascot: Mascot.jellyfish, hint: 'LOIN = L + OIN (son [wa])'
+    ),
+    Exercise(
+      id: 'mots24_10', subject: 'french', type: 'qcm',
+      question: 'Mots 24 bleu - Phonétique 2 : Quel mot contient le son [wɑ̃] ?',
+      options: ['maison', 'montagne', 'bonbon', 'vingt'],
+      correctAnswer: 'vingt', difficulty: 2, points: 15,
+      mascot: Mascot.jellyfish, hint: 'VINGT = son [wɑ̃] nasal'
+    ),
+
+    // Partie 4 : Orthographe - mots à mémoriser
+    Exercise(
+      id: 'mots24_11', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 1 : Écris le mot "hiver" (la saison froide)',
+      prompt: 'Écris : hiver', correctAnswer: 'hiver', difficulty: 1, points: 15,
+      mascot: Mascot.seal, hint: 'H-I-V-E-R'
+    ),
+    Exercise(
+      id: 'mots24_12', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 2 : Écris le mot "forêt" (lieu avec beaucoup d\'arbres)',
+      prompt: 'Écris : forêt', correctAnswer: 'forêt', difficulty: 2, points: 20,
+      mascot: Mascot.seal, hint: 'F-O-R-Ê-T (accent sur le E)'
+    ),
+    Exercise(
+      id: 'mots24_13', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 3 : Écris le mot "noix" (fruit de l\'arbre)',
+      prompt: 'Écris : noix', correctAnswer: 'noix', difficulty: 1, points: 15,
+      mascot: Mascot.seal, hint: 'N-O-I-X'
+    ),
+    Exercise(
+      id: 'mots24_14', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 4 : Écris le mot "mur" (dans une maison)',
+      prompt: 'Écris : mur', correctAnswer: 'mur', difficulty: 1, points: 15,
+      mascot: Mascot.seal, hint: 'M-U-R'
+    ),
+    Exercise(
+      id: 'mots24_15', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 5 : Écris le mot "doux" (pas dur, pas méchant)',
+      prompt: 'Écris : doux', correctAnswer: 'doux', difficulty: 1, points: 15,
+      mascot: Mascot.seal, hint: 'D-O-U-X'
+    ),
+    Exercise(
+      id: 'mots24_16', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 6 : Écris le mot "travail" (ce qu\'on fait pour gagner sa vie)',
+      prompt: 'Écris : travail', correctAnswer: 'travail', difficulty: 2, points: 20,
+      mascot: Mascot.seal, hint: 'T-R-A-V-A-I-L'
+    ),
+    Exercise(
+      id: 'mots24_17', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 7 : Écris le mot "écureuil" (petit animal roux avec une grande queue)',
+      prompt: 'Écris : écureuil', correctAnswer: 'écureuil', difficulty: 3, points: 25,
+      mascot: Mascot.seal, hint: 'É-C-U-R-E-U-I-L (accents!)'
+    ),
+    Exercise(
+      id: 'mots24_18', subject: 'french', type: 'writing',
+      question: 'Mots 24 bleu - Dictée 8 : Écris le mot "fenêtre" (pour voir dehors)',
+      prompt: 'Écris : fenêtre', correctAnswer: 'fenêtre', difficulty: 2, points: 20,
+      mascot: Mascot.seal, hint: 'F-E-N-Ê-T-R-E'
+    ),
   ];
 }
