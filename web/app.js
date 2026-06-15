@@ -21,6 +21,260 @@ let homeworkState = {
   aiExercises: []
 };
 
+// === LESSONS STATE (LEÇONS TDAH/AUTISME) ===
+let lessonsState = {
+  currentLevel: 'ce2', // 'ce1' ou 'ce2'
+  currentSubject: 'math',
+  currentLesson: null,
+  lessonProgress: {},
+  stepsCompleted: [],
+  visualMode: true // Mode visuel pour TDAH
+};
+
+// === CE1 & CE2 PROGRAMS DATA ===
+const CE1_PROGRAM = {
+  math: {
+    name: '🔢 Maths CE1',
+    color: '#3b82f6',
+    lessons: [
+      {
+        id: 'ce1_num1',
+        title: 'Les nombres jusqu\'à 100',
+        icon: '🔢',
+        type: 'number',
+        duration: '10 min',
+        steps: [
+          { id: 's1', text: 'Les nombres de 0 à 20', visual: '0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟 1️⃣1️⃣ 1️⃣2️⃣...', tip: 'Compte sur tes doigts !' },
+          { id: 's2', text: 'La dizaine = 10', visual: '🔟 + 🔟 + 🔟 = 30', tip: '3 dizaines = 30' },
+          { id: 's3', text: 'Compter de 10 en 10', visual: '10 → 20 → 30 → 40 → 50 → 60 → 70 → 80 → 90 → 100', tip: '+10 à chaque fois !' },
+          { id: 's4', text: 'Les nombres en lettres', visual: '🔢 1️⃣2️⃣ = Douze 📖', tip: 'DIX = 10, DOUZE = 12' },
+          { id: 's5', text: 'Comparer deux nombres', visual: '45 < 54\n45 est PLUS PETIT que 54', tip: 'Le plus petit < le plus grand' }
+        ],
+        exercises: [
+          { q: '🔢 Compte de 5 en 5 : 5, 10, 15, ... ?', a: '20', hint: '+5 à chaque fois' },
+          { q: '🔢 30 + 10 = ?', a: '40', hint: '3 dizaines + 1 dizaine = 4 dizaines' },
+          { q: '🔢 Quel est le plus grand : 67 ou 76 ?', a: '76', hint: 'Compare les dizaines !' }
+        ]
+      },
+      {
+        id: 'ce1_add',
+        title: 'L\'addition',
+        icon: '➕',
+        type: 'operation',
+        duration: '8 min',
+        steps: [
+          { id: 's1', text: 'Qu\'est-ce que l\'addition ?', visual: 'J\'ai 3 pommes 🍎 + J\'en ai 2 autres 🍎 = J\'en ai 5 en tout 🍎🍎🍎🍎🍎', tip: 'On AJOUTE des choses !' },
+          { id: 's2', text: 'Additionner avec les doigts', visual: '5 + 3 = ?\nLève 5 doigts 🖐️, ajoute 3 doigts 🖐️🖐️🖐️ = 8 doigts ✋✋✋✋', tip: 'Compte tous les doigts !' },
+          { id: 's3', text: 'La table d\'addition du 10', visual: '0+10=10 | 1+9=10 | 2+8=10 | 3+7=10 | 4+6=10 | 5+5=10', tip: 'Tout fait 10 avec le bon ami !' },
+          { id: 's4', text: 'Pose l\'addition', visual: '  2️⃣3️⃣\n+ 1️⃣4️⃣\n─────\n  ?', tip: 'On additionne d\'abord les unités !' }
+        ],
+        exercises: [
+          { q: '➕ 7 + 5 = ?', a: '12', hint: '7 + 3 = 10, puis +2 = 12' },
+          { q: '➕ 15 + 4 = ?', a: '19', hint: '15 + 4 = 19' },
+          { q: '➕ 8 + 8 = ?', a: '16', hint: 'Deux fois 8 = 16' }
+        ]
+      },
+      {
+        id: 'ce1_sous',
+        title: 'La soustraction',
+        icon: '➖',
+        type: 'operation',
+        duration: '8 min',
+        steps: [
+          { id: 's1', text: 'Qu\'est-ce que la soustraction ?', visual: 'J\'ai 8 bonbons 🍬, j\'en mange 3 🍬🍬🍬 = il m\'en reste 5 🍬🍬🍬🍬🍬', tip: 'On ENLÈVE des choses !' },
+          { id: 's2', text: 'Soustraire avec les doigts', visual: '8 - 3 = ?\nLève 8 doigts, baisse 3 = il en reste 5 !', tip: 'Compte les doigts levés restants !' },
+          { id: 's3', text: 'Les amis de 10', visual: '10-0=10 | 10-1=9 | 10-2=8 | 10-3=7 | 10-4=6 | 10-5=5', tip: 'Soustraire de 10, c\'est facile !' }
+        ],
+        exercises: [
+          { q: '➖ 9 - 4 = ?', a: '5', hint: '9 moins 4 = 5' },
+          { q: '➖ 10 - 7 = ?', a: '3', hint: '10 moins 7 = 3' },
+          { q: '➖ 15 - 5 = ?', a: '10', hint: 'La moitié de 15 !' }
+        ]
+      },
+      {
+        id: 'ce1_geo',
+        title: 'Les formes',
+        icon: '🔷',
+        type: 'geometry',
+        duration: '6 min',
+        steps: [
+          { id: 's1', text: 'Le carré', visual: '🔲 a 4 CÔTÉS égaux\n4 coins droits\nComme une boîte de Pizza 🍕', tip: '4 côtés = 4 !' },
+          { id: 's2', text: 'Le triangle', visual: '🔺 a 3 CÔTÉS\n3 coins\nComme un chapeau de magicien 🎩', tip: '3 côtés = 3 !' },
+          { id: 's3', text: 'Le cercle', visual: '⭕ n\'a pas de côté\nIl est ROND\nComme une roue 🚗', tip: 'Rond = cercle !' },
+          { id: 's4', text: 'Le rectangle', visual: '▬ a 4 CÔTÉS\n2 longs, 2 courts\nComme une porte 🚪', tip: 'Comme le carré mais allongé !' }
+        ],
+        exercises: [
+          { q: '🔷 Combien de côtés a un carré ?', a: '4', hint: '4 côtés égaux !' },
+          { q: '🔷 Quel forme est ronde ?', a: 'cercle', hint: 'Sans côtés, tout rond !' },
+          { q: '🔷 Le triangle a combien de côtés ?', a: '3', hint: '3 !' }
+        ]
+      }
+    ]
+  },
+  french: {
+    name: '📖 Français CE1',
+    color: '#ec4899',
+    lessons: [
+      {
+        id: 'ce1_lettres',
+        title: 'L\'alphabet',
+        icon: '🔤',
+        type: 'reading',
+        duration: '10 min',
+        steps: [
+          { id: 's1', text: 'L\'alphabet en chanson', visual: 'A-B-C-D-E-F-G-H-I-J-K-L-M-N-O-P-Q-R-S-T-U-V-W-X-Y-Z 🎵', tip: 'Chante l\'alphabet !' },
+          { id: 's2', text: 'Les voyelles', visual: 'A - E - I - O - U - Y\n🔴🔴🔴🔴🔴🔴', tip: '5 voyelles principales (Y est spécial)' },
+          { id: 's3', text: 'Les consonnes', visual: 'B-C-D-F-G-H-J-K-L-M-N-P-Q-R-S-T-V-W-X-Z', tip: 'Toutes les autres lettres !' },
+          { id: 's4', text: 'Mettre dans l\'ordre', visual: 'M, A, T, H → A, M, T, H\nalphabétique !', tip: 'A vient avant M !' }
+        ],
+        exercises: [
+          { q: '🔤 Quelle est la 1ère lettre de l\'alphabet ?', a: 'A', hint: 'A-B-C...' },
+          { q: '🔤 Combien de voyelles ?', a: '6', hint: 'A, E, I, O, U, Y' },
+          { q: '🔤 Après F, quelle lettre ?', a: 'G', hint: 'E-F-G !' }
+        ]
+      },
+      {
+        id: 'ce1_mots',
+        title: 'Lire des mots',
+        icon: '📝',
+        type: 'writing',
+        duration: '8 min',
+        steps: [
+          { id: 's1', text: 'Les mots simples', visual: '🔤 CHAT = C-H-A-T\n🐱 Animal qui fait "miaou"', tip: 'Chaque lettre fait un son !' },
+          { id: 's2', text: 'Les syllabes', visual: 'MA → MI → NION\nMa-mion = MAMION ? Non ! MA-NI-ON = MANION', tip: 'Coupe en syllabes !' },
+          { id: 's3', text: 'Compter les syllabes', visual: 'É-LE-PHANT = 3 syllabes 🐘\nSA-VON = 2 syllabes 🧼', tip: 'Compte les "bouches qui s\'ouvrent" !' }
+        ],
+        exercises: [
+          { q: '📝 Combien de syllabes dans "CHIEN" ?', a: '1', hint: 'CHIEN = 1 seule syllabe' },
+          { q: '📝 Combien dans "MAISON" ?', a: '2', hint: 'MAI-SON = 2 syllabes' },
+          { q: '📝 Le mot "PAPILLON" a combien de syllabes ?', a: '3', hint: 'PA-PI-LLON = 3' }
+        ]
+      }
+    ]
+  }
+};
+
+const CE2_PROGRAM = {
+  math: {
+    name: '🔢 Maths CE2',
+    color: '#8b5cf6',
+    lessons: [
+      {
+        id: 'ce2_num',
+        title: 'Les nombres jusqu\'à 9999',
+        icon: '🔢',
+        type: 'number',
+        duration: '12 min',
+        steps: [
+          { id: 's1', text: 'Les milliers', visual: '1️⃣0️⃣0️⃣0️⃣ = UN MILLIER\nC\'est comme 10 centaines !', tip: 'Mille = 1000' },
+          { id: 's2', text: 'Décomposer un nombre', visual: '3️⃣2️⃣5️⃣4️⃣\n= 3 milliers + 2 centaines + 5 dizaines + 4 unités\n= 3000 + 200 + 50 + 4', tip: 'Sépare chaque partie !' },
+          { id: 's3', text: 'Le tableau de numération', visual: ' Milliers | C | D | U\n    3    | 2 | 5 | 4\n\nC = Centaines, D = Dizaines, U = Unités', tip: 'Chaque colonne a sa valeur !' },
+          { id: 's4', text: 'Comparer les nombres', visual: '4️⃣5️⃣2️⃣ < 4️⃣5️⃣3️⃣\n↑       ↑\nMême    2 < 3\nmilliers et    donc PLUS PETIT\ncentaines', tip: 'Compare de gauche à droite !' },
+          { id: 's5', text: 'Encadrer un nombre', visual: '2️⃣5️⃣0️⃣0️⃣ < 2️⃣5️⃣8️⃣0️⃣ < 2️⃣6️⃣0️⃣0️⃣\n   ↓            ↓\n   2500        2600\nEntre 2 centaines !', tip: 'Trouve les voisins !' }
+        ],
+        exercises: [
+          { q: '🔢 2 000 + 300 + 40 + 5 = ?', a: '2345', hint: '2 milliers, 3 centaines, 4 dizaines, 5 unités' },
+          { q: '🔢 Dans 4 738, quel est le chiffre des centaines ?', a: '7', hint: '7 est en position des centaines' },
+          { q: '🔢 Compare : 3 456 ___ 3 465', a: '<', hint: '56 < 65' }
+        ]
+      },
+      {
+        id: 'ce2_mult',
+        title: 'La multiplication',
+        icon: '✖️',
+        type: 'operation',
+        duration: '10 min',
+        steps: [
+          { id: 's1', text: 'Qu\'est-ce que la multiplication ?', visual: '3️⃣ × 4️⃣ = 3 groupes de 4\n🍎🍎🍎🍎 + 🍎🍎🍎🍎 + 🍎🍎🍎🍎 = 12 🍎', tip: 'C\'est une addition répétée !' },
+          { id: 's2', text: 'La table de 2', visual: '2×1=2 | 2×2=4 | 2×3=6 | 2×4=8 | 2×5=10 | 2×6=12 | 2×7=14 | 2×8=16 | 2×9=18 | 2×10=20', tip: 'Ça double !' },
+          { id: 's3', text: 'La table de 5', visual: '5×1=5 | 5×2=10 | 5×3=15 | 5×4=20 | 5×5=25 | 5×6=30 | 5×7=35 | 5×8=40 | 5×9=45 | 5×10=50', tip: 'Ça finit toujours par 0 ou 5 !' },
+          { id: 's4', text: 'Multiplication en colonnes', visual: '    3️⃣2️⃣\n  ×     4️⃣\n  ──────\n  1️⃣2️⃣8️⃣\n(2×4=8, 3×4=12)', tip: 'On multiplie chaque chiffre !' }
+        ],
+        exercises: [
+          { q: '✖️ 7 × 3 = ?', a: '21', hint: '7+7+7 = 21' },
+          { q: '✖️ 6 × 4 = ?', a: '24', hint: '6+6+6+6 = 24' },
+          { q: '✖️ 9 × 5 = ?', a: '45', hint: '9+9+9+9+9 = 45' }
+        ]
+      },
+      {
+        id: 'ce2_div',
+        title: 'La division (partager)',
+        icon: '➗',
+        type: 'operation',
+        duration: '10 min',
+        steps: [
+          { id: 's1', text: 'Qu\'est-ce que la division ?', visual: '🔴🔴🔴🔴 | 2 = On partage 4 billes en 2 parts égales\n= 2 billes par part\n🔴🔴 | 🔴🔴', tip: 'Partager en parts égales !' },
+          { id: 's2', text: 'Le vocabulaire', visual: '1️⃣2️⃣ ÷ 3️⃣ = 4️⃣\nDividende | Diviseur | Quotient', tip: 'Dividende ÷ Diviseur = Quotient' },
+          { id: 's3', text: 'Trouver la moitié', visual: 'La moitié de 10 = 10 ÷ 2 = 5\n½ de 10 = 5 ✅', tip: 'Diviser par 2 = trouver la moitié !' }
+        ],
+        exercises: [
+          { q: '➗ 8 ÷ 2 = ?', a: '4', hint: 'La moitié de 8' },
+          { q: '➗ 15 ÷ 3 = ?', a: '5', hint: '3 × 5 = 15' },
+          { q: '➗ La moitié de 12 = ?', a: '6', hint: '12 ÷ 2 = 6' }
+        ]
+      }
+    ]
+  },
+  french: {
+    name: '📖 Français CE2',
+    color: '#f43f5e',
+    lessons: [
+      {
+        id: 'ce2_orth',
+        title: 'L\'orthographe',
+        icon: '✏️',
+        type: 'spelling',
+        duration: '12 min',
+        steps: [
+          { id: 's1', text: 'Les accents', visual: 'È - É - Ê\nÈ - e accent grave\nÉ - e accent aigu\nÊ - e accent circonflexe', tip: 'Chaque accent change le son !' },
+          { id: 's2', text: 'Les homophones', visual: '❓ EST = verbe être\n❓ ET = pour ajouter\n\n"Il EST grand ET petit"\n(être) (ajouter)', tip: 'EST = action, ET = ajout !' },
+          { id: 's3', text: 'Les mots invariables', visual: '🔒 JAMAIS\n🔒 SOUVENT\n🔒 TOUJOURS\n🔒 PEUT-ÊTRE\n\nIls ne changent JAMAIS !', tip: 'Pas de pluriel, pas de conjugaison !' },
+          { id: 's4', text: 'Les familles de mots', visual: 'FORÊT 🌳 → FORESTIER 🌲→ DÉFORESTATION 🪓\nMême racine = même famille !', tip: 'Cherche le lien !' }
+        ],
+        exercises: [
+          { q: '✏️ forêt ou forait ?', a: 'forêt', hint: 'F-O-R-Ê-T' },
+          { q: '✏️ "Il ___ grand" (être)', a: 'est', hint: 'Verbe être au présent' },
+          { q: '✏️ Quel accent : "travai" ?', a: 'l', hint: 'TRAVAIL = travail' }
+        ]
+      },
+      {
+        id: 'ce2_gram',
+        title: 'La grammaire',
+        icon: '📚',
+        type: 'grammar',
+        duration: '10 min',
+        steps: [
+          { id: 's1', text: 'Le sujet', visual: '🐱 Le chat dort.\n   ↑\n   SUJET = Qui fait l\'action ?\n\n📝 Identifie le sujet : "Marie mange"\n   ↑\n   SUJET = Marie', tip: 'Qui est-ce qui... ?' },
+          { id: 's2', text: 'Le verbe', visual: '🐱 Le chat dort.\n        ↑\n        VERBE = L\'action\n\n📝 Trouve le verbe : "Les enfants jouent"\n              ↑\n              VERBE = jouent', tip: 'C\'est ce que fait le sujet !' },
+          { id: 's3', text: 'Les articles', visual: 'LE / LA / LES = articles définis\nUN / UNE / DES = articles indéfinis\n\n🐱 Le chat (un chat)\n🐈 Les chats (des chats)', tip: 'LE/LA = ce chat, UN = un chat cualquiera !' }
+        ],
+        exercises: [
+          { q: '📚 Dans "Le chien court", qui est le sujet ?', a: 'le chien', hint: 'Qui court ? Le chien !' },
+          { q: '📚 Quel est le verbe : "Nous mangeons" ?', a: 'mangeons', hint: 'C\'est l\'action !' },
+          { q: '📚 "un" est masculin ou féminin ?', a: 'masculin', hint: 'Un chat, un chien...' }
+        ]
+      },
+      {
+        id: 'ce2_conj',
+        title: 'La conjugaison',
+        icon: '🔄',
+        type: 'conjugation',
+        duration: '12 min',
+        steps: [
+          { id: 's1', text: 'Le présent - Être', visual: 'JE suis\nTU es\nIL/EL est\nNOUS sommes\nVOUS êtes\nILS/ELLES sont', tip: 'Suis, es, est, sommes, êtes, sont' },
+          { id: 's2', text: 'Le présent - Avoir', visual: 'J\'AI\nTU as\nIL/EL a\nNOUS avons\nVOUS avez\nILS/ELLES ont', tip: 'Ai, as, a, avons, avez, ont' },
+          { id: 's3', text: 'Le présent - Verbes en -ER', visual: 'J\'ai-ME\nTU chan-GES\nIL/EL chan-GE\nNOUS chan-GEONS\nVOUS chan-GEZ\nILS chan-GENT', tip: 'On retire -ER et on ajoute la terminaison !' }
+        ],
+        exercises: [
+          { q: '🔄 Je ___ (être)', a: 'suis', hint: 'JE SUIS' },
+          { q: '🔄 Nous ___ (avoir)', a: 'avons', hint: 'NOUS AVONS' },
+          { q: '🔄 Ils ___ (manger)', a: 'mangent', hint: 'Verbe en -ER : -ENT au pluriel' }
+        ]
+      }
+    ]
+  }
+};
+
 // === MINI-GAMES STATE ===
 let rocketGame = {
   active: false,
@@ -532,6 +786,232 @@ function talkMascot(type) {
   const msg = msgs[Math.floor(Math.random() * msgs.length)];
   showFeedback(true, msg, type === 'squirrel' ? '🐿️' : type === 'jelly' ? '🪼' : '🦭');
   playBeep(600, 0.1, 'sine');
+}
+
+// === LESSONS PAGE (LEÇONS TDAH/AUTISME) ===
+function lessonsHTML() {
+  const program = lessonsState.currentLevel === 'ce1' ? CE1_PROGRAM : CE2_PROGRAM;
+  const levelLabel = lessonsState.currentLevel.toUpperCase();
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" data-action="home">🏠</button>
+    <h2 class="module-title" style="color: #9333ea;">📚 Leçons ${levelLabel}</h2>
+    <button class="btn-icon" onclick="toggleVisualMode()" title="Mode">${lessonsState.visualMode ? '👁️' : '📝'}</button>
+  </div>
+  
+  <div class="card level-selector-card">
+    <div class="level-tabs">
+      <button class="level-tab ${lessonsState.currentLevel === 'ce1' ? 'active' : ''}" onclick="switchLevel('ce1')">
+        📘 CE1
+      </button>
+      <button class="level-tab ${lessonsState.currentLevel === 'ce2' ? 'active' : ''}" onclick="switchLevel('ce2')">
+        📗 CE2
+      </button>
+    </div>
+    <p class="level-description">${lessonsState.currentLevel === 'ce1' ? 'Cours pour les petits ! 🌟' : 'Cours pour les plus grands ! 🚀'}</p>
+  </div>
+  
+  <div class="card subject-selector-card">
+    <div class="subject-tabs">
+      <button class="subject-tab math ${lessonsState.currentSubject === 'math' ? 'active' : ''}" onclick="switchSubject('math')">
+        🔢 Maths
+      </button>
+      <button class="subject-tab french ${lessonsState.currentSubject === 'french' ? 'active' : ''}" onclick="switchSubject('french')">
+        📖 Français
+      </button>
+    </div>
+  </div>
+  
+  <div class="lessons-container">
+    ${program[lessonsState.currentSubject].lessons.map(lesson => `
+      <div class="lesson-card" onclick="openLesson('${lesson.id}')">
+        <div class="lesson-icon">${lesson.icon}</div>
+        <div class="lesson-info">
+          <h3 class="lesson-title">${lesson.title}</h3>
+          <div class="lesson-meta">
+            <span class="lesson-duration">⏱️ ${lesson.duration}</span>
+            <span class="lesson-type">${lesson.type === 'number' ? '🔢 Numéros' : lesson.type === 'operation' ? '🔢 Opérations' : lesson.type === 'geometry' ? '🔷 Formes' : lesson.type === 'reading' ? '📖 Lecture' : lesson.type === 'writing' ? '✏️ Écriture' : lesson.type === 'spelling' ? '✏️ Orthographe' : lesson.type === 'grammar' ? '📚 Grammaire' : '🔄 Conjugaison'}</span>
+          </div>
+          <div class="lesson-steps-preview">
+            ${lesson.steps.slice(0, 3).map(s => `<span class="step-dot" title="${s.text}">●</span>`).join('')}
+            ${lesson.steps.length > 3 ? `<span class="more-dots">+${lesson.steps.length - 3}</span>` : ''}
+          </div>
+        </div>
+        <div class="lesson-arrow">→</div>
+      </div>
+    `).join('')}
+  </div>
+  
+  <div class="card mascot-lessons-card">
+    <div class="mascot-lessons-anim">
+      <span class="mascot-anim squirrel">🐿️</span>
+      <span class="mascot-anim jelly">🪼</span>
+      <span class="mascot-anim seal">🦭</span>
+    </div>
+    <p class="mascot-lessons-tip">"Apprends avec nous ! Chaque leçon est un adventure !" 🌟</p>
+    <p class="mascot-lessons-name">- Noisette, Bulle et Câlin</p>
+  </div>`;
+}
+
+// Lesson Detail Page
+function openLesson(lessonId) {
+  const program = lessonsState.currentLevel === 'ce1' ? CE1_PROGRAM : CE2_PROGRAM;
+  let lesson = null;
+  
+  for (const subject of Object.values(program)) {
+    lesson = subject.lessons.find(l => l.id === lessonId);
+    if (lesson) break;
+  }
+  
+  if (!lesson) return;
+  
+  lessonsState.currentLesson = lesson;
+  lessonsState.stepsCompleted = [];
+  screen = 'lessonDetail';
+  render();
+}
+
+function lessonDetailHTML() {
+  const lesson = lessonsState.currentLesson;
+  if (!lesson) return '<p>Erreur : leçon non trouvée</p>';
+  
+  const program = lessonsState.currentLevel === 'ce1' ? CE1_PROGRAM : CE2_PROGRAM;
+  const subjectData = Object.values(program).find(s => s.lessons.some(l => l.id === lesson.id));
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="closeLesson()">←</button>
+    <h2 class="module-title" style="color: ${subjectData.color};">${lesson.icon} ${lesson.title}</h2>
+    <span class="lesson-progress-badge">${lessonsState.stepsCompleted.length}/${lesson.steps.length}</span>
+  </div>
+  
+  <div class="lesson-progress-bar-container">
+    <div class="lesson-progress-bar" style="width: ${(lessonsState.stepsCompleted.length / lesson.steps.length) * 100}%"></div>
+  </div>
+  
+  <div class="lesson-steps-container">
+    ${lesson.steps.map((step, index) => {
+      const isCompleted = lessonsState.stepsCompleted.includes(step.id);
+      const isCurrent = index === lessonsState.stepsCompleted.length;
+      
+      return `<div class="lesson-step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}" onclick="toggleStep('${step.id}')">
+        <div class="step-number ${isCompleted ? 'done' : ''}">${isCompleted ? '✓' : index + 1}</div>
+        <div class="step-content">
+          <h4 class="step-title">${step.text}</h4>
+          <div class="step-visual ${lessonsState.visualMode ? 'show' : ''}">${step.visual}</div>
+          <div class="step-tip">💡 ${step.tip}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  
+  ${lessonsState.stepsCompleted.length === lesson.steps.length ? `
+    <div class="card lesson-exercises-card">
+      <h3 style="color: ${subjectData.color}; margin-bottom: 15px;">🎯 Entraîne-toi !</h3>
+      ${lesson.exercises.map((ex, i) => `
+        <div class="lesson-exercise">
+          <p class="exercise-q">${ex.q}</p>
+          <div class="exercise-input-area">
+            <input type="text" class="lesson-answer-input" id="lessonAns${i}" placeholder="Ta réponse...">
+            <button class="lesson-check-btn" onclick="checkLessonAnswer(${i}, '${ex.a}')">✓</button>
+          </div>
+          <div class="exercise-hint" id="hint${i}" style="display: none;">💡 ${ex.hint}</div>
+        </div>
+      `).join('')}
+    </div>
+  ` : `
+    <div class="card lesson-continue-card">
+      <div class="continue-message">
+        <span class="continue-emoji">${lessonsState.stepsCompleted.length === 0 ? '👋' : '🔥'}</span>
+        <p>${lessonsState.stepsCompleted.length === 0 ? 'Clique sur chaque étape pour apprendre !' : `Continue ! Tu as ${lesson.steps.length - lessonsState.stepsCompleted.length} étapes restantes !`}</p>
+      </div>
+      <div class="continue-mascot">${subjectData.color === '#3b82f6' || subjectData.color === '#8b5cf6' ? '🪼' : '🦭'}</div>
+    </div>
+  `}
+  
+  <button class="btn-finish-lesson" onclick="finishLesson()">
+    ✅ J'ai terminé cette leçon !
+  </button>`;
+}
+
+function toggleStep(stepId) {
+  if (lessonsState.stepsCompleted.includes(stepId)) {
+    // Allow unchecking only for current step
+    const lesson = lessonsState.currentLesson;
+    const currentIndex = lesson.steps.findIndex(s => s.id === stepId);
+    if (currentIndex === lessonsState.stepsCompleted.length - 1) {
+      lessonsState.stepsCompleted.pop();
+    }
+  } else {
+    // Check if previous steps are completed
+    const lesson = lessonsState.currentLesson;
+    const stepIndex = lesson.steps.findIndex(s => s.id === stepId);
+    if (stepIndex === 0 || lessonsState.stepsCompleted.includes(lesson.steps[stepIndex - 1].id)) {
+      lessonsState.stepsCompleted.push(stepId);
+      playBeep(800, 0.2, 'sine');
+      if (lessonsState.stepsCompleted.length === lesson.steps.length) {
+        addStars(5);
+        spawnConfetti(15);
+        showFeedback(true, '🎉 Bravo ! Tu peux maintenant faire les exercices !', '⭐');
+      }
+    }
+  }
+  render();
+}
+
+function checkLessonAnswer(index, correctAnswer) {
+  const input = document.getElementById(`lessonAns${index}`);
+  const hint = document.getElementById(`hint${index}`);
+  const userAnswer = input.value.trim().toLowerCase();
+  const correct = userAnswer === correctAnswer.toLowerCase();
+  
+  if (correct) {
+    input.style.borderColor = '#22c55e';
+    input.style.background = '#bbf7d0';
+    input.disabled = true;
+    addStars(3);
+    spawnConfetti(8);
+    showFeedback(true, '⭐ Bravo ! +3 étoiles !', '🎉');
+  } else {
+    input.style.borderColor = '#ef4444';
+    hint.style.display = 'block';
+    showFeedback(false, 'Pas grave, regarde l\'indice ! 💪', '💡');
+  }
+}
+
+function finishLesson() {
+  addStars(10);
+  spawnConfetti(20);
+  showReward(lessonsState.currentLesson.icon, 'Leçon terminée !', 'Tu es amazing ! Continue comme ça !');
+  lessonsState.currentLesson = null;
+  lessonsState.stepsCompleted = [];
+  screen = 'lessons';
+  setTimeout(() => render(), 2000);
+}
+
+function closeLesson() {
+  lessonsState.currentLesson = null;
+  lessonsState.stepsCompleted = [];
+  screen = 'lessons';
+  render();
+}
+
+function switchLevel(level) {
+  lessonsState.currentLevel = level;
+  lessonsState.currentLesson = null;
+  lessonsState.stepsCompleted = [];
+  render();
+}
+
+function switchSubject(subject) {
+  lessonsState.currentSubject = subject;
+  lessonsState.currentLesson = null;
+  lessonsState.stepsCompleted = [];
+  render();
+}
+
+function toggleVisualMode() {
+  lessonsState.visualMode = !lessonsState.visualMode;
+  render();
 }
 
 // === HOMEWORK PAGE (PAGE DEVOIRS DU JOUR) ===
@@ -1174,6 +1654,8 @@ function render() {
   else if (screen === 'wordHunt') app.innerHTML = wordHuntHTML();
   else if (screen === 'stickers') app.innerHTML = stickerAlbumHTML();
   else if (screen === 'homework') app.innerHTML = homeworkHTML();
+  else if (screen === 'lessons') app.innerHTML = lessonsHTML();
+  else if (screen === 'lessonDetail') app.innerHTML = lessonDetailHTML();
   else if (screen === 'math' || screen === 'french' || screen === 'science') {
     if (done) app.innerHTML = resultHTML();
     else app.innerHTML = quizHTML();
@@ -1253,6 +1735,17 @@ function homeHTML() {
       </div>
     </div>
     <span class="homework-btn-arrow">→</span>
+  </button>
+  
+  <button class="lessons-main-btn screen-transition" onclick="screen='lessons';render()">
+    <div class="lessons-btn-content">
+      <span style="font-size: 2rem;">📖</span>
+      <div class="lessons-btn-text">
+        <span class="lessons-btn-title">Leçons CE1 & CE2</span>
+        <span class="lessons-btn-subtitle">Apprends avec Noisette !</span>
+      </div>
+    </div>
+    <span class="lessons-btn-arrow">→</span>
   </button>
   
   <div class="mini-games-section screen-transition">

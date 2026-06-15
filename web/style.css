@@ -400,3 +400,469 @@ body {
   background: #f3f4f6;
   transform: scale(1.1);
 }
+
+/* ===================== LEÇONS TDAH/AUTISME ===================== */
+
+/* Bouton Leçons */
+.lessons-main-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: 'Nunito', cursive;
+}
+
+.lessons-main-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+}
+
+.lessons-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lessons-btn-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.lessons-btn-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.lessons-btn-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.lessons-btn-arrow {
+  font-size: 1.5rem;
+  animation: bounceArrow 1s ease-in-out infinite;
+}
+
+/* Level selector */
+.level-selector-card {
+  text-align: center;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #86efac;
+}
+
+.level-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.level-tab {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #d1d5db;
+  border-radius: 16px;
+  background: white;
+  font-family: 'Nunito', cursive;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.level-tab.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-color: #059669;
+}
+
+.level-description {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Subject selector */
+.subject-selector-card {
+  background: white;
+}
+
+.subject-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.subject-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Nunito', cursive;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.subject-tab.math {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.subject-tab.math.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.subject-tab.french {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.subject-tab.french.active {
+  background: #ec4899;
+  color: white;
+}
+
+/* Lessons container */
+.lessons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lesson-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.lesson-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.lesson-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 16px;
+}
+
+.lesson-info {
+  flex: 1;
+}
+
+.lesson-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+
+.lesson-meta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.lesson-duration, .lesson-type {
+  font-size: 0.8rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.lesson-steps-preview {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.more-dots {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-left: 4px;
+}
+
+.lesson-arrow {
+  font-size: 1.5rem;
+  color: #9ca3af;
+}
+
+/* Mascot lessons card */
+.mascot-lessons-card {
+  background: linear-gradient(135deg, #fef9c3, #fde68a);
+  border: 2px solid #facc15;
+  text-align: center;
+}
+
+.mascot-lessons-anim {
+  margin-bottom: 12px;
+}
+
+.mascot-anim {
+  font-size: 2rem;
+  margin: 0 5px;
+}
+
+.mascot-anim.squirrel { animation: squirrelBounce 2s ease-in-out infinite; }
+.mascot-anim.jelly { animation: jellySwim 1.8s ease-in-out infinite; }
+.mascot-anim.seal { animation: sealWiggle 2.2s ease-in-out infinite; }
+
+.mascot-lessons-tip {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.mascot-lessons-name {
+  color: #9333ea;
+  font-weight: 700;
+}
+
+/* Lesson detail */
+.lesson-progress-badge {
+  background: #10b981;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.lesson-progress-bar-container {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.lesson-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.lesson-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lesson-step {
+  display: flex;
+  gap: 16px;
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.lesson-step:hover {
+  background: #f9fafb;
+}
+
+.lesson-step.current {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.lesson-step.completed {
+  opacity: 0.7;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.step-number.done {
+  background: #10b981;
+  color: white;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.step-visual {
+  display: none;
+  background: #fef9c3;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin-bottom: 10px;
+}
+
+.step-visual.show {
+  display: block;
+}
+
+.step-tip {
+  font-size: 0.9rem;
+  color: #059669;
+  font-style: italic;
+}
+
+/* Lesson exercises */
+.lesson-exercises-card {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #86efac;
+  margin-top: 20px;
+}
+
+.lesson-exercise {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.exercise-q {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.exercise-input-area {
+  display: flex;
+  gap: 10px;
+}
+
+.lesson-answer-input {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-family: 'Nunito', cursive;
+  font-size: 1rem;
+}
+
+.lesson-answer-input:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.lesson-check-btn {
+  padding: 12px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Nunito', cursive;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.lesson-check-btn:active {
+  transform: scale(0.95);
+}
+
+.exercise-hint {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #fef9c3;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 0.9rem;
+}
+
+/* Continue card */
+.lesson-continue-card {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border: 2px solid #93c5fd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.continue-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.continue-emoji {
+  font-size: 2.5rem;
+}
+
+.continue-message p {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.continue-mascot {
+  font-size: 3rem;
+}
+
+/* Finish lesson button */
+.btn-finish-lesson {
+  width: 100%;
+  padding: 16px;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-family: 'Nunito', cursive;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  transition: transform 0.2s;
+}
+
+.btn-finish-lesson:active {
+  transform: scale(0.98);
+}
