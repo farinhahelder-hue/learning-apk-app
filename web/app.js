@@ -8,6 +8,19 @@ let streak = 1;
 let combo = 0;
 let muted = false;
 
+// === HOMEWORK STATE (NOUVEAU) ===
+let homeworkState = {
+  date: '',
+  mathHomework: '',
+  frenchHomework: '',
+  completed: [],
+  focusTimer: 25 * 60, // 25 minutes pomodoro
+  timerActive: false,
+  timerInterval: null,
+  aiGenerating: false,
+  aiExercises: []
+};
+
 // === MINI-GAMES STATE ===
 let rocketGame = {
   active: false,
@@ -521,6 +534,285 @@ function talkMascot(type) {
   playBeep(600, 0.1, 'sine');
 }
 
+// === HOMEWORK PAGE (PAGE DEVOIRS DU JOUR) ===
+function homeworkHTML() {
+  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const hasMath = homeworkState.mathHomework.trim() !== '';
+  const hasFrench = homeworkState.frenchHomework.trim() !== '';
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" data-action="home">🏠</button>
+    <h2 class="module-title" style="color: #9333ea;">📚 Devoirs du Jour</h2>
+    <button class="btn-icon" onclick="downloadHomework()" title="Télécharger">📥</button>
+  </div>
+  
+  <div class="card homework-date-card">
+    <div style="font-size: 2rem; margin-bottom: 5px;">📅</div>
+    <h3 style="color: #9333ea;">${today}</h3>
+    <p style="color: #666; font-size: 0.9rem;">Remplis tes devoirs avec l'aide de Noisette ! 🐿️</p>
+  </div>
+  
+  <div class="card homework-section">
+    <div class="homework-header" onclick="toggleHomeworkSection('math')">
+      <span style="font-size: 1.8rem;">🔢</span>
+      <div>
+        <h3 style="color: #2563eb;">Mathématiques</h3>
+        <p style="font-size: 0.85rem; color: #666;">${hasMath ? 'Exercices ajoutés' : 'Clique pour ajouter'}</p>
+      </div>
+      <span class="homework-toggle" id="mathToggle">▼</span>
+    </div>
+    <div class="homework-content" id="mathContent">
+      ${hasMath ? `<div class="homework-text">${homeworkState.mathHomework}</div>` : ''}
+      <textarea class="homework-input" id="mathInput" placeholder="Ex: Num 13 - Exercices 1 à 6"></textarea>
+      <button class="homework-btn math-btn" onclick="saveHomework('math')">💾 Sauvegarder</button>
+      ${hasMath ? `<button class="homework-btn ai-btn" onclick="generateAIExercises('math')">🤖 Créer exercices IA</button>` : ''}
+    </div>
+  </div>
+  
+  <div class="card homework-section">
+    <div class="homework-header" onclick="toggleHomeworkSection('french')">
+      <span style="font-size: 1.8rem;">📖</span>
+      <div>
+        <h3 style="color: #db2777;">Français</h3>
+        <p style="font-size: 0.85rem; color: #666;">${hasFrench ? 'Mots de dictée ajoutés' : 'Clique pour ajouter'}</p>
+      </div>
+      <span class="homework-toggle" id="frenchToggle">▼</span>
+    </div>
+    <div class="homework-content" id="frenchContent">
+      ${hasFrench ? `<div class="homework-text">${homeworkState.frenchHomework}</div>` : ''}
+      <textarea class="homework-input" id="frenchInput" placeholder="Ex: mots 24 bleu - Liste de dictée"></textarea>
+      <button class="homework-btn french-btn" onclick="saveHomework('french')">💾 Sauvegarder</button>
+      ${hasFrench ? `<button class="homework-btn ai-btn" onclick="generateAIExercises('french')">🤖 Créer exercices IA</button>` : ''}
+    </div>
+  </div>
+  
+  <div class="card focus-timer-card">
+    <div class="focus-timer-header">
+      <span style="font-size: 2rem;">🍅</span>
+      <div>
+        <h3 style="color: #16a34a;">Minuteur Focus</h3>
+        <p style="font-size: 0.85rem; color: #666;">25 min de concentration !</p>
+      </div>
+    </div>
+    <div class="focus-timer-display" id="focusTimerDisplay">25:00</div>
+    <div class="focus-timer-buttons">
+      <button class="focus-btn start" onclick="startFocusTimer()">▶️ Démarrer</button>
+      <button class="focus-btn pause" onclick="pauseFocusTimer()">⏸️ Pause</button>
+      <button class="focus-btn reset" onclick="resetFocusTimer()">🔄 Reset</button>
+    </div>
+  </div>
+  
+  ${homeworkState.aiExercises.length > 0 ? `<div class="card ai-exercises-card">
+    <h3 style="color: #9333ea; margin-bottom: 15px;">🤖 Exercices IA Générés</h3>
+    ${homeworkState.aiExercises.map((ex, i) => `
+      <div class="ai-exercise-item">
+        <div class="ai-exercise-q">${ex.question}</div>
+        <div class="ai-exercise-hint">💡 ${ex.hint || 'Réfléchis bien !'}</div>
+        <button class="ai-exercise-check" onclick="checkAIExercise(${i})">✓ J'ai trouvé !</button>
+      </div>
+    `).join('')}
+  </div>` : ''}
+  
+  <div class="card motivation-card">
+    <div style="font-size: 2.5rem; margin-bottom: 10px;">🐿️</div>
+    <p style="font-style: italic; color: #666;">"Une noisette à la fois, on arrive loin !" 🌰</p>
+    <p style="color: #9333ea; font-weight: bold; margin-top: 8px;">- Noisette</p>
+  </div>`;
+}
+
+// Toggle homework section
+let homeworkSectionsOpen = { math: false, french: false };
+
+function toggleHomeworkSection(subject) {
+  homeworkSectionsOpen[subject] = !homeworkSectionsOpen[subject];
+  const content = document.getElementById(`${subject}Content`);
+  const toggle = document.getElementById(`${subject}Toggle`);
+  content.style.display = homeworkSectionsOpen[subject] ? 'block' : 'none';
+  toggle.textContent = homeworkSectionsOpen[subject] ? '▲' : '▼';
+}
+
+// Save homework
+function saveHomework(subject) {
+  const input = document.getElementById(`${subject}Input`);
+  if (subject === 'math') {
+    homeworkState.mathHomework = input.value;
+  } else {
+    homeworkState.frenchHomework = input.value;
+  }
+  playBeep(800, 0.2, 'sine');
+  showFeedback(true, 'Devoirs sauvegardés ! 💾', '📚');
+  setTimeout(() => render(), 1000);
+}
+
+// Download homework as text file
+function downloadHomework() {
+  const today = new Date().toLocaleDateString('fr-FR');
+  let text = `═══════════════════════════════════════\n`;
+  text += `📚 DEVOIRS DU JOUR - ${today}\n`;
+  text += `═══════════════════════════════════════\n\n`;
+  
+  if (homeworkState.mathHomework.trim()) {
+    text += `🔢 MATHÉMATIQUES\n`;
+    text += `───────────────────────────────────────\n`;
+    text += homeworkState.mathHomework + "\n\n";
+  }
+  
+  if (homeworkState.frenchHomework.trim()) {
+    text += `📖 FRANÇAIS\n`;
+    text += `───────────────────────────────────────\n`;
+    text += homeworkState.frenchHomework + "\n\n";
+  }
+  
+  if (!homeworkState.mathHomework.trim() && !homeworkState.frenchHomework.trim()) {
+    text += `Aucun devoir ajouté aujourd'hui.\n`;
+  }
+  
+  text += `\n═══════════════════════════════════════\n`;
+  text += `🐿️🪼🦭 Bon courage Emilie !\n`;
+  text += `═══════════════════════════════════════\n`;
+  
+  // Create and download file
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `devoirs_${today.replace(/\//g, '-')}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  playBeep(600, 0.2, 'sine');
+  showFeedback(true, 'Fichier téléchargé ! 📥', '⬇️');
+}
+
+// Focus Timer (Pomodoro)
+function startFocusTimer() {
+  if (homeworkState.timerActive) return;
+  homeworkState.timerActive = true;
+  
+  homeworkState.timerInterval = setInterval(() => {
+    homeworkState.focusTimer--;
+    updateFocusTimerDisplay();
+    
+    if (homeworkState.focusTimer <= 0) {
+      pauseFocusTimer();
+      homeworkState.focusTimer = 25 * 60;
+      addStars(5);
+      spawnConfetti(20);
+      showFeedback(true, '🎉 Pause méritée ! 5 étoiles gagnées !', '🍅');
+    }
+  }, 1000);
+  
+  playBeep(500, 0.1, 'sine');
+}
+
+function pauseFocusTimer() {
+  homeworkState.timerActive = false;
+  clearInterval(homeworkState.timerInterval);
+}
+
+function resetFocusTimer() {
+  pauseFocusTimer();
+  homeworkState.focusTimer = 25 * 60;
+  updateFocusTimerDisplay();
+  playBeep(400, 0.1, 'sine');
+}
+
+function updateFocusTimerDisplay() {
+  const mins = Math.floor(homeworkState.focusTimer / 60);
+  const secs = homeworkState.focusTimer % 60;
+  const display = document.getElementById('focusTimerDisplay');
+  if (display) {
+    display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    if (homeworkState.focusTimer <= 60) {
+      display.style.color = '#ef4444';
+    } else {
+      display.style.color = '#16a34a';
+    }
+  }
+}
+
+// Generate AI Exercises (using free API or fallback)
+async function generateAIExercises(subject) {
+  if (homeworkState.aiGenerating) return;
+  
+  homeworkState.aiGenerating = true;
+  playBeep(400, 0.3, 'sine');
+  
+  const homeworkText = subject === 'math' ? homeworkState.mathHomework : homeworkState.frenchHomework;
+  
+  // Use a free AI API (simulated with predefined exercises based on homework)
+  // In production, you could use: Ollama, LM Studio, or other local/free APIs
+  const exercises = generateExercisesFromHomework(subject, homeworkText);
+  
+  homeworkState.aiExercises = exercises;
+  homeworkState.aiGenerating = false;
+  
+  playBeep(800, 0.2, 'sine');
+  showFeedback(true, `🤖 ${exercises.length} exercices créés pour toi !`, '✨');
+  render();
+}
+
+function generateExercisesFromHomework(subject, homeworkText) {
+  // Parse homework text and generate exercises
+  // This uses predefined templates - in production, call a real AI API
+  const exercises = [];
+  
+  if (subject === 'math') {
+    if (homeworkText.toLowerCase().includes('num')) {
+      exercises.push(
+        { question: '🔢 Trouve le nombre : 3 000 + 400 + 50 + 2 = ?', hint: 'Additionne chaque partie !' },
+        { question: '🔢 Écris en chiffres : "deux mille quatre cent dix-sept"', hint: '2 000 + 400 + 10 + 7' },
+        { question: '🔢 Compare : 4 502 ___ 4 520 (<, >, ou =)', hint: 'Compare les dizaines !' },
+        { question: '🔢 Quel est le chiffre des centaines dans 5 738 ?', hint: 'Le 2ème chiffre en partant de la droite' },
+        { question: '🔢 Range du plus petit au plus grand : 2345, 2543, 2435', hint: 'Compare les centaines d\'abord !' }
+      );
+    } else {
+      exercises.push(
+        { question: '🔢 5 + 7 = ?', hint: 'Compte sur tes doigts !' },
+        { question: '🔢 12 - 4 = ?', hint: 'Retire 4 de 12 !' },
+        { question: '🔢 3 × 4 = ?', hint: '3 groupes de 4 !' },
+        { question: '🔢 La moitié de 10 = ?', hint: 'Divise par 2 !' }
+      );
+    }
+  } else {
+    if (homeworkText.toLowerCase().includes('bleu')) {
+      exercises.push(
+        { question: '📖 Écris : oiseau', hint: 'O-I-S-E-A-U' },
+        { question: '📖 Écris : fenêtre', hint: 'F-E-N-Ê-T-R-E' },
+        { question: '📖 Écris : forêt', hint: 'F-O-R-Ê-T' },
+        { question: '📖 Le contraire de nuit = ?', hint: 'Le contraire de nuit, c\'est...' },
+        { question: '📖 Quel son dans "loin" ? [wan]', hint: 'LOIN' }
+      );
+    } else {
+      exercises.push(
+        { question: '📖 Écris : chat', hint: 'C-H-A-T' },
+        { question: '📖 Écris : maison', hint: 'M-A-I-S-O-N' },
+        { question: '📖 Le contraire de grand = ?', hint: 'Petit !' },
+        { question: '📖 Complète : la g _ _ _ _ (animal)', hint: 'GIRAFE' }
+      );
+    }
+  }
+  
+  return exercises;
+}
+
+function checkAIExercise(index) {
+  homeworkState.aiExercises.splice(index, 1);
+  addStars(3);
+  spawnConfetti(10);
+  showFeedback(true, '⭐ Bien joué ! +3 étoiles !', '🎉');
+  
+  if (homeworkState.aiExercises.length === 0) {
+    addStars(10);
+    spawnConfetti(25);
+    showReward('🤖', 'Exercices IA Terminés !', 'Tu as complété tous les exercices générés par l\'IA ! +10 étoiles bonus !');
+  }
+  
+  setTimeout(() => render(), 1500);
+}
+
 // === FEEDBACK ===
 const correctMsgs = [
   'Bravo Emilie ! 🌟','Super ! 🎉','Excellent ! 🐿️','Génial ! 🪼','Parfait ! 🦭',
@@ -881,6 +1173,7 @@ function render() {
   else if (screen === 'rocketRace') app.innerHTML = rocketRaceHTML();
   else if (screen === 'wordHunt') app.innerHTML = wordHuntHTML();
   else if (screen === 'stickers') app.innerHTML = stickerAlbumHTML();
+  else if (screen === 'homework') app.innerHTML = homeworkHTML();
   else if (screen === 'math' || screen === 'french' || screen === 'science') {
     if (done) app.innerHTML = resultHTML();
     else app.innerHTML = quizHTML();
@@ -950,6 +1243,17 @@ function homeHTML() {
     </div>
     <div class="challenge-animals-large">🐿️🪼🦭</div>
   </div>
+  
+  <button class="homework-main-btn screen-transition" onclick="screen='homework';render()">
+    <div class="homework-btn-content">
+      <span style="font-size: 2rem;">📚</span>
+      <div class="homework-btn-text">
+        <span class="homework-btn-title">Devoirs du Jour</span>
+        <span class="homework-btn-subtitle">Clique pour commencer !</span>
+      </div>
+    </div>
+    <span class="homework-btn-arrow">→</span>
+  </button>
   
   <div class="mini-games-section screen-transition">
     <div class="mini-games-title">🎮 Mini-Jeux Ludiques</div>
