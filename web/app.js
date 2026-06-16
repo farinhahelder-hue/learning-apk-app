@@ -31,126 +31,295 @@ let lessonsState = {
   visualMode: true // Mode visuel pour TDAH
 };
 
-// === CE1 & CE2 PROGRAMS DATA ===
+// === CE1 & CE2 PROGRAMS DATA (Programme officiel 2025) ===
 const CE1_PROGRAM = {
   math: {
     name: '🔢 Maths CE1',
     color: '#3b82f6',
-    lessons: [
-      {
-        id: 'ce1_num1',
-        title: 'Les nombres jusqu\'à 100',
+    skills: {
+      'Nombres et numération': {
         icon: '🔢',
-        type: 'number',
-        duration: '10 min',
-        steps: [
-          { id: 's1', text: 'Les nombres de 0 à 20', visual: '0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟 1️⃣1️⃣ 1️⃣2️⃣...', tip: 'Compte sur tes doigts !' },
-          { id: 's2', text: 'La dizaine = 10', visual: '🔟 + 🔟 + 🔟 = 30', tip: '3 dizaines = 30' },
-          { id: 's3', text: 'Compter de 10 en 10', visual: '10 → 20 → 30 → 40 → 50 → 60 → 70 → 80 → 90 → 100', tip: '+10 à chaque fois !' },
-          { id: 's4', text: 'Les nombres en lettres', visual: '🔢 1️⃣2️⃣ = Douze 📖', tip: 'DIX = 10, DOUZE = 12' },
-          { id: 's5', text: 'Comparer deux nombres', visual: '45 < 54\n45 est PLUS PETIT que 54', tip: 'Le plus petit < le plus grand' }
-        ],
-        exercises: [
-          { q: '🔢 Compte de 5 en 5 : 5, 10, 15, ... ?', a: '20', hint: '+5 à chaque fois' },
-          { q: '🔢 30 + 10 = ?', a: '40', hint: '3 dizaines + 1 dizaine = 4 dizaines' },
-          { q: '🔢 Quel est le plus grand : 67 ou 76 ?', a: '76', hint: 'Compare les dizaines !' }
+        lessons: [
+          {
+            id: 'ce1_num100', title: 'Les nombres jusqu\'à 100', duration: '10 min', steps: [
+              { id: 's1', text: 'Les nombres de 0 à 20', visual: '0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟 1️⃣1️⃣ 1️⃣2️⃣...', tip: 'Compte sur tes doigts !' },
+              { id: 's2', text: 'La dizaine = 10', visual: '🔟 + 🔟 + 🔟 = 30', tip: '3 dizaines = 30' },
+              { id: 's3', text: 'Compter de 10 en 10', visual: '10 → 20 → 30 → 40 → 50 → 60 → 70 → 80 → 90 → 100', tip: '+10 à chaque fois !' },
+              { id: 's4', text: 'Compter de 5 en 5', visual: '5 → 10 → 15 → 20 → 25 → 30...', tip: '+5 à chaque fois !' },
+              { id: 's5', text: 'Comparer deux nombres', visual: '45 < 54\n45 est PLUS PETIT que 54', tip: 'Le plus petit < le plus grand' }
+            ], exercises: [
+              { q: '🔢 30 + 10 = ?', a: '40', hint: '3 dizaines + 1 dizaine = 4 dizaines' },
+              { q: '🔢 Quel est le plus grand : 67 ou 76 ?', a: '76', hint: 'Compare les dizaines !' },
+              { q: '🔢 Compte de 5 en 5 : 5, 10, 15, ... ?', a: '20', hint: '+5 à chaque fois' }
+            ]
+          },
+          {
+            id: 'ce1_num1000', title: 'Les nombres jusqu\'à 1000', duration: '12 min', steps: [
+              { id: 's1', text: 'La centaines = 100', visual: '🔟🔟🔟🔟🔟🔟🔟🔟🔟🔟 = 100\nC\'est 10 dizaines !', tip: 'Une centaines = 100' },
+              { id: 's2', text: 'Compter de 100 en 100', visual: '100 → 200 → 300 → 400 → 500 → 600 → 700 → 800 → 900 → 1000', tip: '+100 à chaque fois !' },
+              { id: 's3', text: 'Décomposer un nombre', visual: '3️⃣5️⃣7️⃣ = 300 + 50 + 7\n3 centaines, 5 dizaines, 7 unités', tip: 'Sépare chaque partie !' },
+              { id: 's4', text: 'Les nombres ordinaux', visual: '1️⃣er, 2️⃣e, 3️⃣e, 4️⃣e, 5️⃣e...\nPremier, deuxième, troisième...', tip: 'Pour indiquer un rang !' }
+            ], exercises: [
+              { q: '🔢 500 + 30 + 7 = ?', a: '537', hint: '5 centaines, 3 dizaines, 7 unités' },
+              { q: '🔢 Dans 482, quel est le chiffre des dizaines ?', a: '8', hint: '8 est en position des dizaines' },
+              { q: '🔢 Je suis le 1er → Je suis ___', a: 'premier', hint: '1er = premier' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce1_add',
-        title: 'L\'addition',
+      'Calcul et opérations': {
         icon: '➕',
-        type: 'operation',
-        duration: '8 min',
-        steps: [
-          { id: 's1', text: 'Qu\'est-ce que l\'addition ?', visual: 'J\'ai 3 pommes 🍎 + J\'en ai 2 autres 🍎 = J\'en ai 5 en tout 🍎🍎🍎🍎🍎', tip: 'On AJOUTE des choses !' },
-          { id: 's2', text: 'Additionner avec les doigts', visual: '5 + 3 = ?\nLève 5 doigts 🖐️, ajoute 3 doigts 🖐️🖐️🖐️ = 8 doigts ✋✋✋✋', tip: 'Compte tous les doigts !' },
-          { id: 's3', text: 'La table d\'addition du 10', visual: '0+10=10 | 1+9=10 | 2+8=10 | 3+7=10 | 4+6=10 | 5+5=10', tip: 'Tout fait 10 avec le bon ami !' },
-          { id: 's4', text: 'Pose l\'addition', visual: '  2️⃣3️⃣\n+ 1️⃣4️⃣\n─────\n  ?', tip: 'On additionne d\'abord les unités !' }
-        ],
-        exercises: [
-          { q: '➕ 7 + 5 = ?', a: '12', hint: '7 + 3 = 10, puis +2 = 12' },
-          { q: '➕ 15 + 4 = ?', a: '19', hint: '15 + 4 = 19' },
-          { q: '➕ 8 + 8 = ?', a: '16', hint: 'Deux fois 8 = 16' }
+        lessons: [
+          {
+            id: 'ce1_add', title: 'L\'addition', duration: '10 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce que l\'addition ?', visual: 'J\'ai 3 pommes 🍎 + J\'en ai 2 autres 🍎 = J\'en ai 5 en tout 🍎🍎🍎🍎🍎', tip: 'On AJOUTE des choses !' },
+              { id: 's2', text: 'Additionner avec les doigts', visual: '5 + 3 = ?\nLève 5 doigts 🖐️, ajoute 3 doigts 🖐️🖐️🖐️ = 8 doigts ✋✋✋✋', tip: 'Compte tous les doigts !' },
+              { id: 's3', text: 'La table d\'addition du 10', visual: '0+10=10 | 1+9=10 | 2+8=10 | 3+7=10 | 4+6=10 | 5+5=10', tip: 'Tout fait 10 avec le bon ami !' },
+              { id: 's4', text: 'Pose l\'addition (sans retenue)', visual: '  2️⃣3️⃣\n+ 1️⃣4️⃣\n─────\n  3️⃣7️⃣', tip: 'On additionne d\'abord les unités !' }
+            ], exercises: [
+              { q: '➕ 7 + 5 = ?', a: '12', hint: '7 + 3 = 10, puis +2 = 12' },
+              { q: '➕ 15 + 4 = ?', a: '19', hint: '15 + 4 = 19' },
+              { q: '➕ 8 + 8 = ?', a: '16', hint: 'Deux fois 8 = 16' }
+            ]
+          },
+          {
+            id: 'ce1_sous', title: 'La soustraction', duration: '10 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce que la soustraction ?', visual: 'J\'ai 8 bonbons 🍬, j\'en mange 3 🍬🍬🍬 = il m\'en reste 5 🍬🍬🍬🍬🍬', tip: 'On ENLÈVE des choses !' },
+              { id: 's2', text: 'Soustraire avec les doigts', visual: '8 - 3 = ?\nLève 8 doigts, baisse 3 = il en reste 5 !', tip: 'Compte les doigts levés restants !' },
+              { id: 's3', text: 'Les amis de 10', visual: '10-0=10 | 10-1=9 | 10-2=8 | 10-3=7 | 10-4=6 | 10-5=5', tip: 'Soustraire de 10, c\'est facile !' },
+              { id: 's4', text: 'Pose la soustraction (sans retenue)', visual: '  3️⃣7️⃣\n- 1️⃣2️⃣\n─────\n  2️⃣5️⃣', tip: 'On soustrait d\'abord les unités !' }
+            ], exercises: [
+              { q: '➖ 9 - 4 = ?', a: '5', hint: '9 moins 4 = 5' },
+              { q: '➖ 10 - 7 = ?', a: '3', hint: '10 moins 7 = 3' },
+              { q: '➖ 15 - 5 = ?', a: '10', hint: 'La moitié de 15 !' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce1_sous',
-        title: 'La soustraction',
-        icon: '➖',
-        type: 'operation',
-        duration: '8 min',
-        steps: [
-          { id: 's1', text: 'Qu\'est-ce que la soustraction ?', visual: 'J\'ai 8 bonbons 🍬, j\'en mange 3 🍬🍬🍬 = il m\'en reste 5 🍬🍬🍬🍬🍬', tip: 'On ENLÈVE des choses !' },
-          { id: 's2', text: 'Soustraire avec les doigts', visual: '8 - 3 = ?\nLève 8 doigts, baisse 3 = il en reste 5 !', tip: 'Compte les doigts levés restants !' },
-          { id: 's3', text: 'Les amis de 10', visual: '10-0=10 | 10-1=9 | 10-2=8 | 10-3=7 | 10-4=6 | 10-5=5', tip: 'Soustraire de 10, c\'est facile !' }
-        ],
-        exercises: [
-          { q: '➖ 9 - 4 = ?', a: '5', hint: '9 moins 4 = 5' },
-          { q: '➖ 10 - 7 = ?', a: '3', hint: '10 moins 7 = 3' },
-          { q: '➖ 15 - 5 = ?', a: '10', hint: 'La moitié de 15 !' }
+      'Calcul mental': {
+        icon: '🧮',
+        lessons: [
+          {
+            id: 'ce1_complement10', title: 'Complements à 10', duration: '8 min', steps: [
+              { id: 's1', text: 'Les amis de 10', visual: '🔟 = 0+10 = 1+9 = 2+8 = 3+7 = 4+6 = 5+5', tip: 'Chaque paire fait 10 !' },
+              { id: 's2', text: 'Mémoriser les compléments', visual: 'Pour faire 10 :\n0 + 10 = 10\n1 + 9 = 10\n2 + 8 = 10\n3 + 7 = 10\n4 + 6 = 10\n5 + 5 = 10', tip: 'Connaître par cœur !' }
+            ], exercises: [
+              { q: '🧮 7 + ? = 10', a: '3', hint: '7 + 3 = 10' },
+              { q: '🧮 4 + ? = 10', a: '6', hint: '4 + 6 = 10' },
+              { q: '🧮 8 + ? = 10', a: '2', hint: '8 + 2 = 10' }
+            ]
+          },
+          {
+            id: 'ce1_tables', title: 'Tables de multiplication', duration: '12 min', steps: [
+              { id: 's1', text: 'La table de 2', visual: '2×1=2 | 2×2=4 | 2×3=6 | 2×4=8 | 2×5=10\n2×6=12 | 2×7=14 | 2×8=16 | 2×9=18 | 2×10=20', tip: 'Ça double !' },
+              { id: 's2', text: 'La table de 3', visual: '3×1=3 | 3×2=6 | 3×3=9 | 3×4=12 | 3×5=15\n3×6=18 | 3×7=21 | 3×8=24 | 3×9=27 | 3×10=30', tip: '3 en plus à chaque fois !' },
+              { id: 's3', text: 'La table de 4', visual: '4×1=4 | 4×2=8 | 4×3=12 | 4×4=16 | 4×5=20\n4×6=24 | 4×7=28 | 4×8=32 | 4×9=36 | 4×10=40', tip: 'C\'est le double de la table de 2 !' },
+              { id: 's4', text: 'La table de 5', visual: '5×1=5 | 5×2=10 | 5×3=15 | 5×4=20 | 5×5=25\n5×6=30 | 5×7=35 | 5×8=40 | 5×9=45 | 5×10=50', tip: 'Ça finit toujours par 0 ou 5 !' }
+            ], exercises: [
+              { q: '✖️ 3 × 4 = ?', a: '12', hint: '3 × 4 = 12' },
+              { q: '✖️ 5 × 5 = ?', a: '25', hint: '5 × 5 = 25' },
+              { q: '✖️ 2 × 9 = ?', a: '18', hint: 'Le double de 9 = 18' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce1_geo',
-        title: 'Les formes',
+      'Grandeurs et mesures': {
+        icon: '📏',
+        lessons: [
+          {
+            id: 'ce1_longueur', title: 'Les longueurs', duration: '10 min', steps: [
+              { id: 's1', text: 'Le mètre (m)', visual: '📏 Le mètre = 100 centimètres\n\n1 m = 100 cm', tip: 'Pour mesurer des grandes choses' },
+              { id: 's2', text: 'Le centimètre (cm)', visual: '✏️ Le centimètre\n\n1 cm = petit bout de doigt\n10 cm = 1 décimètre = paume', tip: 'Pour mesurer des petites choses' },
+              { id: 's3', text: 'Le kilomètre (km)', visual: '🏃 1 km = 1000 mètres\n\nC\'est très loin !\nComme 10 terrains de foot !', tip: 'Pour les grandes distances' }
+            ], exercises: [
+              { q: '📏 1 m = ? cm', a: '100', hint: '1 mètre = 100 centimètres' },
+              { q: '📏 2 m = ? cm', a: '200', hint: '2 mètres = 200 centimètres' },
+              { q: '📏 1 km = ? m', a: '1000', hint: '1 kilomètre = 1000 mètres' }
+            ]
+          },
+          {
+            id: 'ce1_monnaie', title: 'La monnaie', duration: '10 min', steps: [
+              { id: 's1', text: 'Les pièces', visual: '1 centime 🪙 | 2 centimes | 5 centimes | 10 centimes\n20 centimes | 50 centimes | 1 euro 💰 | 2 euros', tip: 'Il faut savoir compter les sous !' },
+              { id: 's2', text: 'Les billets', visual: '5€ 💵 | 10€ | 20€ | 50€ | 100€ | 200€', tip: 'Les gros montants' },
+              { id: 's3', text: 'Rendre la monnaie', visual: 'Je donne 10€ pour un jouet à 7€\nOn me rend : 10 - 7 = 3€\n💰 3 euros', tip: 'On soustrait !' }
+            ], exercises: [
+              { q: '💰 5 + 2 + 1 = ? euros', a: '8', hint: '5 + 2 + 1 = 8' },
+              { q: '💰 J\'ai 10€, je dépense 6€. Il me reste ?', a: '4', hint: '10 - 6 = 4' },
+              { q: '💰 20 centimes + 30 centimes = ? euros', a: '0.50', hint: '20 + 30 = 50 centimes = 0.50€' }
+            ]
+          }
+        ]
+      },
+      'Espace et géométrie': {
         icon: '🔷',
-        type: 'geometry',
-        duration: '6 min',
-        steps: [
-          { id: 's1', text: 'Le carré', visual: '🔲 a 4 CÔTÉS égaux\n4 coins droits\nComme une boîte de Pizza 🍕', tip: '4 côtés = 4 !' },
-          { id: 's2', text: 'Le triangle', visual: '🔺 a 3 CÔTÉS\n3 coins\nComme un chapeau de magicien 🎩', tip: '3 côtés = 3 !' },
-          { id: 's3', text: 'Le cercle', visual: '⭕ n\'a pas de côté\nIl est ROND\nComme une roue 🚗', tip: 'Rond = cercle !' },
-          { id: 's4', text: 'Le rectangle', visual: '▬ a 4 CÔTÉS\n2 longs, 2 courts\nComme une porte 🚪', tip: 'Comme le carré mais allongé !' }
-        ],
-        exercises: [
-          { q: '🔷 Combien de côtés a un carré ?', a: '4', hint: '4 côtés égaux !' },
-          { q: '🔷 Quel forme est ronde ?', a: 'cercle', hint: 'Sans côtés, tout rond !' },
-          { q: '🔷 Le triangle a combien de côtés ?', a: '3', hint: '3 !' }
+        lessons: [
+          {
+            id: 'ce1_forme', title: 'Les formes', duration: '10 min', steps: [
+              { id: 's1', text: 'Le carré', visual: '🔲 a 4 CÔTÉS égaux\n4 coins droits\nComme une boîte de Pizza 🍕', tip: '4 côtés = 4 !' },
+              { id: 's2', text: 'Le triangle', visual: '🔺 a 3 CÔTÉS\n3 coins\nComme un chapeau de magicien 🎩', tip: '3 côtés = 3 !' },
+              { id: 's3', text: 'Le cercle', visual: '⭕ n\'a pas de côté\nIl est ROND\nComme une roue 🚗', tip: 'Rond = cercle !' },
+              { id: 's4', text: 'Le rectangle', visual: '▬ a 4 CÔTÉS\n2 longs, 2 courts\nComme une porte 🚪', tip: 'Comme le carré mais allongé !' }
+            ], exercises: [
+              { q: '🔷 Combien de côtés a un carré ?', a: '4', hint: '4 côtés égaux !' },
+              { q: '🔷 Quel forme est ronde ?', a: 'cercle', hint: 'Sans côtés, tout rond !' },
+              { q: '🔷 Le triangle a combien de côtés ?', a: '3', hint: '3 !' }
+            ]
+          },
+          {
+            id: 'ce1_quadrillage', title: 'Le quadrillage', duration: '8 min', steps: [
+              { id: 's1', text: 'Se déplacer sur un quadrillage', visual: '⬆️ Haut | ⬇️ Bas | ⬅️ Gauche | ➡️ Droite\n\nCase (B,2) = colonne B, ligne 2', tip: 'On lit la colonne d\'abord !' },
+              { id: 's2', text: 'Repérer un point', visual: '📊 Case C3 = colonne C, ligne 3\n\nLa case est entre les lignes !', tip: 'Colonne puis ligne !' }
+            ], exercises: [
+              { q: '📊 Quelle case est en colonne A, ligne 1 ?', a: 'A1', hint: 'Colonne A, Ligne 1' },
+              { q: '📊 Case B2 : colonne ? ligne ?', a: 'B2', hint: 'Colonne B, Ligne 2' }
+            ]
+          }
+        ]
+      },
+      'Fractions': {
+        icon: '🍕',
+        lessons: [
+          {
+            id: 'ce1_moitie', title: 'Les moitiés', duration: '8 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce qu\'une moitié ?', visual: '🍕 Je coupe en 2 parts égales\nChaque part = 1 moitié\n\n½ de 8 = 4', tip: 'Diviser par 2 !' },
+              { id: 's2', text: 'Trouver la moitié', visual: '½ de 2 = 1\n½ de 4 = 2\n½ de 6 = 3\n½ de 8 = 4\n½ de 10 = 5', tip: '÷2 pour trouver la moitié !' }
+            ], exercises: [
+              { q: '🍕 La moitié de 6 = ?', a: '3', hint: '6 ÷ 2 = 3' },
+              { q: '🍕 La moitié de 10 = ?', a: '5', hint: '10 ÷ 2 = 5' },
+              { q: '🍕 La moitié de 8 = ?', a: '4', hint: '8 ÷ 2 = 4' }
+            ]
+          }
         ]
       }
-    ]
+    }
   },
   french: {
     name: '📖 Français CE1',
     color: '#ec4899',
-    lessons: [
-      {
-        id: 'ce1_lettres',
-        title: 'L\'alphabet',
-        icon: '🔤',
-        type: 'reading',
-        duration: '10 min',
-        steps: [
-          { id: 's1', text: 'L\'alphabet en chanson', visual: 'A-B-C-D-E-F-G-H-I-J-K-L-M-N-O-P-Q-R-S-T-U-V-W-X-Y-Z 🎵', tip: 'Chante l\'alphabet !' },
-          { id: 's2', text: 'Les voyelles', visual: 'A - E - I - O - U - Y\n🔴🔴🔴🔴🔴🔴', tip: '5 voyelles principales (Y est spécial)' },
-          { id: 's3', text: 'Les consonnes', visual: 'B-C-D-F-G-H-J-K-L-M-N-P-Q-R-S-T-V-W-X-Z', tip: 'Toutes les autres lettres !' },
-          { id: 's4', text: 'Mettre dans l\'ordre', visual: 'M, A, T, H → A, M, T, H\nalphabétique !', tip: 'A vient avant M !' }
-        ],
-        exercises: [
-          { q: '🔤 Quelle est la 1ère lettre de l\'alphabet ?', a: 'A', hint: 'A-B-C...' },
-          { q: '🔤 Combien de voyelles ?', a: '6', hint: 'A, E, I, O, U, Y' },
-          { q: '🔤 Après F, quelle lettre ?', a: 'G', hint: 'E-F-G !' }
+    skills: {
+      'Lecture': {
+        icon: '📖',
+        lessons: [
+          {
+            id: 'ce1_lire', title: 'Lire des mots', duration: '10 min', steps: [
+              { id: 's1', text: 'Les mots simples', visual: '🔤 CHAT = C-H-A-T\n🐱 Animal qui fait "miaou"', tip: 'Chaque lettre fait un son !' },
+              { id: 's2', text: 'Les syllabes', visual: 'MA → MI → NION\nMa-mion = MAMION ? Non ! MA-NI-ON = MANION', tip: 'Coupe en syllabes !' },
+              { id: 's3', text: 'Compter les syllabes', visual: 'É-LE-PHANT = 3 syllabes 🐘\nSA-VON = 2 syllabes 🧼\nCHI-EN = 2 syllabes 🐕', tip: 'Compte les "bouches qui s\'ouvrent" !' }
+            ], exercises: [
+              { q: '📝 Combien de syllabes dans "CHIEN" ?', a: '1', hint: 'CHIEN = 1 seule syllabe' },
+              { q: '📝 Combien dans "MAISON" ?', a: '2', hint: 'MAI-SON = 2 syllabes' },
+              { q: '📝 Le mot "PAPILLON" a combien de syllabes ?', a: '3', hint: 'PA-PI-LLON = 3' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce1_mots',
-        title: 'Lire des mots',
+      'Grammaire': {
+        icon: '📚',
+        lessons: [
+          {
+            id: 'ce1_phrase', title: 'La phrase', duration: '10 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce qu\'une phrase ?', visual: 'Une phrase = une idée complète\n\n🐱 Le chat dort.\n🦊 Le renard court.\n🌞 Le soleil brille.', tip: 'Ça commence par une majuscule et finit par un point !' },
+              { id: 's2', text: 'Les types de phrases', visual: '📢 Phrase déclarative : "Il fait beau." (Le chat dort.)\n❓ Phrase interrogative : "As-tu faim ?" (?)\n❗ Phrase exclamative : "Quel beau chat !" (!)', tip: 'Le point final montre le type !' }
+            ], exercises: [
+              { q: '📚 "Le chien mange." Est-ce une phrase ?', a: 'oui', hint: 'Oui, elle a une majuscule et un point !' },
+              { q: '📚 Quel signe pour "Viens ici" ?', a: '?', hint: 'Question = point d\'interrogation ?' }
+            ]
+          },
+          {
+            id: 'ce1_sujet_verbe', title: 'Sujet et verbe', duration: '12 min', steps: [
+              { id: 's1', text: 'Le sujet', visual: '🐱 Le chat dort.\n   ↑\n   SUJET = Qui fait l\'action ?\n\n📝 Identifie le sujet : "Marie mange"\n   ↑\n   SUJET = Marie', tip: 'Qui est-ce qui...? La réponse = le sujet' },
+              { id: 's2', text: 'Le verbe', visual: '🐱 Le chat dort.\n        ↑\n        VERBE = L\'action\n\n📝 Trouve le verbe : "Les enfants jouent"\n              ↑\n              VERBE = jouent', tip: 'C\'est ce que fait le sujet !' },
+              { id: 's3', text: 'Ponctuation', visual: '. Point → phrase normale\n? Point d\'interrogation → question\n! Point d\'exclamation → surprise\n, Virgule → pause', tip: 'Chaque signe a un rôle !' }
+            ], exercises: [
+              { q: '📚 Dans "Le chien court", qui est le sujet ?', a: 'le chien', hint: 'Qui court ? Le chien !' },
+              { q: '📚 Quel est le verbe : "Nous mangeons" ?', a: 'mangeons', hint: 'C\'est l\'action !' }
+            ]
+          }
+        ]
+      },
+      'Conjugaison': {
+        icon: '🔄',
+        lessons: [
+          {
+            id: 'ce1_etre', title: 'Le verbe être', duration: '10 min', steps: [
+              { id: 's1', text: 'Être au présent', visual: 'JE suis\nTU es\nIL/ELLE est\nNOUS sommes\nVOUS êtes\nILS/ELLES sont', tip: 'Suis, es, est, sommes, êtes, sont' },
+              { id: 's2', text: 'Utiliser être', visual: 'Je suis content 😊\nTu es grand !\nIl est intelligent.\nNous sommes en classe.', tip: 'Être = avoir une qualité ou un état !' }
+            ], exercises: [
+              { q: '🔄 Je ___ (être)', a: 'suis', hint: 'JE SUIS' },
+              { q: '🔄 Nous ___ (être)', a: 'sommes', hint: 'NOUS SOMMES' },
+              { q: '🔄 Elles ___ gentilles (être)', a: 'sont', hint: 'ELLES SONT' }
+            ]
+          },
+          {
+            id: 'ce1_avoir', title: 'Le verbe avoir', duration: '10 min', steps: [
+              { id: 's1', text: 'Avoir au présent', visual: 'J\'AI\nTU as\nIL/ELLE a\nNOUS avons\nVOUS avez\nILS/ELLES ont', tip: 'Ai, as, a, avons, avez, ont' },
+              { id: 's2', text: 'Utiliser avoir', visual: 'J\'ai un chat 🐱\nTu as des livres 📚\nIl a faim 🍽️\nNous avons de la chance !', tip: 'Avoir = posséder quelque chose !' }
+            ], exercises: [
+              { q: '🔄 Tu ___ (avoir)', a: 'as', hint: 'TU AS' },
+              { q: '🔄 Nous ___ (avoir)', a: 'avons', hint: 'NOUS AVONS' },
+              { q: '🔄 Elle ___ un chien (avoir)', a: 'a', hint: 'ELLE A' }
+            ]
+          },
+          {
+            id: 'ce1_groupe', title: 'Verbes en -ER', duration: '12 min', steps: [
+              { id: 's1', text: 'Les verbes en -ER', visual: 'PARLER → Je parl-E\nJOUER → Je jou-E\nMANGER → Je mang-E\n\nOn enlève -ER et on ajoute la terminaison !', tip: '-ER = 1er groupe' },
+              { id: 's2', text: 'Conjuguer -ER au présent', visual: 'PARLER :\nJe parl-E\nTu parl-ES\nIL parl-E\nNOUS parl-ONS\nVOUS parl-EZ\nILS parl-ENT', tip: '-E, -ES, -E, -ONS, -EZ, -ENT' }
+            ], exercises: [
+              { q: '🔄 Je ___ (manger)', a: 'mange', hint: 'Je mang-E' },
+              { q: '🔄 Nous ___ (jouer)', a: 'jouons', hint: 'Nous jou-ONS' },
+              { q: '🔄 Ils ___ (chanter)', a: 'chantent', hint: 'Verbe en -ER : -ENT au pluriel' }
+            ]
+          }
+        ]
+      },
+      'Orthographe': {
+        icon: '✏️',
+        lessons: [
+          {
+            id: 'ce1_accords', title: 'Les accords dans le GN', duration: '12 min', steps: [
+              { id: 's1', text: 'Le groupe nominal (GN)', visual: '🐱 le petit chat\n↑déterminant nom\n   ↑     ↑\n  petit  chat = nom\n\nLe déterminant s\'accorde avec le nom !', tip: 'GN = qui ? quoi ?' },
+              { id: 's2', text: 'Accord au singulier et pluriel', visual: 'le chat → les chats\nla fleur → les fleurs\nl\'arbre → les arbres', tip: 'Le → Les quand il y a plusieurs !' }
+            ], exercises: [
+              { q: '✏️ "les chat" → correct ?', a: 'non', hint: 'les chats (masculin pluriel)' },
+              { q: '✏️ "la petite fille" au pluriel', a: 'les petites filles', hint: 'Le → Les, petite → petites' }
+            ]
+          },
+          {
+            id: 'ce1_homophones', title: 'Premiers homophones', duration: '10 min', steps: [
+              { id: 's1', text: 'a / à', visual: '❓ a = le verbe avoir conjugué\n"Il a un chat." (= il possède)\n\n❓ à = préposition (vers, chez)\n"Je vais à l\'école."', tip: 'a = avoir, à = direction !' },
+              { id: 's2', text: 'et / est', visual: '❓ et = pour ajouter (ET = +)\n"Le chat ET le chien jouent."\n\n❓ est = le verbe être conjugué\n"Il est gentil."', tip: 'ET pour ajouter, EST pour être !' }
+            ], exercises: [
+              { q: '✏️ "Il ___ un chat." (avoir)', a: 'a', hint: 'a = avoir' },
+              { q: '✏️ "Je vais ___ l\'école."', a: 'à', hint: 'à = direction' },
+              { q: '✏️ "Il ___ grand ET beau."', a: 'est', hint: 'est = verbe être' }
+            ]
+          }
+        ]
+      },
+      'Vocabulaire': {
         icon: '📝',
-        type: 'writing',
-        duration: '8 min',
-        steps: [
-          { id: 's1', text: 'Les mots simples', visual: '🔤 CHAT = C-H-A-T\n🐱 Animal qui fait "miaou"', tip: 'Chaque lettre fait un son !' },
-          { id: 's2', text: 'Les syllabes', visual: 'MA → MI → NION\nMa-mion = MAMION ? Non ! MA-NI-ON = MANION', tip: 'Coupe en syllabes !' },
-          { id: 's3', text: 'Compter les syllabes', visual: 'É-LE-PHANT = 3 syllabes 🐘\nSA-VON = 2 syllabes 🧼', tip: 'Compte les "bouches qui s\'ouvrent" !' }
-        ],
-        exercises: [
-          { q: '📝 Combien de syllabes dans "CHIEN" ?', a: '1', hint: 'CHIEN = 1 seule syllabe' },
-          { q: '📝 Combien dans "MAISON" ?', a: '2', hint: 'MAI-SON = 2 syllabes' },
-          { q: '📝 Le mot "PAPILLON" a combien de syllabes ?', a: '3', hint: 'PA-PI-LLON = 3' }
+        lessons: [
+          {
+            id: 'ce1_famille', title: 'Familles de mots', duration: '10 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce qu\'une famille de mots ?', visual: '🌳 ARBRE → arbres, boisé, forestier\n🌸 FLEUR → fleuri, fleurette, fleurir\n🐦 OISEAU → oiseaux, oisillon\n\nMême RACINE = même FAMILLE !', tip: 'Cherche le lien entre les mots !' },
+              { id: 's2', text: 'Trouver la racine', visual: 'FORÊT 🌳 → FORESTIER 🌲 → DÉFORESTATION 🪓\n\nFORÊT = la racine commune !', tip: 'Le mot le plus simple est souvent la racine !' }
+            ], exercises: [
+              { q: '📝 "cheval, chevalier, chevaux" → racine ?', a: 'cheval', hint: 'Cheval est la base !' },
+              { q: '📝 "maison, maisonnette, ménage" → racine ?', a: 'maison', hint: 'Maison est la base !' }
+            ]
+          },
+          {
+            id: 'ce1_synonyme', title: 'Synonymes et antonymes', duration: '10 min', steps: [
+              { id: 's1', text: 'Les synonymes', visual: 'Synonyme = même sens 🔄\n\nGRAND ≠ BON ≠ PETIT ≠ MAUVAIS\n\n"grand" = "haut" = "énorme"\n"petit" = "minuscule" = "petit" ', tip: 'Des mots qui veulent dire la même chose !' },
+              { id: 's2', text: 'Les antonymes', visual: 'Antonyme = sens inverse ↔️\n\nGRAND ↔️ PETIT\nBON ↔️ MAUVAIS\nCHAUD ↔️ FROID\nHAUT ↔️ BAS', tip: 'Des mots opposites !' }
+            ], exercises: [
+              { q: '📝 Synonyme de "malade"', a: 'malade', hint: 'Synonyme : souffrant, pas bien' },
+              { q: '📝 Antonyme de "grand"', a: 'petit', hint: 'Grand ↔️ Petit' }
+            ]
+          }
         ]
       }
-    ]
+    }
   }
 };
 
@@ -158,120 +327,256 @@ const CE2_PROGRAM = {
   math: {
     name: '🔢 Maths CE2',
     color: '#8b5cf6',
-    lessons: [
-      {
-        id: 'ce2_num',
-        title: 'Les nombres jusqu\'à 9999',
+    skills: {
+      'Nombres et numération': {
         icon: '🔢',
-        type: 'number',
-        duration: '12 min',
-        steps: [
-          { id: 's1', text: 'Les milliers', visual: '1️⃣0️⃣0️⃣0️⃣ = UN MILLIER\nC\'est comme 10 centaines !', tip: 'Mille = 1000' },
-          { id: 's2', text: 'Décomposer un nombre', visual: '3️⃣2️⃣5️⃣4️⃣\n= 3 milliers + 2 centaines + 5 dizaines + 4 unités\n= 3000 + 200 + 50 + 4', tip: 'Sépare chaque partie !' },
-          { id: 's3', text: 'Le tableau de numération', visual: ' Milliers | C | D | U\n    3    | 2 | 5 | 4\n\nC = Centaines, D = Dizaines, U = Unités', tip: 'Chaque colonne a sa valeur !' },
-          { id: 's4', text: 'Comparer les nombres', visual: '4️⃣5️⃣2️⃣ < 4️⃣5️⃣3️⃣\n↑       ↑\nMême    2 < 3\nmilliers et    donc PLUS PETIT\ncentaines', tip: 'Compare de gauche à droite !' },
-          { id: 's5', text: 'Encadrer un nombre', visual: '2️⃣5️⃣0️⃣0️⃣ < 2️⃣5️⃣8️⃣0️⃣ < 2️⃣6️⃣0️⃣0️⃣\n   ↓            ↓\n   2500        2600\nEntre 2 centaines !', tip: 'Trouve les voisins !' }
-        ],
-        exercises: [
-          { q: '🔢 2 000 + 300 + 40 + 5 = ?', a: '2345', hint: '2 milliers, 3 centaines, 4 dizaines, 5 unités' },
-          { q: '🔢 Dans 4 738, quel est le chiffre des centaines ?', a: '7', hint: '7 est en position des centaines' },
-          { q: '🔢 Compare : 3 456 ___ 3 465', a: '<', hint: '56 < 65' }
+        lessons: [
+          {
+            id: 'ce2_num10000', title: 'Les nombres jusqu\'à 10 000', duration: '12 min', steps: [
+              { id: 's1', text: 'Les milliers', visual: '1️⃣0️⃣0️⃣0️⃣ = UN MILLIER\nC\'est comme 10 centaines !\n\n1 millier = 1000', tip: 'Mille = 1000' },
+              { id: 's2', text: 'Décomposer un nombre', visual: '3️⃣2️⃣5️⃣4️⃣\n= 3 milliers + 2 centaines + 5 dizaines + 4 unités\n= 3000 + 200 + 50 + 4', tip: 'Sépare chaque partie !' },
+              { id: 's3', text: 'Le tableau de numération', visual: ' Milliers | C | D | U\n    3    | 2 | 5 | 4\n\nC = Centaines, D = Dizaines, U = Unités', tip: 'Chaque colonne a sa valeur !' },
+              { id: 's4', text: 'Comparer les nombres', visual: '4️⃣5️⃣2️⃣ < 4️⃣5️⃣3️⃣\n↑       ↑\nMême    2 < 3\nmilliers et    donc PLUS PETIT\ncentaines', tip: 'Compare de gauche à droite !' },
+              { id: 's5', text: 'Encadrer un nombre', visual: '2️⃣5️⃣0️⃣0️⃣ < 2️⃣5️⃣8️⃣0️⃣ < 2️⃣6️⃣0️⃣0️⃣\n   ↓            ↓\n   2500        2600\nEntre 2 centaines !', tip: 'Trouve les voisins !' }
+            ], exercises: [
+              { q: '🔢 2 000 + 300 + 40 + 5 = ?', a: '2345', hint: '2 milliers, 3 centaines, 4 dizaines, 5 unités' },
+              { q: '🔢 Dans 4 738, quel est le chiffre des centaines ?', a: '7', hint: '7 est en position des centaines' },
+              { q: '🔢 Compare : 3 456 ___ 3 465', a: '<', hint: '56 < 65' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce2_mult',
-        title: 'La multiplication',
-        icon: '✖️',
-        type: 'operation',
-        duration: '10 min',
-        steps: [
-          { id: 's1', text: 'Qu\'est-ce que la multiplication ?', visual: '3️⃣ × 4️⃣ = 3 groupes de 4\n🍎🍎🍎🍎 + 🍎🍎🍎🍎 + 🍎🍎🍎🍎 = 12 🍎', tip: 'C\'est une addition répétée !' },
-          { id: 's2', text: 'La table de 2', visual: '2×1=2 | 2×2=4 | 2×3=6 | 2×4=8 | 2×5=10 | 2×6=12 | 2×7=14 | 2×8=16 | 2×9=18 | 2×10=20', tip: 'Ça double !' },
-          { id: 's3', text: 'La table de 5', visual: '5×1=5 | 5×2=10 | 5×3=15 | 5×4=20 | 5×5=25 | 5×6=30 | 5×7=35 | 5×8=40 | 5×9=45 | 5×10=50', tip: 'Ça finit toujours par 0 ou 5 !' },
-          { id: 's4', text: 'Multiplication en colonnes', visual: '    3️⃣2️⃣\n  ×     4️⃣\n  ──────\n  1️⃣2️⃣8️⃣\n(2×4=8, 3×4=12)', tip: 'On multiplie chaque chiffre !' }
-        ],
-        exercises: [
-          { q: '✖️ 7 × 3 = ?', a: '21', hint: '7+7+7 = 21' },
-          { q: '✖️ 6 × 4 = ?', a: '24', hint: '6+6+6+6 = 24' },
-          { q: '✖️ 9 × 5 = ?', a: '45', hint: '9+9+9+9+9 = 45' }
+      'Calcul et opérations': {
+        icon: '➕',
+        lessons: [
+          {
+            id: 'ce2_add', title: 'Addition posée', duration: '10 min', steps: [
+              { id: 's1', text: 'Addition avec retenue', visual: '    4️⃣7️⃣\n+ 2️⃣8️⃣\n─────\n  1️⃣7️⃣5️⃣\n\n7+8=15, on écrit 5 et on retient 1 !', tip: 'Les retenues sont importantes !' },
+              { id: 's2', text: 'Addition de nombres plus grands', visual: '  3️⃣4️⃣7️⃣\n+ 1️⃣2️⃣8️⃣\n───────\n  4️⃣7️⃣5️⃣', tip: 'On additionne de droite à gauche !' }
+            ], exercises: [
+              { q: '➕ 47 + 28 = ?', a: '75', hint: '47 + 28 = 75' },
+              { q: '➕ 156 + 78 = ?', a: '234', hint: '156 + 78 = 234' }
+            ]
+          },
+          {
+            id: 'ce2_mult', title: 'La multiplication', duration: '12 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce que la multiplication ?', visual: '3️⃣ × 4️⃣ = 3 groupes de 4\n🍎🍎🍎🍎 + 🍎🍎🍎🍎 + 🍎🍎🍎🍎 = 12 🍎', tip: 'C\'est une addition répétée !' },
+              { id: 's2', text: 'La table de 6', visual: '6×1=6 | 6×2=12 | 6×3=18 | 6×4=24 | 6×5=30\n6×6=36 | 6×7=42 | 6×8=48 | 6×9=54 | 6×10=60', tip: '6 en plus à chaque fois !' },
+              { id: 's3', text: 'La table de 7', visual: '7×1=7 | 7×2=14 | 7×3=21 | 7×4=28 | 7×5=35\n7×6=42 | 7×7=49 | 7×8=56 | 7×9=63 | 7×10=70', tip: 'C\'est la plus difficile !' },
+              { id: 's4', text: 'Multiplication en colonnes', visual: '    3️⃣2️⃣\n  ×     4️⃣\n  ──────\n  1️⃣2️⃣8️⃣\n(2×4=8, 3×4=12)', tip: 'On multiplie chaque chiffre !' }
+            ], exercises: [
+              { q: '✖️ 7 × 3 = ?', a: '21', hint: '7+7+7 = 21' },
+              { q: '✖️ 6 × 4 = ?', a: '24', hint: '6+6+6+6 = 24' },
+              { q: '✖️ 9 × 5 = ?', a: '45', hint: '9+9+9+9+9 = 45' }
+            ]
+          },
+          {
+            id: 'ce2_div', title: 'La division (partager)', duration: '12 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce que la division ?', visual: '🔴🔴🔴🔴 | 2 = On partage 4 billes en 2 parts égales\n= 2 billes par part\n🔴🔴 | 🔴🔴', tip: 'Partager en parts égales !' },
+              { id: 's2', text: 'Le vocabulaire', visual: '1️⃣2️⃣ ÷ 3️⃣ = 4️⃣\nDividende | Diviseur | Quotient', tip: 'Dividende ÷ Diviseur = Quotient' },
+              { id: 's3', text: 'Trouver la moitié', visual: 'La moitié de 10 = 10 ÷ 2 = 5\n½ de 10 = 5 ✅', tip: 'Diviser par 2 = trouver la moitié !' },
+              { id: 's4', text: 'Division en ligne', visual: '24 ÷ 4 = 6\n\n4 × 6 = 24\ndonc 24 ÷ 4 = 6', tip: 'Trouve quelle multiplication donne le dividende !' }
+            ], exercises: [
+              { q: '➗ 8 ÷ 2 = ?', a: '4', hint: 'La moitié de 8' },
+              { q: '➗ 15 ÷ 3 = ?', a: '5', hint: '3 × 5 = 15' },
+              { q: '➗ 20 ÷ 4 = ?', a: '5', hint: '4 × 5 = 20' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce2_div',
-        title: 'La division (partager)',
-        icon: '➗',
-        type: 'operation',
-        duration: '10 min',
-        steps: [
-          { id: 's1', text: 'Qu\'est-ce que la division ?', visual: '🔴🔴🔴🔴 | 2 = On partage 4 billes en 2 parts égales\n= 2 billes par part\n🔴🔴 | 🔴🔴', tip: 'Partager en parts égales !' },
-          { id: 's2', text: 'Le vocabulaire', visual: '1️⃣2️⃣ ÷ 3️⃣ = 4️⃣\nDividende | Diviseur | Quotient', tip: 'Dividende ÷ Diviseur = Quotient' },
-          { id: 's3', text: 'Trouver la moitié', visual: 'La moitié de 10 = 10 ÷ 2 = 5\n½ de 10 = 5 ✅', tip: 'Diviser par 2 = trouver la moitié !' }
-        ],
-        exercises: [
-          { q: '➗ 8 ÷ 2 = ?', a: '4', hint: 'La moitié de 8' },
-          { q: '➗ 15 ÷ 3 = ?', a: '5', hint: '3 × 5 = 15' },
-          { q: '➗ La moitié de 12 = ?', a: '6', hint: '12 ÷ 2 = 6' }
+      'Calcul mental': {
+        icon: '🧮',
+        lessons: [
+          {
+            id: 'ce2_tables', title: 'Toutes les tables', duration: '15 min', steps: [
+              { id: 's1', text: 'Rappels : tables de 2 à 5', visual: 'Table de 2 : 2, 4, 6, 8, 10, 12, 14, 16, 18, 20\nTable de 3 : 3, 6, 9, 12, 15, 18, 21, 24, 27, 30\nTable de 4 : 4, 8, 12, 16, 20, 24, 28, 32, 36, 40\nTable de 5 : 5, 10, 15, 20, 25, 30, 35, 40, 45, 50', tip: 'Révise les bases !' },
+              { id: 's2', text: 'Tables de 6, 7, 8, 9', visual: 'Table de 6 : 6, 12, 18, 24, 30, 36, 42, 48, 54, 60\nTable de 7 : 7, 14, 21, 28, 35, 42, 49, 56, 63, 70\nTable de 8 : 8, 16, 24, 32, 40, 48, 56, 64, 72, 80\nTable de 9 : 9, 18, 27, 36, 45, 54, 63, 72, 81, 90', tip: '9 × un chiffre = 10× - le chiffre !' }
+            ], exercises: [
+              { q: '🧮 6 × 7 = ?', a: '42', hint: '6 × 7 = 42' },
+              { q: '🧮 8 × 9 = ?', a: '72', hint: '8 × 9 = 72' },
+              { q: '🧮 7 × 8 = ?', a: '56', hint: '7 × 8 = 56' }
+            ]
+          }
+        ]
+      },
+      'Grandeurs et mesures': {
+        icon: '📏',
+        lessons: [
+          {
+            id: 'ce2_perimetre', title: 'Le périmètre', duration: '10 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce que le périmètre ?', visual: 'Périmètre = MESURER TOUT LE TOUR\n\n🔲 Carré : côté + côté + côté + côté\nP = 4 × côté', tip: 'On fait le tour de la figure !' },
+              { id: 's2', text: 'Périmètre du carré', visual: '🔲 Carré de 3 cm de côté\n\nP = 3 + 3 + 3 + 3 = 12 cm\nou P = 4 × 3 = 12 cm', tip: '4 × côté = périmètre du carré !' },
+              { id: 's3', text: 'Périmètre du rectangle', visual: '▬ Rectangle : L + l + L + l\nP = 2 × (L + l)\n\n▬ Rectangle 6 cm × 4 cm\nP = 2 × (6 + 4) = 20 cm', tip: '2 × (Longueur + Largeur) !' }
+            ], exercises: [
+              { q: '📏 Périmètre d\'un carré de 5 cm : ?', a: '20', hint: '4 × 5 = 20 cm' },
+              { q: '📏 Périmètre d\'un carré de 8 cm : ?', a: '32', hint: '4 × 8 = 32 cm' }
+            ]
+          },
+          {
+            id: 'ce2_mesures', title: 'Unités de mesure', duration: '12 min', steps: [
+              { id: 's1', text: 'Les longueurs', visual: 'km → hm → dam → m → dm → cm → mm\n\n1 km = 1000 m\n1 m = 100 cm\n1 cm = 10 mm', tip: 'Chaque étape = ÷10 ou ×10 !' },
+              { id: 's2', text: 'Les masses', visual: 't → q → kg → hg → dag → g\n\n1 tonne = 1000 kg\n1 kg = 1000 g', tip: '1 kg = 2 packets de sucre !' },
+              { id: 's3', text: 'Les contenances', visual: 'L → dL → cL → mL\n\n1 L = 100 cL\n1 L = 1000 mL', tip: 'Litre = pour les liquides !' }
+            ], exercises: [
+              { q: '📏 1 m = ? cm', a: '100', hint: '1 m = 100 cm' },
+              { q: '📏 1 kg = ? g', a: '1000', hint: '1 kg = 1000 g' },
+              { q: '📏 1 L = ? cL', a: '100', hint: '1 L = 100 cL' }
+            ]
+          }
+        ]
+      },
+      'Espace et géométrie': {
+        icon: '🔷',
+        lessons: [
+          {
+            id: 'ce2_angle', title: 'Les angles', duration: '12 min', steps: [
+              { id: 's1', text: 'L\'angle droit', visual: '📐 Angle droit = comme une équerre\n\nLes côtés sont PERPENDICULAIRES\n↗️ ↘️\n   ↘️ ↙️\n(Forme en L)', tip: 'Utilise une équerre pour vérifier !' },
+              { id: 's2', text: 'Angle aigu et obtus', visual: '🔺 Angle AIGU < 90° (plus petit que droit)\n🔻 Angle OBTUS > 90° (plus grand que droit)', tip: 'Compare à l\'angle droit !' }
+            ], exercises: [
+              { q: '🔷 Un angle de 45° est : aigu ou obtus ?', a: 'aigu', hint: '45° < 90° = angle aigu' },
+              { q: '🔷 Un angle de 120° est : aigu ou obtus ?', a: 'obtus', hint: '120° > 90° = angle obtus' }
+            ]
+          },
+          {
+            id: 'ce2_losange', title: 'Le losange', duration: '10 min', steps: [
+              { id: 's1', text: 'Propriétés du losange', visual: '💎 Losange = 4 côtés ÉGAUX\n\n⚠️ Mais PAS d\'angles droits !\n\nComme un carré penché / un diamant 💎', tip: '4 côtés égaux = losange !' },
+              { id: 's2', text: 'Losange vs Carré', visual: '🔲 Carré : 4 côtés égaux + 4 angles droits\n💎 Losange : 4 côtés égaux + PAS d\'angles droits', tip: 'Le carré est un losange spécial !' }
+            ], exercises: [
+              { q: '🔷 Le losange a combien de côtés égaux ?', a: '4', hint: '4 côtés égaux !' },
+              { q: '🔷 Le losange a-t-il des angles droits ?', a: 'non', hint: 'Non, c\'est la différence avec le carré !' }
+            ]
+          }
+        ]
+      },
+      'Fractions': {
+        icon: '🍕',
+        lessons: [
+          {
+            id: 'ce2_fractions', title: 'Les fractions', duration: '12 min', steps: [
+              { id: 's1', text: 'Qu\'est-ce qu\'une fraction ?', visual: '🍕 Fraction = part d\'un tout\n\n1/2 = une moitié = 2 parts égales, j\'en prends 1\n1/4 = un quart = 4 parts égales, j\'en prends 1', tip: 'Le BAS = en combien on divise\nLe HAUT = combien on prend !' },
+              { id: 's2', text: 'Fractions courantes', visual: '1/2 = une moitié\n1/4 = un quart\n3/4 = trois quarts\n1/3 = un tiers\n2/3 = deux tiers', tip: 'Mémorise ces fractions !' }
+            ], exercises: [
+              { q: '🍕 1/2 de 8 = ?', a: '4', hint: '8 ÷ 2 = 4' },
+              { q: '🍕 1/4 de 12 = ?', a: '3', hint: '12 ÷ 4 = 3' },
+              { q: '🍕 3/4 de 8 = ?', a: '6', hint: '8 ÷ 4 = 2, puis × 3 = 6' }
+            ]
+          }
         ]
       }
-    ]
+    }
   },
   french: {
     name: '📖 Français CE2',
     color: '#f43f5e',
-    lessons: [
-      {
-        id: 'ce2_orth',
-        title: 'L\'orthographe',
-        icon: '✏️',
-        type: 'spelling',
-        duration: '12 min',
-        steps: [
-          { id: 's1', text: 'Les accents', visual: 'È - É - Ê\nÈ - e accent grave\nÉ - e accent aigu\nÊ - e accent circonflexe', tip: 'Chaque accent change le son !' },
-          { id: 's2', text: 'Les homophones', visual: '❓ EST = verbe être\n❓ ET = pour ajouter\n\n"Il EST grand ET petit"\n(être) (ajouter)', tip: 'EST = action, ET = ajout !' },
-          { id: 's3', text: 'Les mots invariables', visual: '🔒 JAMAIS\n🔒 SOUVENT\n🔒 TOUJOURS\n🔒 PEUT-ÊTRE\n\nIls ne changent JAMAIS !', tip: 'Pas de pluriel, pas de conjugaison !' },
-          { id: 's4', text: 'Les familles de mots', visual: 'FORÊT 🌳 → FORESTIER 🌲→ DÉFORESTATION 🪓\nMême racine = même famille !', tip: 'Cherche le lien !' }
-        ],
-        exercises: [
-          { q: '✏️ forêt ou forait ?', a: 'forêt', hint: 'F-O-R-Ê-T' },
-          { q: '✏️ "Il ___ grand" (être)', a: 'est', hint: 'Verbe être au présent' },
-          { q: '✏️ Quel accent : "travai" ?', a: 'l', hint: 'TRAVAIL = travail' }
+    skills: {
+      'Lecture et compréhension': {
+        icon: '📖',
+        lessons: [
+          {
+            id: 'ce2_comprendre', title: 'Comprendre un texte', duration: '15 min', steps: [
+              { id: 's1', text: 'Lire et comprendre', visual: '📖 Pour bien comprendre un texte :\n\n1. Lis une première fois\n2. Cherche les mots difficiles\n3. Relis pour comprendre\n4. Raconte avec tes mots', tip: 'Comprendre = savoir expliquer !' },
+              { id: 's2', text: 'Les questions de compréhension', visual: '❓ QUI ? → la personne\n❓ QUOI ? → l\'action\n❓ OÙ ? → le lieu\n❓ QUAND ? → le moment\n❓ COMMENT ? → la manière', tip: 'Ces mots t\'aident à trouver les réponses !' }
+            ], exercises: [
+              { q: '📖 "Qui" Demande quoi ?', a: 'une personne', hint: 'Qui = quelle personne ?' },
+              { q: '📖 "Où" Demande quoi ?', a: 'un lieu', hint: 'Où = quel endroit ?' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce2_gram',
-        title: 'La grammaire',
+      'Grammaire': {
         icon: '📚',
-        type: 'grammar',
-        duration: '10 min',
-        steps: [
-          { id: 's1', text: 'Le sujet', visual: '🐱 Le chat dort.\n   ↑\n   SUJET = Qui fait l\'action ?\n\n📝 Identifie le sujet : "Marie mange"\n   ↑\n   SUJET = Marie', tip: 'Qui est-ce qui... ?' },
-          { id: 's2', text: 'Le verbe', visual: '🐱 Le chat dort.\n        ↑\n        VERBE = L\'action\n\n📝 Trouve le verbe : "Les enfants jouent"\n              ↑\n              VERBE = jouent', tip: 'C\'est ce que fait le sujet !' },
-          { id: 's3', text: 'Les articles', visual: 'LE / LA / LES = articles définis\nUN / UNE / DES = articles indéfinis\n\n🐱 Le chat (un chat)\n🐈 Les chats (des chats)', tip: 'LE/LA = ce chat, UN = un chat cualquiera !' }
-        ],
-        exercises: [
-          { q: '📚 Dans "Le chien court", qui est le sujet ?', a: 'le chien', hint: 'Qui court ? Le chien !' },
-          { q: '📚 Quel est le verbe : "Nous mangeons" ?', a: 'mangeons', hint: 'C\'est l\'action !' },
-          { q: '📚 "un" est masculin ou féminin ?', a: 'masculin', hint: 'Un chat, un chien...' }
+        lessons: [
+          {
+            id: 'ce2_nature', title: 'Nature des mots', duration: '15 min', steps: [
+              { id: 's1', text: 'Les natures de mots', visual: '📝 Nom = chose, animal, personne\n🐱 chat, 🏠 maison, 👧 Marie\n\n📝 Verbe = action ou état\nmanger, être, courir\n\n📝 Déterminant = devant le nom\nle, la, un, une, les, des', tip: 'Chaque mot a une nature !' },
+              { id: 's2', text: 'L\'adjectif', visual: '✨ Adjectif = décrire le nom\n\nle chat NOIR → noir décrit le chat\nune fleur BELLE → belle décrit la fleur', tip: 'L\'adjectif QUALIFIE le nom !' }
+            ], exercises: [
+              { q: '📚 "grand" dans "un grand château" est un...', a: 'adjectif', hint: 'Il décrit le nom château !' },
+              { q: '📚 "manger" est un...', a: 'verbe', hint: 'C\'est une action !' }
+            ]
+          },
+          {
+            id: 'ce2_gram_sujet_verbe', title: 'Sujet et verbe', duration: '12 min', steps: [
+              { id: 's1', text: 'Accord sujet-verbe', visual: '👧 Marie mange → mange (singulier)\n👧👧 Marie et Léa mangent → mangent (pluriel)\n\nLe verbe s\'accorde avec le SUJET !', tip: 'Singulier → -e/-s, Pluriel → -ons/-ent !' }
+            ], exercises: [
+              { q: '📚 "Les enfants mangent" → mangent est correct ?', a: 'oui', hint: 'Les enfants = pluriel, donc -ent !' }
+            ]
+          }
         ]
       },
-      {
-        id: 'ce2_conj',
-        title: 'La conjugaison',
+      'Conjugaison': {
         icon: '🔄',
-        type: 'conjugation',
-        duration: '12 min',
-        steps: [
-          { id: 's1', text: 'Le présent - Être', visual: 'JE suis\nTU es\nIL/EL est\nNOUS sommes\nVOUS êtes\nILS/ELLES sont', tip: 'Suis, es, est, sommes, êtes, sont' },
-          { id: 's2', text: 'Le présent - Avoir', visual: 'J\'AI\nTU as\nIL/EL a\nNOUS avons\nVOUS avez\nILS/ELLES ont', tip: 'Ai, as, a, avons, avez, ont' },
-          { id: 's3', text: 'Le présent - Verbes en -ER', visual: 'J\'ai-ME\nTU chan-GES\nIL/EL chan-GE\nNOUS chan-GEONS\nVOUS chan-GEZ\nILS chan-GENT', tip: 'On retire -ER et on ajoute la terminaison !' }
-        ],
-        exercises: [
-          { q: '🔄 Je ___ (être)', a: 'suis', hint: 'JE SUIS' },
-          { q: '🔄 Nous ___ (avoir)', a: 'avons', hint: 'NOUS AVONS' },
-          { q: '🔄 Ils ___ (manger)', a: 'mangent', hint: 'Verbe en -ER : -ENT au pluriel' }
+        lessons: [
+          {
+            id: 'ce2_futur', title: 'Le futur', duration: '12 min', steps: [
+              { id: 's1', text: 'Être et Avoir au futur', visual: 'ÊTRE : je SERAI, tu SERAS, il SERA,\nnous SERONS, vous SEREZ, ils SERONT\n\nAVOIR : j\'AURAI, tu AURAS, il AURA,\nnous AURONS, vous AUREZ, ils AURONT', tip: '-AI, -AS, -A, -ONS, -EZ, -ONT !' },
+              { id: 's2', text: 'Verbes en -ER au futur', visual: 'PARLER → je parler-AI\nJOUER → je jouer-AI\nMANGER → je manger-AI\n\nOn ajoute -AI, -AS, -A, -ONS, -EZ, -ONT !', tip: 'Le radical + terminaisons du futur !' }
+            ], exercises: [
+              { q: '🔄 Je ___ demain (être)', a: 'serai', hint: 'Je SERAI' },
+              { q: '🔄 Nous ___ au cinéma (aller au futur)', a: 'irons', hint: 'Nous IRONS (aller → ir-)' }
+            ]
+          },
+          {
+            id: 'ce2_passe', title: 'Le passé composé', duration: '15 min', steps: [
+              { id: 's1', text: 'Passé composé avec avoir', visual: 'PASSÉ COMPOSÉ = quelque chose de TERMINÉ\n\nAVOIR au présent + participe passé\n\nJ\'AI mangé 🍽️\nTu AS joué 🎮\nIl A couru 🏃\n\nLe participe passé de avoir = eu\naiment = eu', tip: 'C\'est "avoir" + ce qu\'on a fait !' },
+              { id: 's2', text: 'Participe passé des verbes en -ER', visual: '-ER → -É\n\nmanger → mangÉ\njouer → jouÉ\nchanter → chantÉ', tip: '-ER devient -É au passé composé !' }
+            ], exercises: [
+              { q: '🔄 J\'ai ___ (manger)', a: 'mangé', hint: 'manger → mangé' },
+              { q: '🔄 Elle a ___ (jouer)', a: 'joué', hint: 'jouer → joué' }
+            ]
+          }
+        ]
+      },
+      'Orthographe': {
+        icon: '✏️',
+        lessons: [
+          {
+            id: 'ce2_homo', title: 'Homophones grammaticaux', duration: '15 min', steps: [
+              { id: 's1', text: 'son / sont', visual: '❓ son = déterminant (mon, ton, son = à lui)\n"il prend son livre" (le livre à lui)\n\n❓ sont = verbe être\n"ils sont contents"', tip: 'SON = à lui, SONT = sont des êtres !' },
+              { id: 's2', text: 'on / ont', visual: '❓ on = pronom (quelqu\'un)\n"on joue" = nous jouons\n\n❓ ont = verbe avoir\n"ils ont faim"', tip: 'ON = pronom, ONT = ont des choses !' },
+              { id: 's3', text: 'ces / ses', visual: '❓ ces = déterminant pluriel\n"ces livres" (plusieurs livres)\n\n❓ ses = déterminant (à lui)\n"il ouvre ses livres"', tip: 'CES = pluriel, SES = ses propres choses !' }
+            ], exercises: [
+              { q: '✏️ "Il prend ___ affaires." (à lui)', a: 'ses', hint: 'SES = à lui' },
+              { q: '✏️ "Ils ___ contents." (être)', a: 'sont', hint: 'SONT = verbe être' },
+              { q: '✏️ "___ enfants jouent." (plusieurs)', a: 'ces', hint: 'CES = pluriel' }
+            ]
+          },
+          {
+            id: 'ce2_accords', title: 'Accords complexes', duration: '12 min', steps: [
+              { id: 's1', text: 'Accord de l\'adjectif', visual: 'le chat noir → les chats noirS\nla fleur belle → les fleurs belleS\n\nL\'adjectif s\'accorde avec le nom !\nMasculin = pas de marque\nFéminin = -e', tip: 'Le nom est féminin → adjectif en -e !' }
+            ], exercises: [
+              { q: '✏️ "une robe rouge" au pluriel', a: 'des robes rouges', hint: 'rouge → rouges (féminin pluriel)' }
+            ]
+          }
+        ]
+      },
+      'Vocabulaire': {
+        icon: '📝',
+        lessons: [
+          {
+            id: 'ce2_famille', title: 'Familles de mots', duration: '10 min', steps: [
+              { id: 's1', text: 'Familles de mots', visual: 'FORÊT 🌳 → FORESTIER 🌲 → DÉFORESTATION 🪓\n\nFORÊT = la racine commune !\n\n Même RACINE = même FAMILLE !', tip: 'Cherche le lien !' }
+            ], exercises: [
+              { q: '📝 "cheval, chevalier, chevaux" → racine ?', a: 'cheval', hint: 'Cheval est la base !' }
+            ]
+          }
+        ]
+      },
+      'Écriture': {
+        icon: '✍️',
+        lessons: [
+          {
+            id: 'ce2_rediger', title: 'Rédiger un texte', duration: '15 min', steps: [
+              { id: 's1', text: 'Organiser son texte', visual: '📝 Un bon texte a :\n\n🏠 DÉBUT : On présente\n   Qui ? Où ? Quand ?\n\n📖 MILIEU : Ce qui se passe\n   Les actions\n\n🎬 FIN : La fin\n   Le résultat', tip: 'Début / Milieu / Fin !' },
+              { id: 's2', text: 'Les connecteurs', visual: '🔗 Pour lier les idées :\n\nPUIS → ensuite\nMAIS → opposition\nPARCE QUE → explication\nALORS → résultat\n\n"Puis il mangea, mais il n\'aima pas,\nparce que c\'était mauvais."', tip: 'Les connecteurs changent le texte !' }
+            ], exercises: [
+              { q: '✍️ "___ il est tombé, il s\'est fait mal." (opposition)', a: 'Mais', hint: 'MAIS = opposition' },
+              { q: '✍️ "Il est parti ___ il avait faim." (explication)', a: 'parce que', hint: 'PARCE QUE = explication' }
+            ]
+          }
         ]
       }
-    ]
+    }
   }
 };
 
@@ -792,6 +1097,7 @@ function talkMascot(type) {
 function lessonsHTML() {
   const program = lessonsState.currentLevel === 'ce1' ? CE1_PROGRAM : CE2_PROGRAM;
   const levelLabel = lessonsState.currentLevel.toUpperCase();
+  const subjectData = program[lessonsState.currentSubject];
   
   return `<div class="module-header screen-transition">
     <button class="back-btn" data-action="home">🏠</button>
@@ -823,21 +1129,31 @@ function lessonsHTML() {
   </div>
   
   <div class="lessons-container">
-    ${program[lessonsState.currentSubject].lessons.map(lesson => `
-      <div class="lesson-card" onclick="openLesson('${lesson.id}')">
-        <div class="lesson-icon">${lesson.icon}</div>
-        <div class="lesson-info">
-          <h3 class="lesson-title">${lesson.title}</h3>
-          <div class="lesson-meta">
-            <span class="lesson-duration">⏱️ ${lesson.duration}</span>
-            <span class="lesson-type">${lesson.type === 'number' ? '🔢 Numéros' : lesson.type === 'operation' ? '🔢 Opérations' : lesson.type === 'geometry' ? '🔷 Formes' : lesson.type === 'reading' ? '📖 Lecture' : lesson.type === 'writing' ? '✏️ Écriture' : lesson.type === 'spelling' ? '✏️ Orthographe' : lesson.type === 'grammar' ? '📚 Grammaire' : '🔄 Conjugaison'}</span>
-          </div>
-          <div class="lesson-steps-preview">
-            ${lesson.steps.slice(0, 3).map(s => `<span class="step-dot" title="${s.text}">●</span>`).join('')}
-            ${lesson.steps.length > 3 ? `<span class="more-dots">+${lesson.steps.length - 3}</span>` : ''}
-          </div>
+    ${Object.entries(subjectData.skills).map(([skillName, skillData]) => `
+      <div class="skill-section">
+        <div class="skill-header" onclick="toggleSkill('${skillName}')">
+          <span class="skill-icon">${skillData.icon}</span>
+          <span class="skill-name">${skillName}</span>
+          <span class="skill-arrow" id="arrow-${skillName.replace(/\s/g, '-')}">▼</span>
         </div>
-        <div class="lesson-arrow">→</div>
+        <div class="skill-lessons" id="lessons-${skillName.replace(/\s/g, '-')}" style="display: none;">
+          ${skillData.lessons.map(lesson => `
+            <div class="lesson-card" onclick="openLesson('${lesson.id}')">
+              <div class="lesson-icon">${skillData.icon}</div>
+              <div class="lesson-info">
+                <h3 class="lesson-title">${lesson.title}</h3>
+                <div class="lesson-meta">
+                  <span class="lesson-duration">⏱️ ${lesson.duration}</span>
+                </div>
+                <div class="lesson-steps-preview">
+                  ${lesson.steps.slice(0, 3).map(s => `<span class="step-dot" title="${s.text}">●</span>`).join('')}
+                  ${lesson.steps.length > 3 ? `<span class="more-dots">+${lesson.steps.length - 3}</span>` : ''}
+                </div>
+              </div>
+              <div class="lesson-arrow">→</div>
+            </div>
+          `).join('')}
+        </div>
       </div>
     `).join('')}
   </div>
@@ -853,13 +1169,30 @@ function lessonsHTML() {
   </div>`;
 }
 
+function toggleSkill(skillName) {
+  const id = 'lessons-' + skillName.replace(/\s/g, '-');
+  const arrowId = 'arrow-' + skillName.replace(/\s/g, '-');
+  const lessonsDiv = document.getElementById(id);
+  const arrow = document.getElementById(arrowId);
+  if (lessonsDiv.style.display === 'none') {
+    lessonsDiv.style.display = 'block';
+    arrow.textContent = '▲';
+  } else {
+    lessonsDiv.style.display = 'none';
+    arrow.textContent = '▼';
+  }
+}
+
 // Lesson Detail Page
 function openLesson(lessonId) {
   const program = lessonsState.currentLevel === 'ce1' ? CE1_PROGRAM : CE2_PROGRAM;
   let lesson = null;
   
   for (const subject of Object.values(program)) {
-    lesson = subject.lessons.find(l => l.id === lessonId);
+    for (const skill of Object.values(subject.skills)) {
+      lesson = skill.lessons.find(l => l.id === lessonId);
+      if (lesson) break;
+    }
     if (lesson) break;
   }
   
@@ -876,11 +1209,20 @@ function lessonDetailHTML() {
   if (!lesson) return '<p>Erreur : leçon non trouvée</p>';
   
   const program = lessonsState.currentLevel === 'ce1' ? CE1_PROGRAM : CE2_PROGRAM;
-  const subjectData = Object.values(program).find(s => s.lessons.some(l => l.id === lesson.id));
+  let subjectData = null;
+  for (const subject of Object.values(program)) {
+    for (const skill of Object.values(subject.skills)) {
+      if (skill.lessons.some(l => l.id === lesson.id)) {
+        subjectData = subject;
+        break;
+      }
+    }
+    if (subjectData) break;
+  }
   
   return `<div class="module-header screen-transition">
     <button class="back-btn" onclick="closeLesson()">←</button>
-    <h2 class="module-title" style="color: ${subjectData.color};">${lesson.icon} ${lesson.title}</h2>
+    <h2 class="module-title" style="color: ${subjectData.color};">${lesson.title}</h2>
     <span class="lesson-progress-badge">${lessonsState.stepsCompleted.length}/${lesson.steps.length}</span>
   </div>
   

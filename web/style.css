@@ -538,6 +538,56 @@ body {
   gap: 12px;
 }
 
+/* Skill section */
+.skill-section {
+  margin-bottom: 10px;
+}
+
+.skill-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: white;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.2s;
+}
+
+.skill-header:hover {
+  background: #f9fafb;
+}
+
+.skill-icon {
+  font-size: 1.5rem;
+}
+
+.skill-name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1f2937;
+}
+
+.skill-arrow {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+.skill-lessons {
+  padding-left: 15px;
+  margin-top: 8px;
+}
+
+.skill-lessons .lesson-card {
+  background: #fafafa;
+}
+
+.lesson-card:hover .lesson-card {
+  background: white;
+}
+
 .lesson-card {
   display: flex;
   align-items: center;
