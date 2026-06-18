@@ -108,8 +108,14 @@ class AudioService extends ChangeNotifier {
     }
   }
 
+  SharedPreferences? _prefs;
+
+  Future<SharedPreferences> get _getPrefs async {
+    return _prefs ??= await SharedPreferences.getInstance();
+  }
+
   Future<void> _loadPrefs() async {
-    final p = await SharedPreferences.getInstance();
+    final p = await _getPrefs;
     _musicEnabled  = p.getBool('music_on')    ?? true;
     _soundEnabled  = p.getBool('sound_on')    ?? true;
     _musicVolume   = p.getDouble('music_vol') ?? 0.35;
@@ -289,7 +295,7 @@ class AudioService extends ChangeNotifier {
   // ── Paramètres ────────────────────────────────────────────────
   Future<void> toggleMusic() async {
     _musicEnabled = !_musicEnabled;
-    final p = await SharedPreferences.getInstance();
+    final p = await _getPrefs;
     await p.setBool('music_on', _musicEnabled);
     if (!_musicEnabled) {
       await _bgPlayer.stop();
@@ -301,7 +307,7 @@ class AudioService extends ChangeNotifier {
 
   Future<void> toggleSound() async {
     _soundEnabled = !_soundEnabled;
-    final p = await SharedPreferences.getInstance();
+    final p = await _getPrefs;
     await p.setBool('sound_on', _soundEnabled);
     notifyListeners();
   }
@@ -309,7 +315,7 @@ class AudioService extends ChangeNotifier {
   Future<void> setMusicVolume(double v) async {
     _musicVolume = v;
     await _bgPlayer.setVolume(v);
-    final p = await SharedPreferences.getInstance();
+    final p = await _getPrefs;
     await p.setDouble('music_vol', v);
     notifyListeners();
   }
@@ -317,7 +323,7 @@ class AudioService extends ChangeNotifier {
   Future<void> setSfxVolume(double v) async {
     _sfxVolume = v;
     await _justSfxPlayer.setVolume(v);
-    final p = await SharedPreferences.getInstance();
+    final p = await _getPrefs;
     await p.setDouble('sfx_vol', v);
     notifyListeners();
   }
