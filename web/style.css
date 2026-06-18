@@ -916,3 +916,62 @@ body {
 .btn-finish-lesson:active {
   transform: scale(0.98);
 }
+
+/* ===================== DÉCOUVERTES ===================== */
+.btn-discovery {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+}
+
+.btn-discovery:hover {
+  background: #fde68a;
+}
+
+.decouverte-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.decouverte-card {
+  padding: 16px 12px;
+  border-radius: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: 'Nunito', cursive;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: none;
+}
+
+.decouverte-card:active {
+  transform: scale(0.95);
+}
+
+.decouverte-card .emoji {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ===================== SKILL TOGGLE FIX ===================== */
+.skill-lessons[style*="block"] {
+  display: block !important;
+}
+
+/* ===================== OVERLAY SCROLL FIX ===================== */
+#decouverteDetailBox {
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#decouverteDetailBox::-webkit-scrollbar {
+  width: 4px;
+}
+
+#decouverteDetailBox::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}

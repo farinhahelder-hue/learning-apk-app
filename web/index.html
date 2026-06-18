@@ -6,6 +6,7 @@
   <title>Emilie App 🌟</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --rose: #FF6B9D;
@@ -998,6 +999,16 @@
       <div class="sticker-detail-name" id="stickerDetailName">Noisette</div>
       <div class="sticker-detail-desc" id="stickerDetailDesc">Description</div>
       <button class="btn-reward" onclick="closeStickerDetail()">Fermer</button>
+    </div>
+  </div>
+
+  <!-- ===================== DÉCOUVERTES SUBJECT OVERLAY ===================== -->
+  <div id="decouverteDetailOverlay" class="rocket-result-overlay">
+    <div id="decouverteDetailBox" class="rocket-result-box" style="max-width: 400px; max-height: 80vh; overflow-y: auto;">
+      <div style="font-size: 3rem; margin-bottom: 10px;" id="decouverteDetailEmoji">📚</div>
+      <div style="font-size: 1.5rem; font-weight: bold; color: #9333ea; margin-bottom: 8px;" id="decouverteDetailTitle">Titre</div>
+      <div id="decouverteDetailContent" style="color: #666; font-size: 0.95rem; margin-bottom: 15px; text-align: left; line-height: 1.5;"></div>
+      <button class="btn-reward" onclick="closeDecouverteDetail()">Fermer</button>
     </div>
   </div>
 

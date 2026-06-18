@@ -1,4 +1,4 @@
-// === STATE ===
+﻿// === STATE ===
 let stars = 0;
 let badges = [];
 let screen = 'home';
@@ -7,6 +7,147 @@ let level = 1;
 let streak = 1;
 let combo = 0;
 let muted = false;
+
+// === SUPABASE SERVICE ===
+const SUPABASE_URL = 'https://wgkcowgnzysuzclhzxxk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FrquHYqydyvPiuhG9mHh_g_6XISLPl6';
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+const supabaseService = {
+  _cache: {},
+  _cacheTime: 5 * 60 * 1000, // 5 min
+
+  async _fetch(table, options = {}) {
+    const cacheKey = table + JSON.stringify(options);
+    const cached = this._cache[cacheKey];
+    if (cached && Date.now() - cached.time < this._cacheTime) return cached.data;
+    try {
+      if (!supabase) return null;
+      let query = supabase.from(table).select(options.select || '*');
+      if (options.eq) for (const [k, v] of Object.entries(options.eq)) query = query.eq(k, v);
+      if (options.order) query = query.order(options.order || 'id', { ascending: options.ascending !== false });
+      if (options.limit) query = query.limit(options.limit);
+      if (options.range) query = query.range(options.range[0], options.range[1]);
+      const { data, error } = await query;
+      if (error) { console.warn(`Supabase ${table}:`, error); return null; }
+      this._cache[cacheKey] = { data, time: Date.now() };
+      return data;
+    } catch (e) { console.warn(`Supabase fetch ${table}:`, e); return null; }
+  },
+
+  // Grammaire
+  async getGrammaire(categorie) {
+    const opts = { order: 'niveau', ascending: true };
+    if (categorie) opts.eq = { categorie };
+    return this._fetch('emilie_grammaire', opts);
+  },
+
+  // Orthographe
+  async getOrthographe(niveau) {
+    const opts = { order: 'id' };
+    if (niveau) opts.eq = { niveau };
+    return this._fetch('emilie_orthographe', opts);
+  },
+
+  // Lecture
+  async getLectures() {
+    return this._fetch('emilie_lecture', { order: 'id' });
+  },
+
+  // Dictées
+  async getDictees(niveau) {
+    const opts = { order: 'nb_mots' };
+    if (niveau) opts.eq = { niveau };
+    return this._fetch('emilie_dictees', opts);
+  },
+
+  // Poésies
+  async getPoesies() {
+    return this._fetch('emilie_poesies', { order: 'id' });
+  },
+
+  // Calcul mental aléatoire
+  async getCalculMental(niveau, operation, limit = 12) {
+    let all = await this._fetch('emilie_calcul_mental', { eq: { niveau }, limit: 200 });
+    if (!all) return [];
+    if (operation) all = all.filter(e => e.operation === operation);
+    all.sort(() => Math.random() - 0.5);
+    return all.slice(0, limit);
+  },
+
+  // Problèmes
+  async getProblemes(niveau) {
+    const opts = { order: 'etapes', ascending: true };
+    if (niveau) opts.eq = { niveau };
+    return this._fetch('emilie_problemes', opts);
+  },
+
+  // Géométrie
+  async getGeometrie(niveau) {
+    const opts = { order: 'niveau' };
+    if (niveau) opts.eq = { niveau };
+    return this._fetch('emilie_geometrie', opts);
+  },
+
+  // Mesures
+  async getMesures(niveau) {
+    const opts = { order: 'niveau' };
+    if (niveau) opts.eq = { niveau };
+    return this._fetch('emilie_mesures', opts);
+  },
+
+  // Anglais
+  async getAnglais(categorie) {
+    const opts = { order: 'mot_fr' };
+    if (categorie) opts.eq = { categorie };
+    return this._fetch('emilie_anglais', opts);
+  },
+
+  // Questionner le monde
+  async getQuestionnerMonde(domaine) {
+    const opts = { order: 'niveau' };
+    if (domaine) opts.eq = { domaine };
+    return this._fetch('emilie_questionner_monde', opts);
+  },
+
+  // EMC
+  async getEmc() {
+    return this._fetch('emilie_emc', { order: 'id' });
+  },
+
+  // Arts
+  async getArts(domaine) {
+    const opts = { order: 'niveau' };
+    if (domaine) opts.eq = { domaine };
+    return this._fetch('emilie_arts', opts);
+  },
+
+  // Lecture questions
+  async getLectureQuestions(lectureId) {
+    return this._fetch('emilie_lecture_questions', {
+      eq: { lecture_id: lectureId }, order: 'id'
+    });
+  },
+
+  clearCache() { this._cache = {}; }
+};
+
+// === DÉCOUVERTES STATE ===
+const decouverteSubjects = [
+  { id: 'grammaire', name: 'Grammaire', emoji: '📚', desc: 'Types de phrases, classes de mots, accords, ponctuation', color: '#8b5cf6' },
+  { id: 'orthographe', name: 'Orthographe', emoji: '✏️', desc: 'Sons, accents, homophones, féminin, pluriel', color: '#ec4899' },
+  { id: 'lecture', name: 'Lecture', emoji: '📖', desc: 'Textes narratifs, documentaires, poésie', color: '#f59e0b' },
+  { id: 'dictees', name: 'Dictées', emoji: '🎙️', desc: 'Dictées progressives avec mots-pièges', color: '#10b981' },
+  { id: 'poesies', name: 'Poésies', emoji: '🎵', desc: 'Comptines et poèmes à réciter', color: '#06b6d4' },
+  { id: 'calcul_mental', name: 'Calcul Mental', emoji: '🧮', desc: 'Additions, soustractions, tables de multiplication', color: '#3b82f6' },
+  { id: 'problemes', name: 'Problèmes', emoji: '🧩', desc: 'Problèmes additifs, multiplicatifs, 2 étapes', color: '#2563eb' },
+  { id: 'geometrie', name: 'Géométrie', emoji: '📐', desc: 'Figures, symétrie, angles, périmètre', color: '#7c3aed' },
+  { id: 'mesures', name: 'Mesures', emoji: '📏', desc: 'Longueurs, masses, capacités, temps', color: '#0891b2' },
+  { id: 'anglais', name: 'Anglais', emoji: '🇬🇧', desc: 'Vocabulaire, phrases, phonétique', color: '#db2777' },
+  { id: 'questionner_monde', name: 'Questionner le Monde', emoji: '🌍', desc: 'Histoire, géographie, sciences', color: '#059669' },
+  { id: 'emc', name: 'EMC', emoji: '🤝', desc: 'Respect, liberté, égalité, citoyenneté', color: '#d97706' },
+  { id: 'arts', name: 'Arts & Musique', emoji: '🎨', desc: 'Arts plastiques, musique, EPS', color: '#ea580c' }
+];
 
 // === HOMEWORK STATE (NOUVEAU) ===
 let homeworkState = {
@@ -1988,6 +2129,392 @@ function getMascotTip(moduleName) {
   return tips[Math.floor(Math.random() * tips.length)];
 }
 
+// === DÉCOUVERTES SCREEN ===
+let currentDecouverteSubject = null;
+let decouverteData = [];
+
+function decouvertesHTML() {
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" data-action="home">🏠</button>
+    <h2 class="module-title" style="color: #9333ea;">🌟 Découvertes CE1</h2>
+    <span style="font-size: 1.2rem;">🐿️🪼🦭</span>
+  </div>
+  
+  <div class="card" style="text-align: center; background: linear-gradient(135deg, #fef3c7, #fde68a);">
+    <p style="font-size: 0.95rem; color: #92400e;">Choisis une matière pour explorer tout le programme CE1 ! 📚</p>
+  </div>
+  
+  <div class="mini-games-grid screen-transition">
+    ${decouverteSubjects.map(s => `
+      <button class="subject-btn" onclick="loadDecouverteSubject('${s.id}')" style="background: ${s.color}22; border: 2px solid ${s.color};">
+        <span class="emoji" style="font-size: 2rem;">${s.emoji}</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #1f2937;">${s.name}</span>
+        <span style="font-size: 0.7rem; color: #6b7280; margin-top: 2px;">${s.desc}</span>
+      </button>
+    `).join('')}
+  </div>`;
+}
+
+async function loadDecouverteSubject(subjectId) {
+  const subject = decouverteSubjects.find(s => s.id === subjectId);
+  if (!subject) return;
+  currentDecouverteSubject = subject;
+  
+  try {
+    let data = null;
+    switch (subjectId) {
+      case 'grammaire': data = await supabaseService.getGrammaire(); break;
+      case 'orthographe': data = await supabaseService.getOrthographe(); break;
+      case 'lecture': data = await supabaseService.getLectures(); break;
+      case 'dictees': data = await supabaseService.getDictees(); break;
+      case 'poesies': data = await supabaseService.getPoesies(); break;
+      case 'calcul_mental': data = await supabaseService.getCalculMental(1); break;
+      case 'problemes': data = await supabaseService.getProblemes(); break;
+      case 'geometrie': data = await supabaseService.getGeometrie(); break;
+      case 'mesures': data = await supabaseService.getMesures(); break;
+      case 'anglais': data = await supabaseService.getAnglais(); break;
+      case 'questionner_monde': data = await supabaseService.getQuestionnerMonde(); break;
+      case 'emc': data = await supabaseService.getEmc(); break;
+      case 'arts': data = await supabaseService.getArts(); break;
+    }
+    decouverteData = data || [];
+  } catch (e) {
+    decouverteData = [];
+  }
+  
+  screen = 'decouverteDetail';
+  render();
+}
+
+function decouverteDetailHTML() {
+  const s = currentDecouverteSubject;
+  if (!s) return decouvertesHTML();
+  
+  const items = decouverteData || [];
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" data-action="decouvertes">←</button>
+    <h2 class="module-title" style="color: ${s.color};">${s.emoji} ${s.name}</h2>
+    <span class="badge-count" style="background: ${s.color}22; color: ${s.color};">${items.length} fiches</span>
+  </div>
+  
+  ${items.length === 0 ? `<div class="card" style="text-align: center; padding: 40px 20px;">
+    <div style="font-size: 3rem; margin-bottom: 15px;">🔍</div>
+    <p style="color: #6b7280;">Chargement des données...</p>
+    <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 8px;">Connecte-toi à Supabase pour voir tout le programme CE1</p>
+  </div>` : ''}
+  
+  <div class="lessons-container screen-transition">
+    ${s.id === 'grammaire' ? grammaireHTML(items) : ''}
+    ${s.id === 'orthographe' ? orthographeHTML(items) : ''}
+    ${s.id === 'lecture' ? lectureHTML(items) : ''}
+    ${s.id === 'dictees' ? dicteesHTML(items) : ''}
+    ${s.id === 'poesies' ? poesiesHTML(items) : ''}
+    ${s.id === 'calcul_mental' ? calculMentalHTML(items) : ''}
+    ${s.id === 'problemes' ? problemesHTML(items) : ''}
+    ${s.id === 'geometrie' ? geometrieHTML(items) : ''}
+    ${s.id === 'mesures' ? mesuresHTML(items) : ''}
+    ${s.id === 'anglais' ? anglaisHTML(items) : ''}
+    ${s.id === 'questionner_monde' ? questionnerMondeHTML(items) : ''}
+    ${s.id === 'emc' ? emcHTML(items) : ''}
+    ${s.id === 'arts' ? artsHTML(items) : ''}
+  </div>`;
+}
+
+function grammaireHTML(items) {
+  const cats = [...new Set(items.map(i => i.categorie))];
+  return cats.map(cat => `
+    <div class="skill-section">
+      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+        <span class="skill-icon">📚</span>
+        <span class="skill-name">${cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+        <span class="skill-arrow">▼</span>
+      </div>
+      <div class="skill-lessons" style="display:none;">
+        ${items.filter(i => i.categorie === cat).map(i => `
+          <div class="lesson-card" onclick="showDecouverteItem('${i.notion}', '${i.explication.replace(/'/g, "\\'")}<br><br><em>Exemple : ${i.exemple || ''}</em>')">
+            <div class="lesson-info">
+              <h3 class="lesson-title">${i.notion}</h3>
+              <p style="font-size: 0.85rem; color: #6b7280;">${i.explication.substring(0, 80)}...</p>
+            </div>
+            <div class="lesson-arrow">→</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function orthographeHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('${i.regle.replace(/'/g, "\\'")}', '${i.explication.replace(/'/g, "\\'")}<br><br><strong>Exemples :</strong> ${i.mots_exemples || ''}')">
+      <div class="lesson-icon">✏️</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">${i.regle}</h3>
+        <p style="font-size: 0.85rem; color: #6b7280;">${i.explication.substring(0, 80)}...</p>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function lectureHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('${i.titre.replace(/'/g, "\\'")}', '<div style=\"white-space:pre-wrap;text-align:left;background:#f9fafb;padding:12px;border-radius:12px;\">${i.texte.replace(/'/g, "\\'")}</div><br><em>Type : ${i.type}</em>')">
+      <div class="lesson-icon">📖</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">${i.titre}</h3>
+        <p style="font-size: 0.85rem; color: #6b7280;">${i.texte.substring(0, 80)}...</p>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function dicteesHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('${i.titre.replace(/'/g, "\\'")}', '<div style=\"white-space:pre-wrap;text-align:left;background:#f9fafb;padding:12px;border-radius:12px;\">${i.texte.replace(/'/g, "\\'")}</div><br><strong>🤫 Mots pièges :</strong> ${(Array.isArray(i.mots_pieges) ? i.mots_pieges : JSON.parse(i.mots_pieges || '[]')).join(', ')}')">
+      <div class="lesson-icon">🎙️</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">${i.titre}</h3>
+        <p style="font-size: 0.85rem; color: #6b7280;">${i.nb_mots} mots • Niveau ${i.niveau}</p>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function poesiesHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('${i.titre.replace(/'/g, "\\'")}', '<div style=\"white-space:pre-wrap;text-align:left;font-style:italic;background:#fef9c3;padding:12px;border-radius:12px;\">${i.texte.replace(/'/g, "\\'")}</div>${i.auteur ? '<br><em>— ' + i.auteur + '</em>' : ''}')">
+      <div class="lesson-icon">🎵</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">${i.titre}</h3>
+        ${i.auteur ? `<p style="font-size: 0.85rem; color: #6b7280;">Par ${i.auteur}</p>` : ''}
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function calculMentalHTML(items) {
+  const nivs = [...new Set(items.map(i => i.niveau))].sort();
+  return nivs.map(niv => `
+    <div class="skill-section">
+      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+        <span class="skill-icon">🧮</span>
+        <span class="skill-name">Niveau ${niv}</span>
+        <span class="skill-arrow">▼</span>
+      </div>
+      <div class="skill-lessons" style="display:none;">
+        <div class="card" style="padding: 15px;">
+          <div class="choices" id="calcMentalQuiz${niv}"></div>
+          <button class="homework-btn math-btn" onclick="startCalcMentalQuiz(${niv})" style="margin-top:12px;">🎯 Démarrer le quiz</button>
+          <div id="calcMentalResult${niv}" style="margin-top:12px;text-align:center;font-weight:bold;"></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+let calcMentalState = { niveau: 1, questions: [], index: 0, score: 0, answers: {} };
+
+function startCalcMentalQuiz(niveau) {
+  const qs = (decouverteData || []).filter(i => i.niveau === niveau);
+  if (qs.length === 0) return;
+  qs.sort(() => Math.random() - 0.5);
+  calcMentalState = { niveau, questions: qs.slice(0, 12), index: 0, score: 0, answers: {} };
+  showCalcMentalQuestion(niveau);
+}
+
+function showCalcMentalQuestion(niveau) {
+  const { questions, index, score } = calcMentalState;
+  if (index >= questions.length) {
+    document.getElementById(`calcMentalResult${niveau}`).innerHTML =
+      `🎉 Score : ${score}/${questions.length} ⭐`;
+    spawnConfetti(10);
+    return;
+  }
+  const q = questions[index];
+  const ops = { '+': '+', '-': '-', '×': '×' };
+  const choices = generateChoices(q.reponse);
+  const container = document.getElementById(`calcMentalQuiz${niveau}`);
+  if (!container) return;
+  container.innerHTML = `
+    <div class="question-card" style="padding:20px;">
+      <p style="font-size:1.5rem;">${q.operande1} ${ops[q.operation] || q.operation} ${q.operande2} = ?</p>
+      <p style="font-size:0.85rem;color:#9ca3af;margin-top:8px;">Question ${index+1}/${questions.length}</p>
+    </div>
+    <div class="choices grid2">
+      ${choices.map(c => `<button class="choice-btn" onclick="checkCalcMentalAnswer(${niveau}, this, ${c}, ${q.reponse})">${c}</button>`).join('')}
+    </div>
+  `;
+}
+
+function generateChoices(correct) {
+  const choices = new Set([correct]);
+  while (choices.size < 4) {
+    const offset = Math.floor(Math.random() * 10) - 5;
+    if (offset !== 0) choices.add(correct + offset);
+  }
+  return [...choices].sort(() => Math.random() - 0.5);
+}
+
+function checkCalcMentalAnswer(niveau, btn, chosen, answer) {
+  // Prevent multiple clicks
+  const container = document.getElementById(`calcMentalQuiz${niveau}`);
+  if (!container || container.querySelectorAll('.choice-btn[disabled]').length > 0) return;
+  
+  const correct = chosen === answer;
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  container.querySelectorAll('.choice-btn').forEach(b => { b.disabled = true; if (Number(b.textContent) === answer) b.classList.add('correct'); });
+  
+  if (correct) { calcMentalState.score++; addStars(1); playCorrectSound(); updateCombo(true); }
+  else { playWrongSound(); updateCombo(false); }
+  
+  setTimeout(() => {
+    calcMentalState.index++;
+    showCalcMentalQuestion(niveau);
+  }, 800);
+}
+
+function problemesHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('Problème n°${i.id}', '<div style=\"text-align:left;\"><p style=\"font-size:1.1rem;background:#f0fdf4;padding:12px;border-radius:12px;\">${i.enonce}</p><br><strong>Opération :</strong> ${i.operation}<br><strong>Réponse :</strong> ${i.reponse}<br><strong>Niveau :</strong> ${i.niveau}</div>')">
+      <div class="lesson-icon">🧩</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">Problème n°${i.id}</h3>
+        <p style="font-size: 0.85rem; color: #6b7280;">${i.enonce.substring(0, 80)}...</p>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function geometrieHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('${i.notion.replace(/'/g, "\\'")}', '<div style=\"text-align:left;\"><p style=\"font-size:1rem;\">${i.description}</p></div>')">
+      <div class="lesson-icon">📐</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">${i.notion}</h3>
+        <p style="font-size: 0.85rem; color: #6b7280;">${i.description.substring(0, 80)}...</p>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function mesuresHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('${i.unite} (${i.symbole})', '<div style=\"text-align:left;\"><p>${i.explication}</p>${i.conversion ? '<br><strong>Conversion :</strong> ' + i.conversion : ''}</div>')">
+      <div class="lesson-icon">📏</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">${i.unite} (${i.symbole})</h3>
+        <p style="font-size: 0.85rem; color: #6b7280;">${i.explication.substring(0, 80)}...</p>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function anglaisHTML(items) {
+  const cats = [...new Set(items.map(i => i.categorie))];
+  return cats.map(cat => `
+    <div class="skill-section">
+      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+        <span class="skill-icon">🇬🇧</span>
+        <span class="skill-name">${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
+        <span class="skill-arrow">▼</span>
+      </div>
+      <div class="skill-lessons" style="display:none;">
+        ${items.filter(i => i.categorie === cat).map(i => `
+          <div class="lesson-card" onclick="showDecouverteItem('${i.mot_fr} ↔ ${i.mot_en}', '<div style=\"text-align:left;\"><p><strong>FR :</strong> ${i.mot_fr}<br><strong>EN :</strong> ${i.mot_en}${i.phonetique ? '<br><strong>Phonétique :</strong> ' + i.phonetique : ''}<br><br><em>${i.phrase_fr}</em><br><em>${i.phrase_en}</em></p></div>')">
+            <div class="lesson-info">
+              <h3 class="lesson-title">${i.mot_fr} ↔ ${i.mot_en}</h3>
+              ${i.phonetique ? `<p style="font-size: 0.8rem; color: #9ca3af;">${i.phonetique}</p>` : ''}
+            </div>
+            <div class="lesson-arrow">→</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function questionnerMondeHTML(items) {
+  const domaines = [...new Set(items.map(i => i.domaine))];
+  return domaines.map(dom => `
+    <div class="skill-section">
+      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+        <span class="skill-icon">🌍</span>
+        <span class="skill-name">${dom.charAt(0).toUpperCase() + dom.slice(1)}</span>
+        <span class="skill-arrow">▼</span>
+      </div>
+      <div class="skill-lessons" style="display:none;">
+        ${items.filter(i => i.domaine === dom).map(i => `
+          <div class="lesson-card" onclick="showDecouverteItem('${i.titre.replace(/'/g, "\\'")}', '<div style=\"text-align:left;\">${i.contenu}</div>')">
+            <div class="lesson-info">
+              <h3 class="lesson-title">${i.titre}</h3>
+              <p style="font-size: 0.85rem; color: #6b7280;">${i.contenu.substring(0, 80)}...</p>
+            </div>
+            <div class="lesson-arrow">→</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function emcHTML(items) {
+  return items.map(i => `
+    <div class="lesson-card" onclick="showDecouverteItem('${i.valeur.replace(/'/g, "\\'")}', '<div style=\"text-align:left;\"><p>${i.explication}</p>${i.question_reflexion ? '<br><div style=\"background:#fef9c3;padding:12px;border-radius:12px;\"><strong>🤔 Réflexion :</strong><br>${i.question_reflexion}</div>' : ''}</div>')">
+      <div class="lesson-icon">🤝</div>
+      <div class="lesson-info">
+        <h3 class="lesson-title">${i.valeur}</h3>
+        <p style="font-size: 0.85rem; color: #6b7280;">${i.explication.substring(0, 80)}...</p>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+function artsHTML(items) {
+  const domaines = [...new Set(items.map(i => i.domaine))];
+  return domaines.map(dom => {
+    const labels = { arts: '🎨 Arts', musique: '🎵 Musique', eps: '🏃 EPS' };
+    return `<div class="skill-section">
+      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+        <span class="skill-icon">${dom === 'arts' ? '🎨' : dom === 'musique' ? '🎵' : '🏃'}</span>
+        <span class="skill-name">${labels[dom] || dom}</span>
+        <span class="skill-arrow">▼</span>
+      </div>
+      <div class="skill-lessons" style="display:none;">
+        ${items.filter(i => i.domaine === dom).map(i => `
+          <div class="lesson-card" onclick="showDecouverteItem('${i.activite.replace(/'/g, "\\'")}', '<div style=\"text-align:left;\">${i.description}</div>')">
+            <div class="lesson-info">
+              <h3 class="lesson-title">${i.activite}</h3>
+              <p style="font-size: 0.85rem; color: #6b7280;">${i.description.substring(0, 80)}...</p>
+            </div>
+            <div class="lesson-arrow">→</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showDecouverteItem(title, content) {
+  document.getElementById('decouverteDetailEmoji').textContent = currentDecouverteSubject?.emoji || '📚';
+  document.getElementById('decouverteDetailTitle').textContent = title;
+  document.getElementById('decouverteDetailContent').innerHTML = content;
+  document.getElementById('decouverteDetailOverlay').classList.add('show');
+  playBeep(600, 0.1, 'sine');
+}
+
+function closeDecouverteDetail() {
+  document.getElementById('decouverteDetailOverlay').classList.remove('show');
+}
+
 // === RENDER ===
 function render() {
   const app = document.getElementById('app');
@@ -1998,6 +2525,8 @@ function render() {
   else if (screen === 'homework') app.innerHTML = homeworkHTML();
   else if (screen === 'lessons') app.innerHTML = lessonsHTML();
   else if (screen === 'lessonDetail') app.innerHTML = lessonDetailHTML();
+  else if (screen === 'decouvertes') app.innerHTML = decouvertesHTML();
+  else if (screen === 'decouverteDetail') app.innerHTML = decouverteDetailHTML();
   else if (screen === 'math' || screen === 'french' || screen === 'science') {
     if (done) app.innerHTML = resultHTML();
     else app.innerHTML = quizHTML();
@@ -2120,6 +2649,14 @@ function homeHTML() {
     <button class="subject-btn btn-french" data-subject="french">
       <span class="emoji">📖</span><span>Français</span>
       <span class="card-mascot seal">🦭</span>
+    </button>
+    <button class="subject-btn btn-science" data-subject="science">
+      <span class="emoji">🔬</span><span>Sciences</span>
+      <span class="card-mascot squirrel">🐿️</span>
+    </button>
+    <button class="subject-btn btn-discovery" onclick="screen='decouvertes';render()" style="background: #fef3c7;">
+      <span class="emoji">🌟</span><span>Découvertes</span>
+      <span class="card-mascot jelly">🪼</span>
     </button>
     <button class="subject-btn btn-science" data-subject="science">
       <span class="emoji">🔬</span><span>Sciences</span>
@@ -2407,6 +2944,7 @@ function attachListeners() {
     btn.onclick = () => {
       if (btn.dataset.action === 'back') { screen = 'home'; render(); }
       else if (btn.dataset.action === 'home') { screen = 'home'; render(); }
+      else if (btn.dataset.action === 'decouvertes') { screen = 'decouvertes'; render(); }
       else if (btn.dataset.action === 'parental') { screen = 'parental'; render(); }
       else if (btn.dataset.action === 'unlock') { unlockParental(); }
     };
