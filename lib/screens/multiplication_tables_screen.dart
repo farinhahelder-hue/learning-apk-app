@@ -33,7 +33,6 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   int _current = 0;
   int _score = 0;
   bool _finished = false;
-  String? _selectedAnswer;
   bool? _isCorrect;
   Timer? _timer;
   int _remainingSeconds = 30;
@@ -118,7 +117,6 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
       _score = 0;
       _finished = false;
       _streak = 0;
-      _selectedAnswer = null;
       _isCorrect = null;
     });
     _startTimer();
@@ -133,7 +131,6 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
       _score = 0;
       _finished = false;
       _streak = 0;
-      _selectedAnswer = null;
       _isCorrect = null;
     });
     _startTimer();
@@ -191,7 +188,6 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   void _onTimeOut() {
     if (_isCorrect != null) return;
     setState(() {
-      _selectedAnswer = null;
       _isCorrect = false;
       _streak = 0;
     });
@@ -209,7 +205,6 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     final audio = context.read<AudioService>();
     
     setState(() {
-      _selectedAnswer = answer.toString();
       _isCorrect = correct;
       if (correct) {
         _score++;
@@ -246,7 +241,6 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     if (_current < _exercises.length - 1) {
       setState(() {
         _current++;
-        _selectedAnswer = null;
         _isCorrect = null;
       });
       _startTimer();
@@ -953,7 +947,6 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                     _score = 0;
                     _finished = false;
                     _streak = 0;
-                    _selectedAnswer = null;
                     _isCorrect = null;
                     _exercises.shuffle();
                   });
