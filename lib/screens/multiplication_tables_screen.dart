@@ -106,12 +106,14 @@ class _MultiplicationTablesScreenState
 
       final options = [correctAnswer, ...distractors].toList()..shuffle();
 
-      exercises.add(MultiplicationExercise(
-        table: table,
-        multiplier: multiplier,
-        correctAnswer: correctAnswer,
-        options: options,
-      ));
+      exercises.add(
+        MultiplicationExercise(
+          table: table,
+          multiplier: multiplier,
+          correctAnswer: correctAnswer,
+          options: options,
+        ),
+      );
     }
 
     setState(() {
@@ -162,12 +164,14 @@ class _MultiplicationTablesScreenState
 
       final options = [correctAnswer, ...distractors].toList()..shuffle();
 
-      exercises.add(MultiplicationExercise(
-        table: table,
-        multiplier: multiplier,
-        correctAnswer: correctAnswer,
-        options: options,
-      ));
+      exercises.add(
+        MultiplicationExercise(
+          table: table,
+          multiplier: multiplier,
+          correctAnswer: correctAnswer,
+          options: options,
+        ),
+      );
     }
 
     return exercises;
@@ -290,16 +294,14 @@ class _MultiplicationTablesScreenState
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppTheme.mathGradient,
-            ),
+            decoration: const BoxDecoration(gradient: AppTheme.mathGradient),
           ),
           SafeArea(
             child: _selectedTable == null && _exercises.isEmpty
                 ? _buildModeSelection()
                 : _finished
-                    ? _buildResults()
-                    : _buildExercise(),
+                ? _buildResults()
+                : _buildExercise(),
           ),
           // Confettis
           Align(
@@ -312,7 +314,7 @@ class _MultiplicationTablesScreenState
                 Colors.orange,
                 Colors.pink,
                 Colors.blue,
-                Colors.green
+                Colors.green,
               ],
             ),
           ),
@@ -323,39 +325,45 @@ class _MultiplicationTablesScreenState
               left: 0,
               right: 0,
               child: Center(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.amber.withOpacity(0.5),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('🔥', style: TextStyle(fontSize: 24)),
-                      const SizedBox(width: 8),
-                      Text(
-                        '$_streak de suite !',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-                    .animate()
-                    .scale(begin: const Offset(0, 0), curve: Curves.elasticOut)
-                    .shake(duration: 500.ms, hz: 3),
+                child:
+                    Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.amber,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.amber.withOpacity(0.5),
+                                blurRadius: 20,
+                                spreadRadius: 5,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('🔥', style: TextStyle(fontSize: 24)),
+                              const SizedBox(width: 8),
+                              Text(
+                                '$_streak de suite !',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                        .animate()
+                        .scale(
+                          begin: const Offset(0, 0),
+                          curve: Curves.elasticOut,
+                        )
+                        .shake(duration: 500.ms, hz: 3),
               ),
             ),
         ],
@@ -378,10 +386,7 @@ class _MultiplicationTablesScreenState
         const SizedBox(height: 8),
         const Text(
           'Choisis ton défi !',
-          style: TextStyle(
-            fontSize: 18,
-            color: Colors.white70,
-          ),
+          style: TextStyle(fontSize: 18, color: Colors.white70),
         ).animate().fadeIn(delay: 200.ms),
         const SizedBox(height: 40),
 
@@ -495,32 +500,32 @@ class _MultiplicationTablesScreenState
               crossAxisSpacing: 16,
               children: [2, 3, 4, 5].map((table) {
                 return BounceButton(
-                  onTap: () => _startTable(table),
-                  color: Colors.white,
-                  shadowColor: AppTheme.primaryBlue,
-                  borderRadius: BorderRadius.circular(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Table',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppTheme.primaryBlue,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      onTap: () => _startTable(table),
+                      color: Colors.white,
+                      shadowColor: AppTheme.primaryBlue,
+                      borderRadius: BorderRadius.circular(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Table',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.primaryBlue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            '× $table',
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w900,
+                              color: AppTheme.primaryBlue,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '× $table',
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.w900,
-                          color: AppTheme.primaryBlue,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+                    )
                     .animate(delay: Duration(milliseconds: 100 * table))
                     .fadeIn()
                     .scale();
@@ -575,7 +580,9 @@ class _MultiplicationTablesScreenState
                           Container(
                             margin: const EdgeInsets.only(right: 8),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.amber,
                               borderRadius: BorderRadius.circular(12),
@@ -583,8 +590,10 @@ class _MultiplicationTablesScreenState
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text('🔥',
-                                    style: TextStyle(fontSize: 14)),
+                                const Text(
+                                  '🔥',
+                                  style: TextStyle(fontSize: 14),
+                                ),
                                 Text(
                                   '$_streak',
                                   style: const TextStyle(
@@ -621,30 +630,36 @@ class _MultiplicationTablesScreenState
                     const SizedBox(height: 4),
                     Text(
                       '${_current + 1} / ${_exercises.length}',
-                      style:
-                          const TextStyle(color: Colors.white70, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: _remainingSeconds <= 10 ? Colors.red : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '$_remainingSeconds s',
-                  style: TextStyle(
-                    color: _remainingSeconds <= 10
-                        ? Colors.white
-                        : AppTheme.primaryBlue,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18,
-                  ),
-                ),
-              )
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _remainingSeconds <= 10
+                          ? Colors.red
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '$_remainingSeconds s',
+                      style: TextStyle(
+                        color: _remainingSeconds <= 10
+                            ? Colors.white
+                            : AppTheme.primaryBlue,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                      ),
+                    ),
+                  )
                   .animate(target: _remainingSeconds <= 5 ? 1 : 0)
                   .shake(duration: 300.ms),
             ],
@@ -682,8 +697,9 @@ class _MultiplicationTablesScreenState
                     mood: MascotMood.wrong,
                     size: 80,
                     showSpeechBubble: true,
-                    speechText: _wrongMessages[
-                        DateTime.now().second % _wrongMessages.length],
+                    speechText:
+                        _wrongMessages[DateTime.now().second %
+                            _wrongMessages.length],
                   ).animate().shake(),
 
                 const SizedBox(height: 24),
@@ -748,7 +764,9 @@ class _MultiplicationTablesScreenState
                         const SizedBox(height: 16),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: _isCorrect!
                                 ? const Color(0xFFE8F5E9)
@@ -795,20 +813,21 @@ class _MultiplicationTablesScreenState
                     childAspectRatio: 1.6,
                     children: exercise.options.asMap().entries.map((entry) {
                       return BounceButton(
-                        onTap: () => _checkAnswer(entry.value),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Text(
-                          entry.value.toString(),
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.primaryBlue,
-                          ),
-                        ),
-                      )
+                            onTap: () => _checkAnswer(entry.value),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            child: Text(
+                              entry.value.toString(),
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.primaryBlue,
+                              ),
+                            ),
+                          )
                           .animate(
-                              delay: Duration(milliseconds: 100 * entry.key))
+                            delay: Duration(milliseconds: 100 * entry.key),
+                          )
                           .fadeIn()
                           .slideX(begin: 0.1);
                     }).toList(),
@@ -852,42 +871,45 @@ class _MultiplicationTablesScreenState
             // Animation boss final si réussi
             if (isBossDefeated)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.amber, Colors.orange],
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.amber.withOpacity(0.5),
-                      blurRadius: 20,
-                      spreadRadius: 5,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text('⚔️', style: TextStyle(fontSize: 24)),
-                    SizedBox(width: 8),
-                    Text(
-                      'BOSS VAINCU !',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Colors.amber, Colors.orange],
                       ),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.5),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text('⚔️', style: TextStyle(fontSize: 24)),
+                        SizedBox(width: 8),
+                        Text(
+                          'BOSS VAINCU !',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                   .animate()
                   .scale(
-                      begin: const Offset(0, 0),
-                      curve: Curves.elasticOut,
-                      delay: 200.ms)
+                    begin: const Offset(0, 0),
+                    curve: Curves.elasticOut,
+                    delay: 200.ms,
+                  )
                   .shake(duration: 800.ms, hz: 2),
 
             const SizedBox(height: 24),
@@ -902,9 +924,10 @@ class _MultiplicationTablesScreenState
             const SizedBox(height: 24),
 
             // Emoji résultat
-            Text(emoji, style: const TextStyle(fontSize: 80))
-                .animate()
-                .scale(delay: 300.ms, curve: Curves.elasticOut),
+            Text(
+              emoji,
+              style: const TextStyle(fontSize: 80),
+            ).animate().scale(delay: 300.ms, curve: Curves.elasticOut),
 
             const SizedBox(height: 16),
 
@@ -913,10 +936,10 @@ class _MultiplicationTablesScreenState
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(3, (i) {
                 return Icon(
-                  i < stars ? Icons.star : Icons.star_border,
-                  size: 48,
-                  color: i < stars ? Colors.amber : Colors.white54,
-                )
+                      i < stars ? Icons.star : Icons.star_border,
+                      size: 48,
+                      color: i < stars ? Colors.amber : Colors.white54,
+                    )
                     .animate(delay: Duration(milliseconds: 400 + i * 150))
                     .scale(curve: Curves.elasticOut);
               }),
@@ -945,10 +968,7 @@ class _MultiplicationTablesScreenState
                   const SizedBox(height: 12),
                   Text(
                     '$_score / ${_exercises.length} bonnes réponses',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.white70,
-                    ),
+                    style: const TextStyle(fontSize: 18, color: Colors.white70),
                   ),
                   if (_selectedTable != null) ...[
                     const SizedBox(height: 8),
@@ -963,10 +983,7 @@ class _MultiplicationTablesScreenState
                     const SizedBox(height: 8),
                     const Text(
                       'Mode Mixte ⚡',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white54,
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.white54),
                     ),
                   ],
                 ],
