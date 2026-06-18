@@ -26,7 +26,7 @@ class DiscoveryWorldScreen extends StatefulWidget {
 
 class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
   final _confettiKey = GlobalKey<ConfettiOverlayState>();
-  final _timerKey    = GlobalKey<ThinkingTimerState>();
+  final _timerKey = GlobalKey<ThinkingTimerState>();
 
   late List<Map<String, dynamic>> _questions;
   late Mascot _mascot;
@@ -56,11 +56,12 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
     if (_currentIndex >= _questions.length) return;
     final q = _questions[_currentIndex];
     setState(() {
-      _mood         = MascotMood.thinking;
-      _speechText   = _mascot.thinkPhrases[_currentIndex % _mascot.thinkPhrases.length];
+      _mood = MascotMood.thinking;
+      _speechText =
+          _mascot.thinkPhrases[_currentIndex % _mascot.thinkPhrases.length];
       _selectedAnswer = null;
-      _answered       = false;
-      _showFunFact    = false;
+      _answered = false;
+      _showFunFact = false;
     });
     _timerKey.currentState?.reset();
     // Optionnel : lire la question via TTS
@@ -110,7 +111,8 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
     _confettiKey.currentState?.burst();
     setState(() {
       _mood = MascotMood.celebrate;
-      _speechText = '${_score} / ${_questions.length} — ${_score == _questions.length ? "PARFAIT ! 🌟" : "Bien joué ! ⭐"}';
+      _speechText =
+          '${_score} / ${_questions.length} — ${_score == _questions.length ? "PARFAIT ! 🌟" : "Bien joué ! ⭐"}';
     });
     showDialog(
       context: context,
@@ -120,17 +122,27 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
         total: _questions.length,
         worldTitle: widget.world['title'] as String,
         mascot: _mascot,
-        onRetry: () { Navigator.pop(context); setState(() { _currentIndex = 0; _score = 0; }); _questions.shuffle(); _showCurrentQuestion(); },
-        onExit:  () { Navigator.pop(context); Navigator.pop(context); },
+        onRetry: () {
+          Navigator.pop(context);
+          setState(() {
+            _currentIndex = 0;
+            _score = 0;
+          });
+          _questions.shuffle();
+          _showCurrentQuestion();
+        },
+        onExit: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final q = _currentIndex < _questions.length
-        ? _questions[_currentIndex]
-        : null;
+    final q =
+        _currentIndex < _questions.length ? _questions[_currentIndex] : null;
     final worldColor = Color(widget.world['color'] as int);
 
     return Scaffold(
@@ -140,7 +152,10 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [worldColor.withOpacity(0.15), AppTheme.backgroundLight],
+                colors: [
+                  worldColor.withOpacity(0.15),
+                  AppTheme.backgroundLight
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -206,7 +221,10 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
                                 ),
                               ),
                             ],
-                          ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.1),
+                          )
+                              .animate()
+                              .fadeIn(duration: 500.ms)
+                              .slideY(begin: -0.1),
 
                           const SizedBox(height: 24),
 
@@ -233,14 +251,20 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
                             _FunFactCard(
                               text: q['funFact'] as String,
                               color: worldColor,
-                            ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2),
+                            )
+                                .animate()
+                                .fadeIn(duration: 500.ms)
+                                .slideY(begin: 0.2),
 
                           if (_showFunFact && q.containsKey('lesson'))
                             _FunFactCard(
                               text: q['lesson'] as String,
                               color: const Color(0xFFFFCA28),
                               icon: '💛',
-                            ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2),
+                            )
+                                .animate()
+                                .fadeIn(duration: 500.ms)
+                                .slideY(begin: 0.2),
 
                           const SizedBox(height: 16),
 
@@ -256,8 +280,8 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
                                     _currentIndex < _questions.length - 1
                                         ? 'Question suivante →'
                                         : 'Voir les résultats 🏆',
-                                    style: AppTheme.buttonStyle.copyWith(
-                                        color: Colors.white),
+                                    style: AppTheme.buttonStyle
+                                        .copyWith(color: Colors.white),
                                   ),
                                 ],
                               ),
@@ -304,13 +328,19 @@ class _AnswerButton extends StatelessWidget {
 
     switch (state) {
       case _AnswerState.correct:
-        bg = const Color(0xFFE8F5E9); border = const Color(0xFF4CAF50); icon = Icons.check_circle;
+        bg = const Color(0xFFE8F5E9);
+        border = const Color(0xFF4CAF50);
+        icon = Icons.check_circle;
         break;
       case _AnswerState.wrong:
-        bg = const Color(0xFFFFEBEE); border = const Color(0xFFF44336); icon = Icons.cancel;
+        bg = const Color(0xFFFFEBEE);
+        border = const Color(0xFFF44336);
+        icon = Icons.cancel;
         break;
       case _AnswerState.neutral:
-        bg = Colors.white; border = const Color(0xFFE0E0E0); icon = null;
+        bg = Colors.white;
+        border = const Color(0xFFE0E0E0);
+        icon = null;
     }
 
     return GestureDetector(
@@ -325,8 +355,10 @@ class _AnswerButton extends StatelessWidget {
           border: Border.all(color: border, width: 2),
           boxShadow: [
             BoxShadow(
-              color: border.withOpacity(state == _AnswerState.neutral ? 0.1 : 0.25),
-              blurRadius: 8, offset: const Offset(0, 4),
+              color: border
+                  .withOpacity(state == _AnswerState.neutral ? 0.1 : 0.25),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -390,7 +422,8 @@ class _FunFactCard extends StatelessWidget {
             child: Text(
               text,
               style: AppTheme.bodyStyle.copyWith(
-                fontSize: 15, color: color.withOpacity(0.9),
+                fontSize: 15,
+                color: color.withOpacity(0.9),
               ),
             ),
           ),
@@ -431,8 +464,10 @@ class _Header extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.07),
-                      blurRadius: 8, offset: const Offset(0, 3))
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.07),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3))
                 ],
               ),
               child: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -478,15 +513,22 @@ class _ResultDialog extends StatelessWidget {
   final VoidCallback onExit;
 
   const _ResultDialog({
-    required this.score, required this.total,
-    required this.worldTitle, required this.mascot,
-    required this.onRetry, required this.onExit,
+    required this.score,
+    required this.total,
+    required this.worldTitle,
+    required this.mascot,
+    required this.onRetry,
+    required this.onExit,
   });
 
   @override
   Widget build(BuildContext context) {
     final pct = score / total;
-    final stars = pct == 1.0 ? 3 : pct >= 0.7 ? 2 : 1;
+    final stars = pct == 1.0
+        ? 3
+        : pct >= 0.7
+            ? 2
+            : 1;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       child: Padding(
@@ -503,7 +545,8 @@ class _ResultDialog extends StatelessWidget {
             const SizedBox(height: 16),
             MascotWidget(
               mascot: mascot,
-              mood: score == total ? MascotMood.celebrate : MascotMood.encourage,
+              mood:
+                  score == total ? MascotMood.celebrate : MascotMood.encourage,
               size: 90,
               showSpeechBubble: true,
               speechText: score == total
@@ -529,8 +572,8 @@ class _ResultDialog extends StatelessWidget {
                     color: const Color(0xFF4FC3F7),
                     onTap: onExit,
                     child: Text('🏠 Accueil',
-                        style: AppTheme.buttonStyle
-                            .copyWith(color: Colors.white)),
+                        style:
+                            AppTheme.buttonStyle.copyWith(color: Colors.white)),
                   ),
                 ),
               ],

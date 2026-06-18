@@ -47,7 +47,10 @@ class _SplashScreenState extends State<SplashScreen> {
                   fontWeight: FontWeight.w800,
                   color: AppTheme.textDark,
                 ),
-              ).animate(delay: 400.ms).fadeIn(duration: 600.ms).slideY(begin: 0.3),
+              )
+                  .animate(delay: 400.ms)
+                  .fadeIn(duration: 600.ms)
+                  .slideY(begin: 0.3),
               const SizedBox(height: 12),
               const Text(
                 'Bonjour Emilie ! 👋',

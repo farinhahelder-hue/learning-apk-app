@@ -14,7 +14,8 @@ class DicteeInteractiveScreen extends StatefulWidget {
   const DicteeInteractiveScreen({super.key});
 
   @override
-  State<DicteeInteractiveScreen> createState() => _DicteeInteractiveScreenState();
+  State<DicteeInteractiveScreen> createState() =>
+      _DicteeInteractiveScreenState();
 }
 
 class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
@@ -26,14 +27,22 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
 
   // Mots de la dictée avec leur phonétique IPA
   static const List<DicteeWord> _words = [
-    DicteeWord(word: 'chat', ipa: '[ʃa]', hint: 'Un animal domestique qui fait "miaou"'),
-    DicteeWord(word: 'maman', ipa: '[mamɑ̃]', hint: 'Ta maman est la meilleure !'),
+    DicteeWord(
+        word: 'chat',
+        ipa: '[ʃa]',
+        hint: 'Un animal domestique qui fait "miaou"'),
+    DicteeWord(
+        word: 'maman', ipa: '[mamɑ̃]', hint: 'Ta maman est la meilleure !'),
     DicteeWord(word: 'pomme', ipa: '[pɔm]', hint: 'Un fruit rouge ou vert'),
-    DicteeWord(word: 'étoile', ipa: '[etwal]', hint: 'Brille dans le ciel la nuit'),
-    DicteeWord(word: 'cheval', ipa: '[ʃəval]', hint: 'Un animal avec une crinière'),
-    DicteeWord(word: 'merci', ipa: '[mɛʁsi]', hint: 'On le dit quand on est poli'),
+    DicteeWord(
+        word: 'étoile', ipa: '[etwal]', hint: 'Brille dans le ciel la nuit'),
+    DicteeWord(
+        word: 'cheval', ipa: '[ʃəval]', hint: 'Un animal avec une crinière'),
+    DicteeWord(
+        word: 'merci', ipa: '[mɛʁsi]', hint: 'On le dit quand on est poli'),
     DicteeWord(word: 'bateau', ipa: '[bato]', hint: 'Il navigue sur l\'eau'),
-    DicteeWord(word: 'lune', ipa: '[lyn]', hint: 'Elle brille la nuit dans le ciel'),
+    DicteeWord(
+        word: 'lune', ipa: '[lyn]', hint: 'Elle brille la nuit dans le ciel'),
   ];
 
   int _currentIndex = 0;
@@ -108,7 +117,7 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
   void _checkAnswer(String transcript) {
     final normalizedTranscript = transcript.toLowerCase().trim();
     final normalizedWord = _currentWord.word.toLowerCase();
-    
+
     // Comparaison simple : le mot prononcé contient le mot attendu
     final isCorrect = normalizedTranscript == normalizedWord ||
         normalizedTranscript.contains(normalizedWord) ||
@@ -132,7 +141,7 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
 
   double _calculateSimilarity(String s1, String s2) {
     if (s1.isEmpty || s2.isEmpty) return 0;
-    
+
     int matches = 0;
     for (int i = 0; i < s1.length && i < s2.length; i++) {
       if (s1[i] == s2[i]) matches++;
@@ -215,20 +224,23 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                     const SizedBox(height: 4),
                     Text(
                       '${_currentIndex + 1} / ${_words.length}',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.check, color: AppTheme.primaryGreen, size: 18),
+                    const Icon(Icons.check,
+                        color: AppTheme.primaryGreen, size: 18),
                     const SizedBox(width: 4),
                     Text(
                       '$_correctCount',
@@ -331,7 +343,8 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                           onTap: _speakWord,
                           color: AppTheme.primaryPink,
                           borderRadius: BorderRadius.circular(30),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -353,7 +366,8 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
 
                         // Phonétique
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
                           decoration: BoxDecoration(
                             color: const Color(0xFFE3F2FD),
                             borderRadius: BorderRadius.circular(12),
@@ -362,7 +376,8 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.record_voice_over, color: AppTheme.primaryBlue, size: 20),
+                              const Icon(Icons.record_voice_over,
+                                  color: AppTheme.primaryBlue, size: 20),
                               const SizedBox(width: 8),
                               Text(
                                 'Phonétique : ${_currentWord.ipa}',
@@ -394,10 +409,15 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                                       : AppTheme.primaryPink,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: (_isListening ? Colors.red : AppTheme.primaryPink)
-                                          .withOpacity(0.3 + (_pulseController.value * 0.3)),
-                                      blurRadius: 20 + (_pulseController.value * 20),
-                                      spreadRadius: 5 + (_pulseController.value * 10),
+                                      color: (_isListening
+                                              ? Colors.red
+                                              : AppTheme.primaryPink)
+                                          .withOpacity(0.3 +
+                                              (_pulseController.value * 0.3)),
+                                      blurRadius:
+                                          20 + (_pulseController.value * 20),
+                                      spreadRadius:
+                                          5 + (_pulseController.value * 10),
                                     ),
                                   ],
                                 ),
@@ -412,7 +432,9 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _isListening ? 'Appuie pour arrêter' : 'Appuie et prononce le mot',
+                          _isListening
+                              ? 'Appuie pour arrêter'
+                              : 'Appuie et prononce le mot',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 14,
@@ -436,7 +458,8 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                         children: [
                           const Text(
                             'Tu as prononcé :',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 14),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -450,9 +473,12 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                           if (_lastResult != null) ...[
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
-                                color: _lastResult! ? const Color(0xFF81C784) : const Color(0xFFEF9A9A),
+                                color: _lastResult!
+                                    ? const Color(0xFF81C784)
+                                    : const Color(0xFFEF9A9A),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -516,14 +542,11 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
               mood: pct >= 0.5 ? MascotMood.celebrate : MascotMood.happy,
               size: 120,
             ).animate().scale(curve: Curves.elasticOut),
-
             const SizedBox(height: 24),
-
             Text(emoji, style: const TextStyle(fontSize: 80))
-                .animate().scale(delay: 300.ms, curve: Curves.elasticOut),
-
+                .animate()
+                .scale(delay: 300.ms, curve: Curves.elasticOut),
             const SizedBox(height: 16),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(3, (i) {
@@ -531,13 +554,12 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                   i < stars ? Icons.star : Icons.star_border,
                   size: 48,
                   color: i < stars ? Colors.amber : Colors.white54,
-                ).animate(delay: Duration(milliseconds: 400 + i * 150))
+                )
+                    .animate(delay: Duration(milliseconds: 400 + i * 150))
                     .scale(curve: Curves.elasticOut);
               }),
             ),
-
             const SizedBox(height: 24),
-
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -563,9 +585,7 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                 ],
               ),
             ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2),
-
             const SizedBox(height: 32),
-
             BounceButton(
               onTap: _restart,
               color: Colors.white,
@@ -586,9 +606,7 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
                 ],
               ),
             ).animate().fadeIn(delay: 800.ms),
-
             const SizedBox(height: 12),
-
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text(
@@ -605,9 +623,9 @@ class _DicteeInteractiveScreenState extends State<DicteeInteractiveScreen>
 
 /// Modèle de mot pour la dictée
 class DicteeWord {
-  final String word;     // Mot à écrire
-  final String ipa;      // Phonétique IPA
-  final String hint;     // Indice pour l'élève
+  final String word; // Mot à écrire
+  final String ipa; // Phonétique IPA
+  final String hint; // Indice pour l'élève
 
   const DicteeWord({
     required this.word,

@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/app_theme.dart';
 import '../utils/constants.dart';
 import '../services/progress_service.dart';
+import '../services/parental_settings_service.dart';
 import '../services/audio_service.dart';
 import '../widgets/subject_card.dart';
 import '../widgets/progress_banner.dart';
@@ -34,14 +35,16 @@ class HomeScreen extends StatelessWidget {
                         Text(
                           'Bonjour ${AppConstants.childName} ! 🌟',
                           style: const TextStyle(
-                            fontSize: 26, fontWeight: FontWeight.w800,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
                             color: AppTheme.textDark,
                           ),
                         ),
                         Text(
                           'Niveau ${progress.currentLevel} • ${progress.totalPoints} ⭐',
                           style: const TextStyle(
-                            fontSize: 16, color: AppTheme.textGrey,
+                            fontSize: 16,
+                            color: AppTheme.textGrey,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -55,14 +58,15 @@ class HomeScreen extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: audio.musicEnabled 
-                                  ? Colors.green.withOpacity(0.1) 
+                              color: audio.musicEnabled
+                                  ? Colors.green.withOpacity(0.1)
                                   : Colors.grey.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(14),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.08),
-                                  blurRadius: 10, offset: const Offset(0, 4),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
@@ -79,13 +83,18 @@ class HomeScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: audio.musicEnabled ? Colors.green : Colors.grey,
+                                    color: audio.musicEnabled
+                                        ? Colors.green
+                                        : Colors.grey,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ).animate().fadeIn().scale(begin: const Offset(0.8, 0.8)),
+                        )
+                            .animate()
+                            .fadeIn()
+                            .scale(begin: const Offset(0.8, 0.8)),
                         const SizedBox(width: 8),
                         // Bouton code parental
                         GestureDetector(
@@ -98,11 +107,13 @@ class HomeScreen extends StatelessWidget {
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.08),
-                                  blurRadius: 10, offset: const Offset(0, 4),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            child: const Text('🔒', style: TextStyle(fontSize: 24)),
+                            child: const Text('🔒',
+                                style: TextStyle(fontSize: 24)),
                           ),
                         ),
                       ],
@@ -112,68 +123,96 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 // --- Bannière progression ---
                 ProgressBanner(progress: progress)
-                    .animate(delay: 200.ms).fadeIn(duration: 500.ms).slideX(begin: -0.2),
+                    .animate(delay: 200.ms)
+                    .fadeIn(duration: 500.ms)
+                    .slideX(begin: -0.2),
                 const SizedBox(height: 28),
                 const Text(
                   'Que veux-tu apprendre ?',
                   style: TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                     color: AppTheme.textDark,
                   ),
                 ).animate(delay: 300.ms).fadeIn(),
                 const SizedBox(height: 16),
                 // --- Cartes matières ---
                 SubjectCard(
-                  title: 'Mathématiques', emoji: '🔢',
+                  title: 'Mathématiques',
+                  emoji: '🔢',
                   subtitle: 'Additions • Multiplications • Géométrie',
-                  gradient: AppTheme.mathGradient, points: progress.mathPoints,
+                  gradient: AppTheme.mathGradient,
+                  points: progress.mathPoints,
                   onTap: () => Navigator.pushNamed(context, '/math'),
-                ).animate(delay: 400.ms).fadeIn(duration: 500.ms).slideX(begin: 0.2),
+                )
+                    .animate(delay: 400.ms)
+                    .fadeIn(duration: 500.ms)
+                    .slideX(begin: 0.2),
                 const SizedBox(height: 16),
                 SubjectCard(
-                  title: 'Français', emoji: '📚',
+                  title: 'Français',
+                  emoji: '📚',
                   subtitle: 'Lecture • Orthographe • Conjugaison',
-                  gradient: AppTheme.frenchGradient, points: progress.frenchPoints,
+                  gradient: AppTheme.frenchGradient,
+                  points: progress.frenchPoints,
                   onTap: () => Navigator.pushNamed(context, '/french'),
-                ).animate(delay: 500.ms).fadeIn(duration: 500.ms).slideX(begin: -0.2),
+                )
+                    .animate(delay: 500.ms)
+                    .fadeIn(duration: 500.ms)
+                    .slideX(begin: -0.2),
                 const SizedBox(height: 16),
                 SubjectCard(
-                  title: 'Sciences', emoji: '🔬',
+                  title: 'Sciences',
+                  emoji: '🔬',
                   subtitle: 'Nature • Corps humain • Météo',
-                  gradient: AppTheme.scienceGradient, points: progress.sciencePoints,
+                  gradient: AppTheme.scienceGradient,
+                  points: progress.sciencePoints,
                   onTap: () => Navigator.pushNamed(context, '/science'),
-                ).animate(delay: 600.ms).fadeIn(duration: 500.ms).slideX(begin: 0.2),
+                )
+                    .animate(delay: 600.ms)
+                    .fadeIn(duration: 500.ms)
+                    .slideX(begin: 0.2),
                 const SizedBox(height: 24),
                 // --- Badges ---
                 if (progress.earnedBadges.isNotEmpty) ...[
                   const Text(
                     'Mes badges 🏅',
                     style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                       color: AppTheme.textDark,
                     ),
                   ).animate(delay: 700.ms).fadeIn(),
                   const SizedBox(height: 12),
                   Wrap(
-                    spacing: 10, runSpacing: 10,
+                    spacing: 10,
+                    runSpacing: 10,
                     children: progress.earnedBadges.map((badgeId) {
-                      final badge = AppConstants.badges
-                          .firstWhere((b) => b['id'] == badgeId, orElse: () => {});
+                      final badge = AppConstants.badges.firstWhere(
+                          (b) => b['id'] == badgeId,
+                          orElse: () => {});
                       if (badge.isEmpty) return const SizedBox.shrink();
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 8)],
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 8)
+                          ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(badge['icon'] as String, style: const TextStyle(fontSize: 20)),
+                            Text(badge['icon'] as String,
+                                style: const TextStyle(fontSize: 20)),
                             const SizedBox(width: 6),
                             Text(badge['name'] as String,
-                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 13)),
                           ],
                         ),
                       );
@@ -204,19 +243,24 @@ class HomeScreen extends StatelessWidget {
             TextField(
               controller: controller,
               keyboardType: TextInputType.number,
-              maxLength: 4, obscureText: true,
+              maxLength: 4,
+              obscureText: true,
               decoration: InputDecoration(
                 hintText: '• • • •',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Annuler')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Annuler')),
           ElevatedButton(
             onPressed: () {
-              if (controller.text == AppConstants.parentalCode) {
+              final parentalSettings = context.read<ParentalSettingsService>();
+              if (parentalSettings.verifyCode(controller.text)) {
                 Navigator.pop(ctx);
                 Navigator.pushNamed(context, '/parental');
               } else {

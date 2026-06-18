@@ -7,11 +7,36 @@ class MathMenuScreen extends StatelessWidget {
   const MathMenuScreen({super.key});
 
   static const List<Map<String, dynamic>> _categories = [
-    {'title': 'Additions',        'emoji': '➕', 'category': 'addition',        'color': Color(0xFF4FC3F7)},
-    {'title': 'Soustractions',    'emoji': '➖', 'category': 'subtraction',     'color': Color(0xFF29B6F6)},
-    {'title': 'Multiplications',  'emoji': '✖️', 'category': 'multiplication', 'color': Color(0xFF0288D1)},
-    {'title': 'Géométrie',        'emoji': '🔺', 'category': 'geometry',      'color': Color(0xFF0277BD)},
-    {'title': 'Logique & Mesures','emoji': '🧩', 'category': 'logic',         'color': Color(0xFF01579B)},
+    {
+      'title': 'Additions',
+      'emoji': '➕',
+      'category': 'addition',
+      'color': Color(0xFF4FC3F7)
+    },
+    {
+      'title': 'Soustractions',
+      'emoji': '➖',
+      'category': 'subtraction',
+      'color': Color(0xFF29B6F6)
+    },
+    {
+      'title': 'Multiplications',
+      'emoji': '✖️',
+      'category': 'multiplication',
+      'color': Color(0xFF0288D1)
+    },
+    {
+      'title': 'Géométrie',
+      'emoji': '🔺',
+      'category': 'geometry',
+      'color': Color(0xFF0277BD)
+    },
+    {
+      'title': 'Logique & Mesures',
+      'emoji': '🧩',
+      'category': 'logic',
+      'color': Color(0xFF01579B)
+    },
   ];
 
   @override
@@ -69,7 +94,8 @@ class MathMenuScreen extends StatelessWidget {
                             child: Text(
                               cat['title'] as String,
                               style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
                                 color: cat['color'] as Color,
                               ),
                             ),
@@ -79,7 +105,10 @@ class MathMenuScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ).animate(delay: Duration(milliseconds: 100 * i)).fadeIn().slideX(begin: 0.2);
+                  )
+                      .animate(delay: Duration(milliseconds: 100 * i))
+                      .fadeIn()
+                      .slideX(begin: 0.2);
                 },
               ),
             ),

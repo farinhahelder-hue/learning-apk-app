@@ -25,7 +25,7 @@ class AnimatedProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clampedProgress = progress.clamp(0.0, 1.0);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -68,9 +68,7 @@ class AnimatedProgressBar extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
-                      .animate()
-                      .shimmer(
+                  ).animate().shimmer(
                         duration: 1500.ms,
                         color: Colors.white.withOpacity(0.3),
                       ),
@@ -189,11 +187,13 @@ class StreakIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final achieved = streak >= target;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: achieved ? Colors.amber.withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+        color: achieved
+            ? Colors.amber.withOpacity(0.2)
+            : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: achieved ? Colors.amber : Colors.grey.shade300,

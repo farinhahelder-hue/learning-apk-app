@@ -10,7 +10,8 @@ import '../../widgets/exercise_card.dart';
 class ScienceExerciseScreen extends StatefulWidget {
   final String category;
   final String title;
-  const ScienceExerciseScreen({super.key, required this.category, required this.title});
+  const ScienceExerciseScreen(
+      {super.key, required this.category, required this.title});
 
   @override
   State<ScienceExerciseScreen> createState() => _ScienceExerciseScreenState();
@@ -32,20 +33,27 @@ class _ScienceExerciseScreenState extends State<ScienceExerciseScreen> {
   }
 
   @override
-  void dispose() { _confetti.dispose(); super.dispose(); }
+  void dispose() {
+    _confetti.dispose();
+    super.dispose();
+  }
 
   void _onCorrect() {
     setState(() => _score++);
     if (_current < _exercises.length - 1)
-      Future.delayed(const Duration(milliseconds: 300), () => setState(() => _current++));
-    else _finish();
+      Future.delayed(
+          const Duration(milliseconds: 300), () => setState(() => _current++));
+    else
+      _finish();
   }
 
   void _onWrong() {
     setState(() => _wrong++);
     if (_current < _exercises.length - 1)
-      Future.delayed(const Duration(milliseconds: 1500), () => setState(() => _current++));
-    else _finish();
+      Future.delayed(
+          const Duration(milliseconds: 1500), () => setState(() => _current++));
+    else
+      _finish();
   }
 
   void _finish() {
@@ -60,19 +68,31 @@ class _ScienceExerciseScreenState extends State<ScienceExerciseScreen> {
       appBar: AppBar(
         title: Text(widget.title),
         backgroundColor: AppTheme.scienceColor.withOpacity(0.15),
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
             onPressed: () => Navigator.pop(context)),
-        actions: [Center(child: Padding(padding: const EdgeInsets.only(right: 16),
-            child: Text('⭐ ${_score * 10} pts', style: const TextStyle(fontWeight: FontWeight.w700))))],
+        actions: [
+          Center(
+              child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Text('⭐ ${_score * 10} pts',
+                      style: const TextStyle(fontWeight: FontWeight.w700))))
+        ],
       ),
       body: Stack(
         children: [
           if (_finished) _buildResults() else _buildExercise(),
           Align(
             alignment: Alignment.topCenter,
-            child: ConfettiWidget(confettiController: _confetti,
+            child: ConfettiWidget(
+                confettiController: _confetti,
                 blastDirectionality: BlastDirectionality.explosive,
-                colors: const [Colors.green, Colors.yellow, Colors.blue, Colors.orange]),
+                colors: const [
+                  Colors.green,
+                  Colors.yellow,
+                  Colors.blue,
+                  Colors.orange
+                ]),
           ),
         ],
       ),
@@ -80,7 +100,8 @@ class _ScienceExerciseScreenState extends State<ScienceExerciseScreen> {
   }
 
   Widget _buildExercise() {
-    if (_exercises.isEmpty) return const Center(child: Text('Aucun exercice disponible.'));
+    if (_exercises.isEmpty)
+      return const Center(child: Text('Aucun exercice disponible.'));
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -88,15 +109,19 @@ class _ScienceExerciseScreenState extends State<ScienceExerciseScreen> {
           LinearProgressIndicator(
             value: (_current + 1) / _exercises.length,
             backgroundColor: Colors.grey.shade200,
-            color: AppTheme.scienceColor, minHeight: 8,
+            color: AppTheme.scienceColor,
+            minHeight: 8,
             borderRadius: BorderRadius.circular(10),
           ),
           const SizedBox(height: 8),
           Text('Question ${_current + 1} / ${_exercises.length}',
               style: const TextStyle(color: AppTheme.textGrey)),
           const SizedBox(height: 24),
-          ExerciseCard(key: ValueKey(_current), exercise: _exercises[_current],
-              onCorrect: _onCorrect, onWrong: _onWrong),
+          ExerciseCard(
+              key: ValueKey(_current),
+              exercise: _exercises[_current],
+              onCorrect: _onCorrect,
+              onWrong: _onWrong),
         ],
       ),
     );
@@ -110,25 +135,49 @@ class _ScienceExerciseScreenState extends State<ScienceExerciseScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(pct == 1 ? '🏆' : pct >= 0.7 ? '🌟' : '💪', style: const TextStyle(fontSize: 80)),
+            Text(
+                pct == 1
+                    ? '🏆'
+                    : pct >= 0.7
+                        ? '🌟'
+                        : '💪',
+                style: const TextStyle(fontSize: 80)),
             const SizedBox(height: 16),
-            Text(pct == 1 ? 'Parfait Emilie !' : pct >= 0.7 ? 'Très bien !' : 'Continue à pratiquer !',
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
+            Text(
+                pct == 1
+                    ? 'Parfait Emilie !'
+                    : pct >= 0.7
+                        ? 'Très bien !'
+                        : 'Continue à pratiquer !',
+                style:
+                    const TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+                textAlign: TextAlign.center),
             const SizedBox(height: 12),
             Text('$_score / ${_exercises.length} bonnes réponses',
                 style: const TextStyle(fontSize: 18, color: AppTheme.textGrey)),
             Text('+${_score * 10} points ⭐',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.scienceColor)),
+                style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.scienceColor)),
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () => setState(() {
-                _current = 0; _score = 0; _wrong = 0; _finished = false; _exercises.shuffle();
+                _current = 0;
+                _score = 0;
+                _wrong = 0;
+                _finished = false;
+                _exercises.shuffle();
               }),
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.scienceColor),
-              child: const Text('Rejouer ! 🔄', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.scienceColor),
+              child: const Text('Rejouer ! 🔄',
+                  style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 12),
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Retour au menu')),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Retour au menu')),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/progress_service.dart';
+import '../../services/parental_settings_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/constants.dart';
 
@@ -10,11 +11,12 @@ class ParentalDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final svc = context.watch<ProgressService>();
-    final p   = svc.progress;
+    final p = svc.progress;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Espace Parents \u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}'),
+        title: const Text(
+            'Espace Parents \u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}'),
         backgroundColor: AppTheme.primaryPurple.withOpacity(0.15),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
@@ -33,14 +35,27 @@ class ParentalDashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _SectionTitle(title: 'R\u00e9capitulatif \ud83d\udcca'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _SectionTitle(title: 'Récapitulatif 📊'),
+                TextButton.icon(
+                  onPressed: () => _showChangeCodeDialog(context),
+                  icon: const Icon(Icons.lock_reset,
+                      color: AppTheme.primaryPurple),
+                  label: const Text('Changer le code',
+                      style: TextStyle(color: AppTheme.primaryPurple)),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFFCE93D8), Color(0xFF9C27B0)],
-                  begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -48,9 +63,10 @@ class ParentalDashboardScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _WhiteStat(label: 'Total pts', value: '${p.totalPoints}'),
-                  _WhiteStat(label: 'Niveau',    value: '${p.currentLevel}'),
-                  _WhiteStat(label: 'Badges',    value: '${p.earnedBadges.length}'),
-                  _WhiteStat(label: 'S\u00e9rie',     value: '${p.streakDays}j'),
+                  _WhiteStat(label: 'Niveau', value: '${p.currentLevel}'),
+                  _WhiteStat(
+                      label: 'Badges', value: '${p.earnedBadges.length}'),
+                  _WhiteStat(label: 'S\u00e9rie', value: '${p.streakDays}j'),
                 ],
               ),
             ),
@@ -58,18 +74,24 @@ class ParentalDashboardScreen extends StatelessWidget {
             _SectionTitle(title: 'Progression par mati\u00e8re'),
             const SizedBox(height: 12),
             _SubjectProgress(
-              label: 'Math\u00e9matiques \ud83d\udd22', points: p.mathPoints,
-              color: AppTheme.mathColor, max: 300,
+              label: 'Math\u00e9matiques \ud83d\udd22',
+              points: p.mathPoints,
+              color: AppTheme.mathColor,
+              max: 300,
             ),
             const SizedBox(height: 10),
             _SubjectProgress(
-              label: 'Fran\u00e7ais \ud83d\udcda', points: p.frenchPoints,
-              color: AppTheme.frenchColor, max: 300,
+              label: 'Fran\u00e7ais \ud83d\udcda',
+              points: p.frenchPoints,
+              color: AppTheme.frenchColor,
+              max: 300,
             ),
             const SizedBox(height: 10),
             _SubjectProgress(
-              label: 'Sciences \ud83d\udd2c', points: p.sciencePoints,
-              color: AppTheme.scienceColor, max: 300,
+              label: 'Sciences \ud83d\udd2c',
+              points: p.sciencePoints,
+              color: AppTheme.scienceColor,
+              max: 300,
             ),
             const SizedBox(height: 24),
             _SectionTitle(title: 'Badges obtenus \ud83c\udfc5'),
@@ -81,7 +103,8 @@ class ParentalDashboardScreen extends StatelessWidget {
               )
             else
               Wrap(
-                spacing: 10, runSpacing: 10,
+                spacing: 10,
+                runSpacing: 10,
                 children: p.earnedBadges.map((id) {
                   final badge = AppConstants.badges
                       .firstWhere((b) => b['id'] == id, orElse: () => {});
@@ -98,15 +121,20 @@ class ParentalDashboardScreen extends StatelessWidget {
             _SectionTitle(title: 'Conseils pour les parents \ud83d\udca1'),
             const SizedBox(height: 12),
             ..._tips.map((tip) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('\u2022 ', style: TextStyle(fontSize: 18, color: AppTheme.primaryPurple)),
-                  Expanded(child: Text(tip, style: const TextStyle(fontSize: 14, height: 1.5))),
-                ],
-              ),
-            )),
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('\u2022 ',
+                          style: TextStyle(
+                              fontSize: 18, color: AppTheme.primaryPurple)),
+                      Expanded(
+                          child: Text(tip,
+                              style:
+                                  const TextStyle(fontSize: 14, height: 1.5))),
+                    ],
+                  ),
+                )),
           ],
         ),
       ),
@@ -117,7 +145,7 @@ class ParentalDashboardScreen extends StatelessWidget {
     'Sessions recommand\u00e9es\u00a0: 10\u201315 minutes par jour pour maintenir l\u2019attention.',
     'C\u00e9l\u00e9brez chaque badge obtenu \u2014 la motivation positive est cl\u00e9 \u00e0 cet \u00e2ge.',
     'Alterner les mati\u00e8res \u00e9vite la monotonie et stimule l\u2019apprentissage.',
-    'Le code parental par d\u00e9faut est 1234 \u2014 changez-le dans le fichier constants.dart.',
+    'Le code parental par d\u00e9faut est 1234 \u2014 changez-le via le bouton "Changer le code" ci-dessus.',
     'En cas de difficult\u00e9 persistante, r\u00e9p\u00e9tez les exercices de niveau 1 (difficult\u00e9 facile).',
   ];
 
@@ -148,6 +176,74 @@ class ParentalDashboardScreen extends StatelessWidget {
   }
 }
 
+void _showChangeCodeDialog(BuildContext context) {
+  final currentCodeController = TextEditingController();
+  final newCodeController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Changer le code parental'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: currentCodeController,
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Code actuel'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: newCodeController,
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Nouveau code'),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final parentalSettings = context.read<ParentalSettingsService>();
+            if (!parentalSettings.verifyCode(currentCodeController.text)) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Code actuel incorrect'),
+                    backgroundColor: Colors.red),
+              );
+              return;
+            }
+            if (newCodeController.text.length != 4) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Le nouveau code doit contenir 4 chiffres'),
+                    backgroundColor: Colors.red),
+              );
+              return;
+            }
+
+            parentalSettings.updateCode(newCodeController.text);
+            Navigator.pop(ctx);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Code parental mis à jour avec succès'),
+                  backgroundColor: Colors.green),
+            );
+          },
+          child: const Text('Enregistrer'),
+        ),
+      ],
+    ),
+  );
+}
+
 class _SectionTitle extends StatelessWidget {
   final String title;
   const _SectionTitle({required this.title});
@@ -165,7 +261,9 @@ class _WhiteStat extends StatelessWidget {
         children: [
           Text(value,
               style: const TextStyle(
-                  color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800)),
           Text(label,
               style: TextStyle(
                   color: Colors.white.withOpacity(0.85), fontSize: 12)),
@@ -202,11 +300,9 @@ class _SubjectProgress extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label,
-                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
               Text('$points pts',
-                  style: TextStyle(
-                      color: color, fontWeight: FontWeight.w600)),
+                  style: TextStyle(color: color, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 8),

@@ -5,91 +5,91 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Sons disponibles pour Emilie App
 enum SoundEffect {
-  correct,      // bonne réponse
-  wrong,        // mauvaise réponse
-  combo,        // combo x3+
-  levelUp,      // montée de niveau
-  starEarned,   // étoile gagnée
-  buttonTap,    // clic bouton
-  challengeDone,// défi du jour terminé
-  unlock,       // avatar débloqué
-  countdown,    // dernières secondes
-  perfect,      // score parfait 3 étoiles
-  success,      // son de succès glockenspiel
-  birdChirp,    // chant d'oiseau (pour Billy)
-  last5sec,     // 5 dernières secondes
+  correct, // bonne réponse
+  wrong, // mauvaise réponse
+  combo, // combo x3+
+  levelUp, // montée de niveau
+  starEarned, // étoile gagnée
+  buttonTap, // clic bouton
+  challengeDone, // défi du jour terminé
+  unlock, // avatar débloqué
+  countdown, // dernières secondes
+  perfect, // score parfait 3 étoiles
+  success, // son de succès glockenspiel
+  birdChirp, // chant d'oiseau (pour Billy)
+  last5sec, // 5 dernières secondes
   // Nouveaux sons demandés
-  confetti,     // son confettis
-  levelComplete,// son niveau terminé
-  applause,     // applaudissements
+  confetti, // son confettis
+  levelComplete, // son niveau terminé
+  applause, // applaudissements
 }
 
 /// Catégories de musique de fond
 enum BackgroundMusic {
-  home,         // écran d'accueil - douce et joyeuse
-  math,         // maths - rythmée et dynamique
-  french,       // français - calme et mélodique
-  science,      // sciences - curieuse et aventureuse
-  results,      // résultats - festive
-  challenge,    // défi du jour - épique
+  home, // écran d'accueil - douce et joyeuse
+  math, // maths - rythmée et dynamique
+  french, // français - calme et mélodique
+  science, // sciences - curieuse et aventureuse
+  results, // résultats - festive
+  challenge, // défi du jour - épique
 }
 
 class AudioService extends ChangeNotifier {
   // Players audioplayers pour fichiers .wav
-  final ap.AudioPlayer _bgPlayer    = ap.AudioPlayer();
-  final ap.AudioPlayer _sfxPlayer   = ap.AudioPlayer();
-  final ap.AudioPlayer _sfxPlayer2  = ap.AudioPlayer(); // pour sons simultanés
+  final ap.AudioPlayer _bgPlayer = ap.AudioPlayer();
+  final ap.AudioPlayer _sfxPlayer = ap.AudioPlayer();
+  final ap.AudioPlayer _sfxPlayer2 = ap.AudioPlayer(); // pour sons simultanés
   // Player just_audio pour nouveaux fichiers MP3
   final AudioPlayer _justSfxPlayer = AudioPlayer();
-  
-  bool _musicEnabled  = true;
-  bool _soundEnabled  = true;
+
+  bool _musicEnabled = true;
+  bool _soundEnabled = true;
   double _musicVolume = 0.35;
-  double _sfxVolume   = 0.85;
+  double _sfxVolume = 0.85;
   BackgroundMusic? _currentMusic;
 
-  bool get musicEnabled  => _musicEnabled;
-  bool get soundEnabled  => _soundEnabled;
+  bool get musicEnabled => _musicEnabled;
+  bool get soundEnabled => _soundEnabled;
   double get musicVolume => _musicVolume;
-  double get sfxVolume   => _sfxVolume;
+  double get sfxVolume => _sfxVolume;
 
   // Mapping effets sonores → fichier assets/sounds/
   static const Map<SoundEffect, String> _sfxPaths = {
-    SoundEffect.correct:       'sounds/correct.wav',
-    SoundEffect.wrong:         'sounds/wrong.wav',
-    SoundEffect.combo:         'sounds/combo.wav',
-    SoundEffect.levelUp:       'sounds/level_up.wav',
-    SoundEffect.starEarned:     'sounds/star.wav',
-    SoundEffect.buttonTap:     'sounds/tap.wav',
+    SoundEffect.correct: 'sounds/correct.wav',
+    SoundEffect.wrong: 'sounds/wrong.wav',
+    SoundEffect.combo: 'sounds/combo.wav',
+    SoundEffect.levelUp: 'sounds/level_up.wav',
+    SoundEffect.starEarned: 'sounds/star.wav',
+    SoundEffect.buttonTap: 'sounds/tap.wav',
     SoundEffect.challengeDone: 'sounds/celebrate.wav',
-    SoundEffect.unlock:         'sounds/unlock.wav',
-    SoundEffect.countdown:     'sounds/countdown.wav',
-    SoundEffect.perfect:        'sounds/perfect.wav',
-    SoundEffect.success:        'sounds/celebrate.wav',
-    SoundEffect.birdChirp:     'sounds/mascot_hello_bubulle.wav',
-    SoundEffect.last5sec:       'sounds/countdown.wav',
+    SoundEffect.unlock: 'sounds/unlock.wav',
+    SoundEffect.countdown: 'sounds/countdown.wav',
+    SoundEffect.perfect: 'sounds/perfect.wav',
+    SoundEffect.success: 'sounds/celebrate.wav',
+    SoundEffect.birdChirp: 'sounds/mascot_hello_bubulle.wav',
+    SoundEffect.last5sec: 'sounds/countdown.wav',
     // Nouveaux fichiers audio (à ajouter)
-    SoundEffect.confetti:       'audio/sounds/confetti.mp3',
-    SoundEffect.levelComplete:   'audio/sounds/level_complete.mp3',
-    SoundEffect.applause:        'audio/sounds/applause.mp3',
+    SoundEffect.confetti: 'audio/sounds/confetti.mp3',
+    SoundEffect.levelComplete: 'audio/sounds/level_complete.mp3',
+    SoundEffect.applause: 'audio/sounds/applause.mp3',
   };
 
   // Mapping musiques → fichier assets/sounds/music/
   static const Map<BackgroundMusic, String> _musicPaths = {
-    BackgroundMusic.home:      'sounds/music/music_home.wav',
-    BackgroundMusic.math:      'sounds/music/music_math.wav',
-    BackgroundMusic.french:    'sounds/music/music_french.wav',
-    BackgroundMusic.science:   'sounds/music/music_science.wav',
-    BackgroundMusic.results:   'sounds/music/music_results.wav',
+    BackgroundMusic.home: 'sounds/music/music_home.wav',
+    BackgroundMusic.math: 'sounds/music/music_math.wav',
+    BackgroundMusic.french: 'sounds/music/music_french.wav',
+    BackgroundMusic.science: 'sounds/music/music_science.wav',
+    BackgroundMusic.results: 'sounds/music/music_results.wav',
     BackgroundMusic.challenge: 'sounds/music/music_challenge.wav',
   };
 
   // Mapping musique de fond pour just_audio (nouveaux fichiers)
   static const Map<BackgroundMusic, String> _newMusicPaths = {
-    BackgroundMusic.math:      'audio/music/math_music.mp3',
-    BackgroundMusic.french:    'audio/music/french_music.mp3',
-    BackgroundMusic.science:    'audio/music/science_music.mp3',
-    BackgroundMusic.home:      'audio/music/default_music.mp3',
+    BackgroundMusic.math: 'audio/music/math_music.mp3',
+    BackgroundMusic.french: 'audio/music/french_music.mp3',
+    BackgroundMusic.science: 'audio/music/science_music.mp3',
+    BackgroundMusic.home: 'audio/music/default_music.mp3',
   };
 
   AudioService() {
@@ -110,10 +110,10 @@ class AudioService extends ChangeNotifier {
 
   Future<void> _loadPrefs() async {
     final p = await SharedPreferences.getInstance();
-    _musicEnabled  = p.getBool('music_on')    ?? true;
-    _soundEnabled  = p.getBool('sound_on')    ?? true;
-    _musicVolume   = p.getDouble('music_vol') ?? 0.35;
-    _sfxVolume     = p.getDouble('sfx_vol')   ?? 0.85;
+    _musicEnabled = p.getBool('music_on') ?? true;
+    _soundEnabled = p.getBool('sound_on') ?? true;
+    _musicVolume = p.getDouble('music_vol') ?? 0.35;
+    _sfxVolume = p.getDouble('sfx_vol') ?? 0.85;
     notifyListeners();
   }
 
@@ -131,14 +131,14 @@ class AudioService extends ChangeNotifier {
   Future<void> playMusicJustAudio(BackgroundMusic music) async {
     if (!_musicEnabled) return;
     if (_currentMusic == music) return;
-    
+
     final path = _newMusicPaths[music];
     if (path == null) {
       // Fallback vers audioplayers
       await playMusic(music);
       return;
     }
-    
+
     try {
       _currentMusic = music;
       await _bgPlayer.stop();
@@ -182,7 +182,7 @@ class AudioService extends ChangeNotifier {
   }
 
   // ── Nouveaux sons avec just_audio ────────────────────────────────────────────
-  
+
   /// Son de succès - "ding" court
   Future<void> playSuccess() async {
     if (!_soundEnabled) return;
@@ -236,21 +236,21 @@ class AudioService extends ChangeNotifier {
   }
 
   void onWrongAnswer() => playError(); // Nouveau son avec just_audio
-  void onButtonTap()   => playSound(SoundEffect.buttonTap);
-  void onLevelUp()     => playSound(SoundEffect.levelUp);
-  void onStarEarned()   => playSound(SoundEffect.starEarned);
-  
-  void onPerfect() { 
-    playLevelComplete(); 
+  void onButtonTap() => playSound(SoundEffect.buttonTap);
+  void onLevelUp() => playSound(SoundEffect.levelUp);
+  void onStarEarned() => playSound(SoundEffect.starEarned);
+
+  void onPerfect() {
+    playLevelComplete();
     playApplause();
   }
-  
-  void onUnlock()          => playSound(SoundEffect.unlock);
-  void onChallengeDone()   => playSound(SoundEffect.challengeDone);
-  void onCountdown()        => playSound(SoundEffect.countdown);
-  void onBillyGreeting()    => playSound(SoundEffect.birdChirp);
-  void onLast5Seconds()     => playSound(SoundEffect.last5sec);
-  
+
+  void onUnlock() => playSound(SoundEffect.unlock);
+  void onChallengeDone() => playSound(SoundEffect.challengeDone);
+  void onCountdown() => playSound(SoundEffect.countdown);
+  void onBillyGreeting() => playSound(SoundEffect.birdChirp);
+  void onLast5Seconds() => playSound(SoundEffect.last5sec);
+
   /// Appelée après 3 bonnes réponses consécutives (streak)
   void onStreak() => playConfetti();
 

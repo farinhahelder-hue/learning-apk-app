@@ -13,6 +13,7 @@ import 'services/progress_service.dart';
 import 'services/audio_service.dart';
 import 'services/audio_settings_service.dart';
 import 'services/tts_service.dart';
+import 'services/parental_settings_service.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
@@ -41,6 +42,7 @@ class EmilieApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ProgressService(prefs)),
         ChangeNotifierProvider(create: (_) => AudioSettingsService(prefs)),
+        ChangeNotifierProvider(create: (_) => ParentalSettingsService(prefs)),
         ChangeNotifierProvider(create: (_) => AudioService()),
         ChangeNotifierProvider(create: (_) => TtsService()),
       ],

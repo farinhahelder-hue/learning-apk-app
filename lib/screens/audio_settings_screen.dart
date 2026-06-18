@@ -52,21 +52,25 @@ class AudioSettingsScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
             ..._musicList.map((m) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  Text(m['emoji']!, style: const TextStyle(fontSize: 28)),
-                  const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
                     children: [
-                      Text(m['name']!, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      Text(m['desc']!, style: const TextStyle(color: AppTheme.textGrey, fontSize: 12)),
+                      Text(m['emoji']!, style: const TextStyle(fontSize: 28)),
+                      const SizedBox(width: 14),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(m['name']!,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w700)),
+                          Text(m['desc']!,
+                              style: const TextStyle(
+                                  color: AppTheme.textGrey, fontSize: 12)),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            )),
+                )),
             const SizedBox(height: 24),
             const Text('🔊 Effets sonores',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
@@ -74,13 +78,14 @@ class AudioSettingsScreen extends StatelessWidget {
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: _sfxList.map((s) => _SfxChip(
-                emoji: s['emoji']!,
-                label: s['name']!,
-                onTap: () => audio.playSound(
-                  SoundEffect.values.firstWhere((e) => e.name == s['id'])
-                ),
-              )).toList(),
+              children: _sfxList
+                  .map((s) => _SfxChip(
+                        emoji: s['emoji']!,
+                        label: s['name']!,
+                        onTap: () => audio.playSound(SoundEffect.values
+                            .firstWhere((e) => e.name == s['id'])),
+                      ))
+                  .toList(),
             ),
           ],
         ),
@@ -89,12 +94,36 @@ class AudioSettingsScreen extends StatelessWidget {
   }
 
   static const _musicList = [
-    {'emoji': '🏠', 'name': 'Accueil', 'desc': 'Douce et joyeuse – écran principal'},
-    {'emoji': '🔢', 'name': 'Maths', 'desc': 'Rythmée et dynamique – exercices de calcul'},
-    {'emoji': '📚', 'name': 'Français', 'desc': 'Calme et mélodique – lecture & orthographe'},
-    {'emoji': '🔬', 'name': 'Sciences', 'desc': 'Curieuse et aventureuse – découvertes'},
-    {'emoji': '🏆', 'name': 'Résultats', 'desc': 'Festive – quand tu gagnes des étoiles'},
-    {'emoji': '⚡', 'name': 'Défi du Jour', 'desc': 'Épique – pour les défis quotidiens'},
+    {
+      'emoji': '🏠',
+      'name': 'Accueil',
+      'desc': 'Douce et joyeuse – écran principal'
+    },
+    {
+      'emoji': '🔢',
+      'name': 'Maths',
+      'desc': 'Rythmée et dynamique – exercices de calcul'
+    },
+    {
+      'emoji': '📚',
+      'name': 'Français',
+      'desc': 'Calme et mélodique – lecture & orthographe'
+    },
+    {
+      'emoji': '🔬',
+      'name': 'Sciences',
+      'desc': 'Curieuse et aventureuse – découvertes'
+    },
+    {
+      'emoji': '🏆',
+      'name': 'Résultats',
+      'desc': 'Festive – quand tu gagnes des étoiles'
+    },
+    {
+      'emoji': '⚡',
+      'name': 'Défi du Jour',
+      'desc': 'Épique – pour les défis quotidiens'
+    },
   ];
 
   static const _sfxList = [
@@ -118,9 +147,14 @@ class _SectionCard extends StatelessWidget {
   final Color color;
 
   const _SectionCard({
-    required this.icon, required this.title, required this.subtitle,
-    required this.enabled, required this.onToggle,
-    required this.volume, required this.onVolumeChanged, required this.color,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.enabled,
+    required this.onToggle,
+    required this.volume,
+    required this.onVolumeChanged,
+    required this.color,
   });
 
   @override
@@ -130,7 +164,9 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 12)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 12)
+        ],
       ),
       child: Column(
         children: [
@@ -138,25 +174,34 @@ class _SectionCard extends StatelessWidget {
             children: [
               Text(icon, style: const TextStyle(fontSize: 30)),
               const SizedBox(width: 12),
-              Expanded(child: Column(
+              Expanded(
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                  Text(subtitle, style: const TextStyle(color: AppTheme.textGrey, fontSize: 12)),
+                  Text(title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text(subtitle,
+                      style: const TextStyle(
+                          color: AppTheme.textGrey, fontSize: 12)),
                 ],
               )),
-              Switch(value: enabled, onChanged: (_) => onToggle(), activeColor: color),
+              Switch(
+                  value: enabled,
+                  onChanged: (_) => onToggle(),
+                  activeColor: color),
             ],
           ),
-          if (enabled) ...
-          [
+          if (enabled) ...[
             const SizedBox(height: 12),
             Row(
               children: [
                 Icon(Icons.volume_down, color: Colors.grey.shade400, size: 20),
                 Expanded(
                   child: Slider(
-                    value: volume, min: 0, max: 1,
+                    value: volume,
+                    min: 0,
+                    max: 1,
                     activeColor: color,
                     onChanged: onVolumeChanged,
                   ),
@@ -174,7 +219,8 @@ class _SectionCard extends StatelessWidget {
 class _SfxChip extends StatelessWidget {
   final String emoji, label;
   final VoidCallback onTap;
-  const _SfxChip({required this.emoji, required this.label, required this.onTap});
+  const _SfxChip(
+      {required this.emoji, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -186,16 +232,21 @@ class _SfxChip extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)],
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(emoji, style: const TextStyle(fontSize: 18)),
             const SizedBox(width: 6),
-            Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text(label,
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(width: 4),
-            Icon(Icons.play_circle_outline, size: 16, color: AppTheme.primaryBlue),
+            Icon(Icons.play_circle_outline,
+                size: 16, color: AppTheme.primaryBlue),
           ],
         ),
       ),

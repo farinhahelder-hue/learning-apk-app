@@ -26,11 +26,11 @@ class MascotWidget extends StatefulWidget {
 
 class _MascotWidgetState extends State<MascotWidget>
     with TickerProviderStateMixin {
-  late AnimationController _idleCtrl;   // respiration idle
-  late AnimationController _happyCtrl;  // saut joyeux
-  late AnimationController _wrongCtrl;  // secousse erreur
-  late AnimationController _thinkCtrl;  // balancement pensée
-  late AnimationController _blinkCtrl;  // clignement yeux
+  late AnimationController _idleCtrl; // respiration idle
+  late AnimationController _happyCtrl; // saut joyeux
+  late AnimationController _wrongCtrl; // secousse erreur
+  late AnimationController _thinkCtrl; // balancement pensée
+  late AnimationController _blinkCtrl; // clignement yeux
 
   @override
   void initState() {
@@ -117,7 +117,9 @@ class _MascotWidgetState extends State<MascotWidget>
         // Bulle de dialogue
         if (widget.showSpeechBubble && widget.speechText != null)
           _SpeechBubble(text: widget.speechText!, color: widget.mascot.color)
-              .animate().fadeIn(duration: 300.ms).slideY(begin: 0.2),
+              .animate()
+              .fadeIn(duration: 300.ms)
+              .slideY(begin: 0.2),
 
         const SizedBox(height: 8),
 
@@ -177,9 +179,12 @@ class _MascotWidgetState extends State<MascotWidget>
             .animate(onPlay: (c) => c.repeat(count: 3))
             .moveY(begin: 0, end: -20, duration: 300.ms, curve: Curves.easeOut)
             .then()
-            .moveY(begin: -20, end: 0, duration: 300.ms, curve: Curves.bounceOut)
-            .scale(begin: const Offset(1,1), end: const Offset(1.15,1.15),
-                   duration: 200.ms);
+            .moveY(
+                begin: -20, end: 0, duration: 300.ms, curve: Curves.bounceOut)
+            .scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.15, 1.15),
+                duration: 200.ms);
 
       case MascotMood.wrong:
         // Pipipipi de Monika : secousse rapide + rouge
@@ -201,8 +206,11 @@ class _MascotWidgetState extends State<MascotWidget>
       case MascotMood.encourage:
         return mascot
             .animate()
-            .scale(begin: const Offset(0.8,0.8), end: const Offset(1.0,1.0),
-                   curve: Curves.elasticOut, duration: 800.ms)
+            .scale(
+                begin: const Offset(0.8, 0.8),
+                end: const Offset(1.0, 1.0),
+                curve: Curves.elasticOut,
+                duration: 800.ms)
             .fadeIn();
 
       case MascotMood.sleepy:
@@ -229,9 +237,9 @@ class _SpeechBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
         borderRadius: const BorderRadius.only(
-          topLeft:     Radius.circular(18),
-          topRight:    Radius.circular(18),
-          bottomLeft:  Radius.circular(4),
+          topLeft: Radius.circular(18),
+          topRight: Radius.circular(18),
+          bottomLeft: Radius.circular(4),
           bottomRight: Radius.circular(18),
         ),
         border: Border.all(color: color.withOpacity(0.4), width: 2),

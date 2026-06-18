@@ -13,22 +13,25 @@ class GameService extends ChangeNotifier {
   List<String> _unlockedAvatars = ['avatar_star'];
   String _currentAvatar = 'avatar_star';
 
-  GameService(this._prefs) { _load(); }
+  GameService(this._prefs) {
+    _load();
+  }
 
-  int get xp              => _xp;
-  int get level           => _level;
+  int get xp => _xp;
+  int get level => _level;
   String get currentAvatar => _currentAvatar;
   List<String> get unlockedAvatars => _unlockedAvatars;
   Map<String, WorldProgress> get worldsProgress => _worldsProgress;
 
-  int get xpForNextLevel  => _level * 200;
-  double get xpProgress   => (_xp % xpForNextLevel) / xpForNextLevel;
+  int get xpForNextLevel => _level * 200;
+  double get xpProgress => (_xp % xpForNextLevel) / xpForNextLevel;
 
   void _load() {
-    _xp    = _prefs.getInt('game_xp')    ?? 0;
+    _xp = _prefs.getInt('game_xp') ?? 0;
     _level = _prefs.getInt('game_level') ?? 1;
     _currentAvatar = _prefs.getString('avatar') ?? 'avatar_star';
-    _unlockedAvatars = _prefs.getStringList('unlocked_avatars') ?? ['avatar_star'];
+    _unlockedAvatars =
+        _prefs.getStringList('unlocked_avatars') ?? ['avatar_star'];
     _completedDailyChallenges = _prefs.getStringList('daily_done') ?? [];
 
     final raw = _prefs.getString('worlds_progress');
@@ -79,9 +82,9 @@ class GameService extends ChangeNotifier {
   void _checkAvatarUnlocks() {
     final milestones = {
       'avatar_unicorn': 100,
-      'avatar_rocket':  300,
-      'avatar_crown':   600,
-      'avatar_dragon':  1000,
+      'avatar_rocket': 300,
+      'avatar_crown': 600,
+      'avatar_dragon': 1000,
     };
     milestones.forEach((avatar, xpRequired) {
       if (_xp >= xpRequired && !_unlockedAvatars.contains(avatar)) {

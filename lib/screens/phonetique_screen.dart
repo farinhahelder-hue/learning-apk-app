@@ -18,7 +18,7 @@ class PhonetiqueScreen extends StatefulWidget {
 
 class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
   final Mascot _mascot = Mascots.ninonDolphin;
-  
+
   // Les 6 exercices de phonétique
   static const List<PhonetiqueExercise> _allExercises = [
     // Son [a] - comme dans "chat", "papa"
@@ -28,7 +28,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
       word: 'chat',
       options: ['chat', 'chien', 'chou', 'clé'],
       correctIndex: 0,
-      lesson: 'Le son [a] s\'écrit souvent "a" ou "à".\nExemples : mama, papa, chat, lac',
+      lesson:
+          'Le son [a] s\'écrit souvent "a" ou "à".\nExemples : mama, papa, chat, lac',
     ),
     // Son [o] - comme dans "hot", "moto"
     PhonetiqueExercise(
@@ -37,7 +38,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
       word: 'moto',
       options: ['moto', 'mitaine', 'mutuelle', 'motte'],
       correctIndex: 0,
-      lesson: 'Le son [o] s\'écrit "o", "eau", "au" ou "ô".\nExemples : moto, peau, château',
+      lesson:
+          'Le son [o] s\'écrit "o", "eau", "au" ou "ô".\nExemples : moto, peau, château',
     ),
     // Son [ɛ] - comme dans "père", "tête"
     PhonetiqueExercise(
@@ -46,7 +48,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
       word: 'tête',
       options: ['tête', 'tarte', 'tissu', 'tissu', 'tôle'],
       correctIndex: 0,
-      lesson: 'Le son [ɛ] s\'écrit "è", "ê", "ei" ou "ai".\nExemples : père, tête, maître',
+      lesson:
+          'Le son [ɛ] s\'écrit "è", "ê", "ei" ou "ai".\nExemples : père, tête, maître',
     ),
     // Son [j] - comme dans "fille", "travail"
     PhonetiqueExercise(
@@ -55,7 +58,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
       word: 'fille',
       options: ['fille', 'foule', 'file', 'faule'],
       correctIndex: 0,
-      lesson: 'Le son [j] s\'écrit "ille", "aille", "eille".\nExemples : fille, travaille, araignée',
+      lesson:
+          'Le son [j] s\'écrit "ille", "aille", "eille".\nExemples : fille, travaille, araignée',
     ),
     // Son [ã] - comme dans "enfant", "chant"
     PhonetiqueExercise(
@@ -64,7 +68,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
       word: 'enfant',
       options: ['enfant', 'éléphant', 'enfer', 'infecte'],
       correctIndex: 0,
-      lesson: 'Le son [ã] s\'écrit "an", "en", "ant", "ent".\nExemples : enfant, chant, temps',
+      lesson:
+          'Le son [ã] s\'écrit "an", "en", "ant", "ent".\nExemples : enfant, chant, temps',
     ),
     // Son [ʃ] - comme dans "chat", "schtroumpf"
     PhonetiqueExercise(
@@ -73,7 +78,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
       word: 'chat',
       options: ['chat', 'çat', 'scat', 'ksat'],
       correctIndex: 0,
-      lesson: 'Le son [ʃ] s\'écrit "ch".\nExemples : chat, cheval, Schule (en allemand)',
+      lesson:
+          'Le son [ʃ] s\'écrit "ch".\nExemples : chat, cheval, Schule (en allemand)',
     ),
   ];
 
@@ -97,10 +103,10 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
 
   void _checkAnswer(int index) {
     if (_selectedIndex != null) return;
-    
+
     final exercise = _exercises[_current];
     final correct = index == exercise.correctIndex;
-    
+
     setState(() {
       _selectedIndex = index;
       _isCorrect = correct;
@@ -172,7 +178,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
 
   Widget _buildExercise() {
     final exercise = _exercises[_current];
-    
+
     return Column(
       children: [
         // Header
@@ -206,13 +212,15 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                     const SizedBox(height: 4),
                     Text(
                       '${_current + 1} / ${_exercises.length}',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -272,7 +280,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                     children: [
                       const Text(
                         'Quel mot contient le son',
-                        style: TextStyle(fontSize: 18, color: AppTheme.textGrey),
+                        style:
+                            TextStyle(fontSize: 18, color: AppTheme.textGrey),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -284,13 +293,14 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Bouton pour écouter
                       BounceButton(
                         onTap: () => _speakWord(exercise.word),
                         color: AppTheme.primaryPink,
                         borderRadius: BorderRadius.circular(30),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
@@ -315,7 +325,9 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: _isCorrect! ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE),
+                            color: _isCorrect!
+                                ? const Color(0xFFE8F5E9)
+                                : const Color(0xFFFFEBEE),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -331,7 +343,9 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                                       ? 'Le mot était "${exercise.word}"'
                                       : 'Le bon mot était "${exercise.word}"',
                                   style: TextStyle(
-                                    color: _isCorrect! ? Colors.green.shade700 : Colors.red.shade700,
+                                    color: _isCorrect!
+                                        ? Colors.green.shade700
+                                        : Colors.red.shade700,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -400,14 +414,16 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                   ...exercise.options.asMap().entries.map((entry) {
                     final idx = entry.key;
                     final option = entry.value;
-                    
+
                     Color bg = Colors.white;
                     Color fg = AppTheme.textDark;
                     Color border = Colors.grey.withOpacity(0.3);
-                    
+
                     if (_selectedIndex != null) {
                       if (idx == _selectedIndex) {
-                        bg = _isCorrect! ? const Color(0xFF81C784) : const Color(0xFFEF9A9A);
+                        bg = _isCorrect!
+                            ? const Color(0xFF81C784)
+                            : const Color(0xFFEF9A9A);
                         fg = Colors.white;
                         border = bg;
                       } else if (idx == exercise.correctIndex) {
@@ -420,7 +436,9 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: BounceButton(
-                        onTap: _selectedIndex == null ? () => _checkAnswer(idx) : null,
+                        onTap: _selectedIndex == null
+                            ? () => _checkAnswer(idx)
+                            : null,
                         color: bg,
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
@@ -440,7 +458,8 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                      ).animate(delay: Duration(milliseconds: 100 * idx))
+                      )
+                          .animate(delay: Duration(milliseconds: 100 * idx))
                           .fadeIn()
                           .slideX(begin: 0.1),
                     );
@@ -457,7 +476,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
   Widget _buildResults() {
     final pct = _score / _exercises.length;
     final stars = pct >= 0.8 ? 3 : (pct >= 0.5 ? 2 : 1);
-    
+
     String message;
     String emoji;
     if (pct >= 0.8) {
@@ -482,14 +501,11 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
               mood: pct >= 0.5 ? MascotMood.celebrate : MascotMood.happy,
               size: 120,
             ).animate().scale(curve: Curves.elasticOut),
-
             const SizedBox(height: 24),
-
             Text(emoji, style: const TextStyle(fontSize: 80))
-                .animate().scale(delay: 300.ms, curve: Curves.elasticOut),
-
+                .animate()
+                .scale(delay: 300.ms, curve: Curves.elasticOut),
             const SizedBox(height: 16),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(3, (i) {
@@ -497,13 +513,12 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                   i < stars ? Icons.star : Icons.star_border,
                   size: 48,
                   color: i < stars ? Colors.amber : Colors.white54,
-                ).animate(delay: Duration(milliseconds: 400 + i * 150))
+                )
+                    .animate(delay: Duration(milliseconds: 400 + i * 150))
                     .scale(curve: Curves.elasticOut);
               }),
             ),
-
             const SizedBox(height: 24),
-
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -529,9 +544,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                 ],
               ),
             ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2),
-
             const SizedBox(height: 32),
-
             BounceButton(
               onTap: _restart,
               color: Colors.white,
@@ -552,9 +565,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                 ],
               ),
             ).animate().fadeIn(delay: 800.ms),
-
             const SizedBox(height: 12),
-
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text(
@@ -571,12 +582,12 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
 
 /// Modèle d'exercice de phonétique
 class PhonetiqueExercise {
-  final String sound;       // Le son phonétique, ex: 'a', 'o', 'ʃ'
-  final String description;  // Description pour l'élève
-  final String word;         // Le mot à trouver
+  final String sound; // Le son phonétique, ex: 'a', 'o', 'ʃ'
+  final String description; // Description pour l'élève
+  final String word; // Le mot à trouver
   final List<String> options; // Les 4 options
-  final int correctIndex;    // Index de la bonne réponse
-  final String lesson;       // Leçon après bonne réponse
+  final int correctIndex; // Index de la bonne réponse
+  final String lesson; // Leçon après bonne réponse
 
   const PhonetiqueExercise({
     required this.sound,

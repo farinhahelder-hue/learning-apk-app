@@ -8,10 +8,10 @@ import 'dart:math';
 ///   ConfettiOverlay(key: key)
 ///   key.currentState?.burst(ConfettiType.success);  // différentes animations
 enum ConfettiType {
-  success,  // Confettis rapide pour bonne réponse
+  success, // Confettis rapide pour bonne réponse
   celebrate, // Explosion massive pour score parfait
-  star,     // Étoiles dorées pour badge
-  rainbow,  // Arc-en-ciel pour fin de niveau
+  star, // Étoiles dorées pour badge
+  rainbow, // Arc-en-ciel pour fin de niveau
 }
 
 /// Widget confettis réutilisable.
@@ -21,7 +21,7 @@ enum ConfettiType {
 ///   key.currentState?.burst();  // déclenche les confettis
 class ConfettiOverlay extends StatefulWidget {
   final bool alignTop;
-  
+
   const ConfettiOverlay({
     super.key,
     this.alignTop = true,
@@ -64,28 +64,40 @@ class ConfettiOverlayState extends State<ConfettiOverlay> {
 
   int _getParticleCount(ConfettiType type) {
     switch (type) {
-      case ConfettiType.success:  return 15;
-      case ConfettiType.celebrate: return 50;
-      case ConfettiType.star:      return 20;
-      case ConfettiType.rainbow:   return 40;
+      case ConfettiType.success:
+        return 15;
+      case ConfettiType.celebrate:
+        return 50;
+      case ConfettiType.star:
+        return 20;
+      case ConfettiType.rainbow:
+        return 40;
     }
   }
 
   double _getGravity(ConfettiType type) {
     switch (type) {
-      case ConfettiType.success:  return 0.25;
-      case ConfettiType.celebrate: return 0.15;
-      case ConfettiType.star:      return 0.3;
-      case ConfettiType.rainbow:   return 0.1;
+      case ConfettiType.success:
+        return 0.25;
+      case ConfettiType.celebrate:
+        return 0.15;
+      case ConfettiType.star:
+        return 0.3;
+      case ConfettiType.rainbow:
+        return 0.1;
     }
   }
 
   double _getEmissionFrequency(ConfettiType type) {
     switch (type) {
-      case ConfettiType.success:  return 0.08;
-      case ConfettiType.celebrate: return 0.05;
-      case ConfettiType.star:      return 0.1;
-      case ConfettiType.rainbow:   return 0.03;
+      case ConfettiType.success:
+        return 0.08;
+      case ConfettiType.celebrate:
+        return 0.05;
+      case ConfettiType.star:
+        return 0.1;
+      case ConfettiType.rainbow:
+        return 0.03;
     }
   }
 
