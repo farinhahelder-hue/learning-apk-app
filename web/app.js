@@ -129,8 +129,232 @@ const supabaseService = {
     });
   },
 
-  clearCache() { this._cache = {}; }
+  clearCache() { this._cache = {}; },
+
+  // === GAMIFICATION ===
+  async getUserProgress() {
+    if (!supabase) return null;
+    const { data, error } = await supabase.from('user_progress')
+      .select('*').eq('user_id', 'emilie').single();
+    if (error) { console.warn('getUserProgress:', error); return null; }
+    return data;
+  },
+
+  async upsertProgress(updates) {
+    if (!supabase) return null;
+    const { data, error } = await supabase.from('user_progress')
+      .upsert({ user_id: 'emilie', updated_at: new Date().toISOString(), ...updates },
+        { onConflict: 'user_id' }).select().single();
+    if (error) { console.warn('upsertProgress:', error); return null; }
+    return data;
+  },
+
+  async saveSession(session) {
+    if (!supabase) return null;
+    const { data, error } = await supabase.from('user_sessions')
+      .insert({ user_id: 'emilie', ...session }).select().single();
+    if (error) { console.warn('saveSession:', error); return null; }
+    return data;
+  },
+
+  async getRecentSessions(limit = 20) {
+    if (!supabase) return [];
+    const { data, error } = await supabase.from('user_sessions')
+      .select('*').eq('user_id', 'emilie')
+      .order('created_at', { ascending: false }).limit(limit);
+    if (error) return [];
+    return data;
+  },
+
+  async getBadges() {
+    if (!supabase) return [];
+    const { data, error } = await supabase.from('user_badges')
+      .select('*').eq('user_id', 'emilie').order('earned_at');
+    if (error) return [];
+    return data;
+  },
+
+  async addBadge(badgeId, badgeName, badgeEmoji) {
+    if (!supabase) return null;
+    const { data, error } = await supabase.from('user_badges')
+      .insert({ user_id: 'emilie', badge_id: badgeId, badge_name: badgeName, badge_emoji: badgeEmoji })
+      .select().single();
+    if (error) { if (!error.message?.includes('duplicate')) console.warn('addBadge:', error); return null; }
+    return data;
+  },
+
+  async getWeeklyStats() {
+    if (!supabase) return [];
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+    const { data, error } = await supabase.from('user_sessions')
+      .select('*').eq('user_id', 'emilie').gte('created_at', weekAgo)
+      .order('created_at', { ascending: true });
+    if (error) return [];
+    return data;
+  }
 };
+
+// === BADGES DÉFINITIONS ===
+const ALL_BADGES = [
+  { id: 'first_steps', name: 'Premiers Pas', emoji: '👣', desc: 'Complète ton premier exercice', check: (p) => p.total_exercises >= 1 },
+  { id: 'math_star', name: 'Star des Maths', emoji: '🔢', desc: '50 points en maths', check: (p) => p.math_score >= 50 },
+  { id: 'french_star', name: 'Star du Français', emoji: '📖', desc: '50 points en français', check: (p) => p.french_score >= 50 },
+  { id: 'science_star', name: 'Star des Sciences', emoji: '🔬', desc: '50 points en sciences', check: (p) => p.science_score >= 50 },
+  { id: 'explorer', name: 'Explorateur', emoji: '🌟', desc: 'Visite la section Découvertes', check: (p) => p.discovery_score >= 10 },
+  { id: 'perfect10', name: 'Sans Faute !', emoji: '💯', desc: '10 bonnes réponses d\'affilée', check: (p) => p.correct_answers >= 10 },
+  { id: 'level5', name: 'Niveau 5', emoji: '🏆', desc: 'Atteins le niveau 5', check: (p) => p.level >= 5 },
+  { id: 'streak7', name: '7 Jours de Suite', emoji: '🔥', desc: 'Reviens 7 jours d\'affilée', check: (p) => p.streak_days >= 7 },
+  { id: 'century', name: 'Centenaire', emoji: '💪', desc: '100 exercices complétés', check: (p) => p.total_exercises >= 100 },
+  { id: 'all_rounder', name: 'Tout-en-un', emoji: '🎯', desc: '50 points dans chaque matière', check: (p) => p.math_score >= 50 && p.french_score >= 50 && p.science_score >= 50 }
+];
+
+// === GAMIFICATION ENGINE ===
+let xpEngine = {
+  progress: null,
+  badges: [],
+  loaded: false,
+
+  async init() {
+    if (!supabase) { this.loaded = true; return; }
+    try {
+      let p = await supabaseService.getUserProgress();
+      if (!p) {
+        await supabaseService.upsertProgress({});
+        p = await supabaseService.getUserProgress();
+      }
+      this.progress = p;
+      this.badges = await supabaseService.getBadges() || [];
+    } catch(e) { console.warn('xpEngine.init:', e); }
+    this.loaded = true;
+  },
+
+  async addXp(amount, subject) {
+    this.ensureProgress();
+    this.progress.total_xp = (this.progress.total_xp || 0) + amount;
+    this.progress.total_exercises = (this.progress.total_exercises || 0) + 1;
+    if (subject === 'math') this.progress.math_score = (this.progress.math_score || 0) + amount;
+    else if (subject === 'french') this.progress.french_score = (this.progress.french_score || 0) + amount;
+    else if (subject === 'science') this.progress.science_score = (this.progress.science_score || 0) + amount;
+    else this.progress.discovery_score = (this.progress.discovery_score || 0) + amount;
+
+    // Level up check (100 XP per level)
+    const newLevel = Math.floor(this.progress.total_xp / 100) + 1;
+    if (newLevel > this.progress.level) {
+      this.progress.level = newLevel;
+      playLevelUp();
+      showReward('🎉', `Niveau ${newLevel} !`, 'Tu es incroyable, continue comme ça ! ⭐');
+      spawnConfetti(30);
+      await this.syncToSupabase();
+    }
+
+    this.progress.stars = this.progress.level * 5 + Math.floor(this.progress.total_xp / 20);
+
+    // Check badges
+    this.checkBadges();
+
+    // Sync to Supabase
+    await this.syncToSupabase();
+
+    // Update UI
+    updateProgressUI();
+  },
+
+  async addCorrectAnswer(subject) {
+    this.ensureProgress();
+    this.progress.correct_answers = (this.progress.correct_answers || 0) + 1;
+    await this.addXp(10, subject);
+  },
+
+  async addWrongAnswer() {
+    this.progress.correct_answers = 0;
+  },
+
+  async completeSession(subject, category, score, total, duration) {
+    this.ensureProgress();
+    const xpEarned = score * 10;
+    const starsEarned = score / total >= 1 ? 3 : score / total >= 0.7 ? 2 : 1;
+
+    await supabaseService.saveSession({
+      subject, category, score, total_questions: total,
+      xp_earned: xpEarned, stars_earned: starsEarned,
+      duration_seconds: duration, completed: true
+    });
+
+    if (score === total) {
+      playPerfectScore();
+    } else if (score / total >= 0.7) {
+      playLevelUp();
+    }
+
+    return { xpEarned, starsEarned };
+  },
+
+  async checkBadges() {
+    for (const badge of ALL_BADGES) {
+      if (badge.check(this.progress)) {
+        const already = this.badges.find(b => b.badge_id === badge.id);
+        if (!already) {
+          const result = await supabaseService.addBadge(badge.id, badge.name, badge.emoji);
+          if (result) {
+            this.badges.push(result);
+            spawnConfetti(20);
+            showReward(badge.emoji, `Badge débloqué : ${badge.name} !`, badge.desc);
+            const el = document.getElementById('totalBadges');
+            if (el) el.textContent = this.badges.length;
+          }
+        }
+      }
+    }
+  },
+
+  async syncToSupabase() {
+    if (!supabase) return;
+    try {
+      await supabaseService.upsertProgress({
+        total_xp: this.progress.total_xp,
+        level: this.progress.level,
+        stars: this.progress.stars,
+        math_score: this.progress.math_score,
+        french_score: this.progress.french_score,
+        science_score: this.progress.science_score,
+        discovery_score: this.progress.discovery_score,
+        total_exercises: this.progress.total_exercises,
+        correct_answers: this.progress.correct_answers,
+        streak_days: this.progress.streak_days,
+        last_play_date: new Date().toISOString().split('T')[0]
+      });
+    } catch(e) {}
+  },
+
+  ensureProgress() {
+    if (!this.progress) {
+      this.progress = {
+        total_xp: 0, level: 1, stars: 0, streak_days: 1,
+        math_score: 0, french_score: 0, science_score: 0, discovery_score: 0,
+        total_exercises: 0, correct_answers: 0
+      };
+    }
+  }
+};
+
+function updateProgressUI() {
+  const p = xpEngine.progress;
+  if (!p) return;
+  const elStars = document.getElementById('totalStars');
+  const elBadges = document.getElementById('totalBadges');
+  const elLevel = document.getElementById('levelDisplay');
+  const elXpBar = document.getElementById('xpBar');
+  const elXpText = document.getElementById('xpText');
+
+  if (elStars) elStars.textContent = p.stars || 0;
+  if (elBadges) elBadges.textContent = xpEngine.badges.length;
+  if (elLevel) elLevel.textContent = `Niv.${p.level}`;
+
+  const xpInLevel = p.total_xp % 100;
+  const pct = Math.min((xpInLevel / 100) * 100, 100);
+  if (elXpBar) elXpBar.style.width = pct + '%';
+  if (elXpText) elXpText.textContent = `${xpInLevel} / 100 XP`;
+}
 
 // === DÉCOUVERTES STATE ===
 const decouverteSubjects = [
@@ -148,6 +372,50 @@ const decouverteSubjects = [
   { id: 'emc', name: 'EMC', emoji: '🤝', desc: 'Respect, liberté, égalité, citoyenneté', color: '#d97706' },
   { id: 'arts', name: 'Arts & Musique', emoji: '🎨', desc: 'Arts plastiques, musique, EPS', color: '#ea580c' }
 ];
+
+// === PWA INSTALL PROMPT ===
+let deferredPrompt = null;
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW registered:', reg.scope);
+    }).catch(err => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
+
+// Listen for install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'block';
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'none';
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then((choiceResult) => {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('App installed');
+    }
+    deferredPrompt = null;
+    document.getElementById('installBanner').style.display = 'none';
+  });
+}
+
+function closeInstallBanner() {
+  document.getElementById('installBanner').style.display = 'none';
+}
 
 // === HOMEWORK STATE (NOUVEAU) ===
 let homeworkState = {
@@ -1181,7 +1449,93 @@ function playLevelUp() {
 function toggleMute() {
   muted = !muted;
   document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
-  playBeep(500, 0.1, 'sine');
+  if (!muted) playBeep(500, 0.1, 'sine');
+}
+
+// === SYNTHÈSE VOCALE (SpeechSynthesis) ===
+function sayMessage(text, rate = 0.9) {
+  if (muted) return;
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'fr-FR';
+  utterance.rate = rate;
+  utterance.pitch = 1.1;
+  // Try to find a French voice
+  const voices = window.speechSynthesis.getVoices();
+  const frVoice = voices.find(v => v.lang.startsWith('fr'));
+  if (frVoice) utterance.voice = frVoice;
+  // If voices not yet loaded, wait and retry
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      const v = window.speechSynthesis.getVoices().find(v => v.lang.startsWith('fr'));
+      if (v) utterance.voice = v;
+      window.speechSynthesis.speak(utterance);
+    };
+    return;
+  }
+  window.speechSynthesis.speak(utterance);
+}
+
+function sayBravo() {
+  const msgs = [
+    'Bravo Emilie, tu as réussi !',
+    'Excellent travail, continue comme ça !',
+    'Super, tu es la meilleure !',
+    'Félicitations, quel talent !',
+    'Magnifique, tu progresses chaque jour !'
+  ];
+  sayMessage(msgs[Math.floor(Math.random() * msgs.length)]);
+}
+
+function sayTryAgain() {
+  const msgs = [
+    'Essaie encore, tu vas y arriver !',
+    'Pas grave, recommence, je crois en toi !',
+    'Tu peux le faire, un peu de concentration !',
+    'Allez, un dernier effort !'
+  ];
+  sayMessage(msgs[Math.floor(Math.random() * msgs.length)], 0.95);
+}
+
+// === APPLAUDISSEMENT GÉNÉRÉ (bruit blanc filtré) ===
+function playApplause(duration = 2) {
+  if (muted) return;
+  try {
+    const ctx = getAudio();
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      // Bruit blanc avec enveloppe
+      const env = Math.max(0, 1 - Math.pow(i / bufferSize, 2));
+      data[i] = (Math.random() * 2 - 1) * env * 0.4;
+    }
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    
+    // Filtre passe-bande pour simuler des applaudissements
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 2000;
+    filter.Q.value = 0.5;
+    
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(ctx.currentTime);
+    source.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+function playPerfectScore() {
+  playLevelUp();
+  setTimeout(() => playApplause(1.5), 600);
+  setTimeout(() => sayBravo(), 800);
 }
 
 // === PARTICULES ANIMAUX ===
@@ -1853,10 +2207,43 @@ function showReward(mascots, title, desc) {
   document.getElementById('rewardTitle').textContent = title;
   document.getElementById('rewardDesc').textContent = desc;
   document.getElementById('rewardModal').classList.add('show');
+  spawnRewardConfetti();
 }
 
 function closeReward() {
   document.getElementById('rewardModal').classList.remove('show');
+}
+
+function spawnRewardConfetti() {
+  const container = document.getElementById('confettiBurst');
+  if (!container) return;
+  container.innerHTML = '';
+  const colors = ['#FF6B9D', '#FFD700', '#4ECDC4', '#C3A6FF', '#FFA552', '#95E1D3'];
+  for (let i = 0; i < 30; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random() * 90) + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (1 + Math.random() * 0.8) + 's';
+    piece.style.animationDelay = (Math.random() * 0.3) + 's';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(piece);
+  }
+  setTimeout(() => container.innerHTML = '', 2500);
+}
+
+function showVictory(emoji, title, score, xp) {
+  document.getElementById('victoryEmoji').textContent = emoji || '🏆';
+  document.getElementById('victoryTitle').textContent = title || 'Bravo Emilie !';
+  document.getElementById('victoryScore').textContent = score || '10/10 bonnes réponses';
+  document.getElementById('victoryXp').textContent = xp || '+100 XP gagnés';
+  document.getElementById('victoryOverlay').classList.add('show');
+  spawnConfetti(30);
+  playPerfectScore();
+}
+
+function closeVictory() {
+  document.getElementById('victoryOverlay').classList.remove('show');
 }
 
 // === DATA WITH MASCOT THEMES ===
@@ -2064,10 +2451,13 @@ function handleMathAnswer(btn, chosen, answer) {
     playCorrectSound();
     spawnConfetti(5);
     showFeedback(true);
+    xpEngine.addCorrectAnswer('math');
+    if (combo >= 3) xpEngine.addXp(5, 'math');
   } else {
     updateCombo(false);
     playWrongSound();
     showFeedback(false);
+    xpEngine.addWrongAnswer();
   }
   
   setTimeout(() => {
@@ -2225,7 +2615,7 @@ function grammaireHTML(items) {
   const cats = [...new Set(items.map(i => i.categorie))];
   return cats.map(cat => `
     <div class="skill-section">
-      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+      <div class="skill-header" onclick="toggleSkill(this)">
         <span class="skill-icon">📚</span>
         <span class="skill-name">${cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
         <span class="skill-arrow">▼</span>
@@ -2301,7 +2691,7 @@ function calculMentalHTML(items) {
   const nivs = [...new Set(items.map(i => i.niveau))].sort();
   return nivs.map(niv => `
     <div class="skill-section">
-      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+      <div class="skill-header" onclick="toggleSkill(this)">
         <span class="skill-icon">🧮</span>
         <span class="skill-name">Niveau ${niv}</span>
         <span class="skill-arrow">▼</span>
@@ -2369,8 +2759,18 @@ function checkCalcMentalAnswer(niveau, btn, chosen, answer) {
   btn.classList.add(correct ? 'correct' : 'wrong');
   container.querySelectorAll('.choice-btn').forEach(b => { b.disabled = true; if (Number(b.textContent) === answer) b.classList.add('correct'); });
   
-  if (correct) { calcMentalState.score++; addStars(1); playCorrectSound(); updateCombo(true); }
-  else { playWrongSound(); updateCombo(false); }
+  if (correct) {
+    calcMentalState.score++;
+    addStars(1);
+    playCorrectSound();
+    updateCombo(true);
+    xpEngine.addCorrectAnswer('math');
+    if (combo >= 3) xpEngine.addXp(5, 'math');
+  } else {
+    playWrongSound();
+    updateCombo(false);
+    xpEngine.addWrongAnswer();
+  }
   
   setTimeout(() => {
     calcMentalState.index++;
@@ -2421,7 +2821,7 @@ function anglaisHTML(items) {
   const cats = [...new Set(items.map(i => i.categorie))];
   return cats.map(cat => `
     <div class="skill-section">
-      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+      <div class="skill-header" onclick="toggleSkill(this)">
         <span class="skill-icon">🇬🇧</span>
         <span class="skill-name">${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
         <span class="skill-arrow">▼</span>
@@ -2445,7 +2845,7 @@ function questionnerMondeHTML(items) {
   const domaines = [...new Set(items.map(i => i.domaine))];
   return domaines.map(dom => `
     <div class="skill-section">
-      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+      <div class="skill-header" onclick="toggleSkill(this)">
         <span class="skill-icon">🌍</span>
         <span class="skill-name">${dom.charAt(0).toUpperCase() + dom.slice(1)}</span>
         <span class="skill-arrow">▼</span>
@@ -2483,7 +2883,7 @@ function artsHTML(items) {
   return domaines.map(dom => {
     const labels = { arts: '🎨 Arts', musique: '🎵 Musique', eps: '🏃 EPS' };
     return `<div class="skill-section">
-      <div class="skill-header" onclick="this.parentElement.querySelector(`.skill-lessons`).style.display = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `block` : `none`; this.querySelector(`.skill-arrow`).textContent = this.parentElement.querySelector(`.skill-lessons`).style.display === `none` ? `▼` : `▲`">
+      <div class="skill-header" onclick="toggleSkill(this)">
         <span class="skill-icon">${dom === 'arts' ? '🎨' : dom === 'musique' ? '🎵' : '🏃'}</span>
         <span class="skill-name">${labels[dom] || dom}</span>
         <span class="skill-arrow">▼</span>
@@ -2537,9 +2937,17 @@ function render() {
 }
 
 function homeHTML() {
-  const xpPct = Math.min(((xp % 100) / 100) * 100, 100);
+  const p = xpEngine.progress || { total_xp: 0, level: 1, stars: 0 };
+  const xpVal = p.total_xp || 0;
+  const levelVal = p.level || 1;
+  const starsVal = p.stars || 0;
+  const badgeCount = xpEngine.badges ? xpEngine.badges.length : 0;
+  const xpPct = Math.min(((xpVal % 100) / 100) * 100, 100);
   return `<div class="header screen-transition">
-    <span class="star">🌟</span>
+    <div class="mascot-star-container">
+      <img src="icons/emilie-star.svg" class="mascot-star-img" alt="Émilie l'étoile" onclick="sayMessage('Bonjour Emilie, c\'est parti pour apprendre !')">
+      <div class="sparkle-ring"></div>
+    </div>
     <h1>Bonjour Emilie !</h1>
     <p>Qu'est-ce qu'on apprend aujourd'hui ?</p>
     <div class="header-mascots">
@@ -2550,16 +2958,16 @@ function homeHTML() {
   </div>
   
   <div class="stats-bar">
-    <div class="stat-item"><span>⭐</span><span id="totalStars">${stars}</span> étoiles</div>
-    <div class="stat-item"><span>🏅</span><span id="totalBadges">${badges.length}</span> badges</div>
+    <div class="stat-item"><span>⭐</span><span id="totalStars">${starsVal}</span> étoiles</div>
+    <div class="stat-item"><span>🏅</span><span id="totalBadges">${badgeCount}</span> badges</div>
     <div class="stat-item"><span>🔥</span><span>${streak}</span> jours</div>
-    <div class="stat-item"><span>🎯</span><span id="levelDisplay">Niv.${level}</span></div>
+    <div class="stat-item"><span>🎯</span><span id="levelDisplay">Niv.${levelVal}</span></div>
   </div>
   
   <div class="level-section">
     <div class="level-title">
       <span>🐣 Début</span>
-      <span id="xpText">${xp % 100} / 100 XP</span>
+      <span id="xpText">${xpVal % 100} / 100 XP</span>
       <span>🦋 Expert</span>
     </div>
     <div class="progress-bar">
@@ -2581,6 +2989,24 @@ function homeHTML() {
       <small>Continue comme ça, Câlin est fier de toi !</small>
     </div>
     <div class="streak-animals">🐿️🪼🦭</div>
+  </div>
+  
+  <div class="subject-progress-section">
+    <div class="subject-progress-row">
+      <span class="subj-icon">🔢</span>
+      <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill math-fill" style="width:${Math.min((p.math_score||0)/2, 100)}%"></div></div></div>
+      <span class="subj-score">${p.math_score||0} pts</span>
+    </div>
+    <div class="subject-progress-row">
+      <span class="subj-icon">📖</span>
+      <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill french-fill" style="width:${Math.min((p.french_score||0)/2, 100)}%"></div></div></div>
+      <span class="subj-score">${p.french_score||0} pts</span>
+    </div>
+    <div class="subject-progress-row">
+      <span class="subj-icon">🔬</span>
+      <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill science-fill" style="width:${Math.min((p.science_score||0)/2, 100)}%"></div></div></div>
+      <span class="subj-score">${p.science_score||0} pts</span>
+    </div>
   </div>
   
   <div class="daily-challenge-detail ${dailyChallenge.completed ? 'completed' : ''}" onclick="handleDailyChallenge()">
@@ -2676,10 +3102,13 @@ function quizHTML() {
     return `<div class="module-header screen-transition">
       <button class="back-btn" data-action="back">⬅️</button>
       <h2 class="module-title math">🔢 Maths avec 🪼 Bulle</h2>
-                  <span class='badge-count badge-math' id='mathProgress'>${score}/10</span>
+      <span class='badge-count badge-math' id='mathProgress'>${score}/10</span>
     </div>
     
-    <div id="mathExerciseArea"></div>`;
+    <div id="mathExerciseArea"></div>
+    <div class="mascot-tip" style="text-align:center;">
+      <em>🪼 Bulle : "Les maths c'est comme nager, tu vas progresser !"</em>
+    </div>`;
   }
   
   // Pour les autres modules (français, sciences), utiliser le système existant
@@ -2715,6 +3144,12 @@ function resultHTML() {
   const emoji = score >= 8 ? '🏆' : score >= 5 ? '😊' : '💪';
   const cls = module === 'math' ? 'blue' : module === 'french' ? 'pink' : 'green';
   const mascots = score >= 8 ? '🐿️🪼🦭' : '🐿️🦭';
+  // Show victory overlay for perfect score
+  if (score === exercises.length && exercises.length >= 5) {
+    setTimeout(() => {
+      showVictory('🌟', 'Score Parfait !', `${score}/${exercises.length} bonnes réponses`, `+${score * 10} XP`);
+    }, 500);
+  }
   return `<div class="card result-screen screen-transition">
     <span class="result-emoji">${emoji}</span>
     <div style="font-size: 2rem; margin-bottom: 10px;">${mascots}</div>
@@ -2726,19 +3161,24 @@ function resultHTML() {
 }
 
 function trophyHTML() {
+  const p = xpEngine.progress || { stars: 0, level: 1, streak_days: 1 };
+  const allBadges = xpEngine.badges || [];
+  const oldBadgeList = badges.map(b => `<div class="badge-item">${b}</div>`).join('');
+  const newBadgeList = allBadges.map(b => `<div class="badge-item" title="${b.badge_name}">${b.badge_emoji} ${b.badge_name}</div>`).join('');
+  const badgeHtml = oldBadgeList || newBadgeList || `<p class="empty-msg">Continue les exercices pour gagner des badges ! 💪🐿️🪼🦭</p>`;
   return `<div class="module-header screen-transition">
     <button class="back-btn" data-action="back">⬅️</button>
     <h2 class="module-title trophy">🏆 Mes Trophées 🐿️🪼🦭</h2>
   </div>
   <div class="trophies-grid">
-    <div class="trophy-card"><span class="trophy-icon">⭐</span><div class="trophy-value">${stars}</div><div class="trophy-label">étoiles</div></div>
-    <div class="trophy-card"><span class="trophy-icon">🏅</span><div class="trophy-value">${badges.length}</div><div class="trophy-label">badges</div></div>
-    <div class="trophy-card"><span class="trophy-icon">🎯</span><div class="trophy-value">Niv.${level}</div><div class="trophy-label">niveau</div></div>
-    <div class="trophy-card"><span class="trophy-icon">🔥</span><div class="trophy-value">${streak}</div><div class="trophy-label">jours</div></div>
+    <div class="trophy-card"><span class="trophy-icon">⭐</span><div class="trophy-value">${p.stars || 0}</div><div class="trophy-label">étoiles</div></div>
+    <div class="trophy-card"><span class="trophy-icon">🏅</span><div class="trophy-value">${allBadges.length}</div><div class="trophy-label">badges</div></div>
+    <div class="trophy-card"><span class="trophy-icon">🎯</span><div class="trophy-value">Niv.${p.level || 1}</div><div class="trophy-label">niveau</div></div>
+    <div class="trophy-card"><span class="trophy-icon">🔥</span><div class="trophy-value">${p.streak_days || 1}</div><div class="trophy-label">jours</div></div>
   </div>
   <div class="card">
     <h3 style="font-weight:900;margin-bottom:12px">🏅 Mes Badges</h3>
-    ${badges.length ? `<div class="badges-list">${badges.map(b => `<div class="badge-item">${b}</div>`).join('')}</div>` : `<p class="empty-msg">Continue les exercices pour gagner des badges ! 💪🐿️🪼🦭</p>`}
+    ${badgeHtml}
   </div>
   <div style="text-align:center;padding:20px;font-size:1.5rem;">🐿️🪼🦭</div>`;
 }
@@ -2929,6 +3369,17 @@ function getBtnClass(c) {
   return '';
 }
 
+// === SKILL TOGGLE ===
+function toggleSkill(el) {
+  const section = el.parentElement;
+  const lessons = section.querySelector('.skill-lessons');
+  const arrow = el.querySelector('.skill-arrow');
+  if (!lessons) return;
+  const isHidden = lessons.style.display === 'none';
+  lessons.style.display = isHidden ? 'block' : 'none';
+  if (arrow) arrow.textContent = isHidden ? '▲' : '▼';
+}
+
 // === ACTIONS ===
 function attachListeners() {
   document.querySelectorAll('[data-subject]').forEach(btn => {
@@ -2992,10 +3443,14 @@ function handleChoice(choice) {
     playCorrectSound();
     spawnConfetti(5);
         showFeedback(correct);
+    // XP Engine
+    xpEngine.addCorrectAnswer(module === 'math' ? 'math' : module === 'french' ? 'french' : 'science');
+    if (combo >= 3) xpEngine.addXp(5, module);
   } else {
     updateCombo(false);
     playWrongSound();
         showFeedback(correct);
+    xpEngine.addWrongAnswer();
   }
   
   render();
@@ -3004,18 +3459,24 @@ function handleChoice(choice) {
     if (qIdx + 1 >= exercises.length) {
       done = true;
       
-      // Award badges
+      // XP Engine : session complete
+      xpEngine.completeSession(module, 'quiz', score, exercises.length, 30);
+      
+      // Award badges (old system + xpEngine)
       if (module === 'math' && score >= 8 && !badges.includes('🏆 Super Mathématicien·ne !')) {
         badges.push('🏆 Super Mathématicien·ne !');
         showReward('🪼', 'Badge Mathématiques !', 'Tu es une vraie mathématicienne avec Bulle !');
+        xpEngine.addBadge('math_master', 'Super Mathématicienne', '🪼');
       }
       if (module === 'french' && score >= 8 && !badges.includes('📚 Championne de Français !')) {
         badges.push('📚 Championne de Français !');
         showReward('🦭', 'Badge Français !', 'Câlin est impressionné par ta maîtrise du français !');
+        xpEngine.addBadge('french_master', 'Championne de Français', '🦭');
       }
       if (module === 'science' && score >= 6 && !badges.includes('🔬 Petite Scientifique !')) {
         badges.push('🔬 Petite Scientifique !');
         showReward('🐿️', 'Badge Sciences !', 'Noisette découvre le monde avec toi !');
+        xpEngine.addBadge('science_master', 'Petite Scientifique', '🐿️');
       }
       
       // Level up celebration
@@ -3053,9 +3514,32 @@ function shuffle(arr) {
   return arr.sort(() => Math.random() - 0.5);
 }
 
+// === TIMER SVG GÉNÉRATEUR ===
+function timerSVG(remaining, total, size = 56, stroke = 4) {
+  const r = (size / 2) - stroke;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - remaining / total);
+  return `<div class="timer-ring-container" style="width:${size}px;height:${size}px;">
+    <svg class="timer-ring" width="${size}" height="${size}">
+      <circle class="timer-ring-bg" cx="${size/2}" cy="${size/2}" r="${r}"/>
+      <circle class="timer-ring-fill" cx="${size/2}" cy="${size/2}" r="${r}"
+        stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+        style="${remaining/total < 0.25 ? 'stroke:#ef4444;' : remaining/total < 0.5 ? 'stroke:#f59e0b;' : ''}"/>
+    </svg>
+    <span class="timer-ring-text">${Math.ceil(remaining)}</span>
+  </div>`;
+}
+
 // === INIT ===
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   createFloatingAnimals();
+  
+  // Init XP Engine
+  await xpEngine.init();
+  updateProgressUI();
+  
+  // Preload speech synthesis voices
+  if (window.speechSynthesis) window.speechSynthesis.getVoices();
   
   // Welcome message
   setTimeout(() => {

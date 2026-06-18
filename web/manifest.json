@@ -1,0 +1,26 @@
+{
+  "name": "Emilie CE1 - App Éducative",
+  "short_name": "Emilie",
+  "description": "Application éducative pour le CE1 - Maths, Français, Sciences, et découvre tout le programme",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FF6B9D",
+  "background_color": "#FFF9C4",
+  "categories": ["education", "kids", "learning"],
+  "lang": "fr-FR",
+  "icons": [
+    { "src": "/icons/icon-192.svg", "type": "image/svg+xml", "sizes": "192x192" },
+    { "src": "/icons/icon-512.svg", "type": "image/svg+xml", "sizes": "512x512" },
+    { "src": "/icons/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icons/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "scope": "/",
+  "serviceworker": {
+    "src": "/sw.js",
+    "scope": "/"
+  }
+}
