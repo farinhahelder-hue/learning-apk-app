@@ -20,7 +20,7 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
   late List<Exercise> _exercises;
   int _current = 0;
   int _score = 0;
-  int _wrong = 0;
+
   bool _finished = false;
   late ConfettiController _confetti;
 
@@ -49,7 +49,7 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
   }
 
   void _onWrong() {
-    setState(() { _wrong++; });
+
     if (_current < _exercises.length - 1) {
       Future.delayed(const Duration(milliseconds: 1500), () {
         setState(() { _current++; });
@@ -156,7 +156,7 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                setState(() { _current = 0; _score = 0; _wrong = 0; _finished = false; _exercises.shuffle(); });
+                setState(() { _current = 0; _score = 0; _finished = false; _exercises.shuffle(); });
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.mathColor),
               child: const Text('Rejouer ! 🔄', style: TextStyle(color: Colors.white)),
