@@ -145,7 +145,7 @@ class _BounceButtonState extends State<BounceButton>
               ),
             )
                 .animate(onPlay: (c) => c.repeat(reverse: true))
-                .scale(begin: 1.0, end: 1.1, duration: 500.ms),
+                .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1), duration: 500.ms),
           ),
       ],
     );
