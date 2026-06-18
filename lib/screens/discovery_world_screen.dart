@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -6,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../models/mascot.dart';
 import '../services/audio_service.dart';
 import '../utils/app_theme.dart';
-import '../utils/new_worlds_curriculum.dart';
 import '../widgets/confetti_overlay.dart';
 import '../widgets/mascot_widget.dart';
 import '../widgets/thinking_timer.dart';
@@ -54,7 +52,6 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
 
   void _showCurrentQuestion() {
     if (_currentIndex >= _questions.length) return;
-    final q = _questions[_currentIndex];
     setState(() {
       _mood         = MascotMood.thinking;
       _speechText   = _mascot.thinkPhrases[_currentIndex % _mascot.thinkPhrases.length];
@@ -64,7 +61,7 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
     });
     _timerKey.currentState?.reset();
     // Optionnel : lire la question via TTS
-    // context.read<TtsService>().readQuestion(q['question']);
+    // context.read<TtsService>().readQuestion(_questions[_currentIndex]['question']);
   }
 
   void _onAnswerSelected(String answer) {
