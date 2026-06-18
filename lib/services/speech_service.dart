@@ -51,7 +51,9 @@ class SpeechService extends ChangeNotifier {
           orElse: () => locales.first,
         );
         if (kDebugMode) {
-          print('Using locale: ${frenchLocale.name} (${frenchLocale.localeId})');
+          print(
+            'Using locale: ${frenchLocale.name} (${frenchLocale.localeId})',
+          );
         }
       }
 
@@ -112,13 +114,13 @@ class SpeechService extends ChangeNotifier {
       onResult: (SpeechRecognitionResult result) {
         _lastWords = result.recognizedWords;
         _confidence = result.confidence;
-        
+
         if (kDebugMode) {
-          print('STT Result: "${result.recognizedWords}" (confidence: ${result.confidence})');
+          print('STT Result received (confidence: ${result.confidence})');
         }
 
         onResult(result.recognizedWords);
-        
+
         if (result.finalResult) {
           _isListening = false;
           notifyListeners();
