@@ -743,7 +743,7 @@ class _MultiplicationTablesScreenState
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.w900,
-                              color: AppTheme.textLight,
+                              color: AppTheme.textDark,
                             ),
                           ),
                           Text(
@@ -759,7 +759,7 @@ class _MultiplicationTablesScreenState
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.w900,
-                              color: AppTheme.textLight,
+                              color: AppTheme.textDark,
                             ),
                           ),
                         ],
