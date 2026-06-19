@@ -1503,14 +1503,19 @@ function playWordFoundSound() {
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 
+
 function getAudio() {
   if (!audioCtx) audioCtx = new AudioCtx();
   return audioCtx;
 }
 
-function playBeep(freq=440, duration=0.15, type='sine', volume=0.3) {
-  if (muted) return;
-  if (calmMode) volume *= 0.7;
+// === MUSIQUE DE FOND ===
+let musicEnabled = localStorage.getItem('emilie_music') === '1';
+let musicTrack = null;
+let musicNodes = [];
+let lastMusicScreen = null;
+
+function musicNote(freq, duration, startTime, type='sine', volume=0.08) {
   try {
     const ctx = getAudio();
     const osc = ctx.createOscillator();
@@ -1519,14 +1524,71 @@ function playBeep(freq=440, duration=0.15, type='sine', volume=0.3) {
     gain.connect(ctx.destination);
     osc.frequency.value = freq;
     osc.type = type;
-    gain.gain.setValueAtTime(volume, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + duration);
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(volume, startTime + 0.04);
+    gain.gain.setValueAtTime(volume, startTime + duration - 0.06);
+    gain.gain.linearRampToValueAtTime(0.001, startTime + duration);
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+    musicNodes.push(osc);
   } catch(e) {}
 }
 
-// === LOADING SPINNER ===
+const MELODIES = {
+  home: [
+    [523,0.3,'sine'],[659,0.3,'sine'],[784,0.3,'sine'],[659,0.3,'sine'],
+    [523,0.6,'triangle'],[494,0.3,'sine'],[587,0.3,'sine'],
+    [659,0.4,'sine'],[784,0.4,'sine'],[880,0.4,'sine'],[784,0.4,'sine'],
+    [659,0.8,'triangle'],[523,0.3,'sine'],[494,0.3,'sine'],[440,0.3,'sine'],
+    [523,0.6,'triangle'],[587,0.3,'sine'],[659,0.3,'sine'],
+    [523,0.3,'sine'],[659,0.3,'sine'],[784,0.3,'sine'],[659,0.3,'sine'],
+    [1046,0.8,'triangle']
+  ],
+  game: [
+    [523,0.2,'sine'],[587,0.2,'sine'],[659,0.2,'sine'],[784,0.2,'sine'],
+    [659,0.2,'sine'],[784,0.2,'sine'],[880,0.2,'sine'],[1046,0.4,'triangle'],
+    [784,0.2,'sine'],[880,0.2,'sine'],[1046,0.2,'sine'],[1174,0.2,'sine'],
+    [1046,0.2,'sine'],[1174,0.2,'sine'],[1318,0.2,'sine'],[1046,0.4,'triangle']
+  ],
+  calm: [
+    [392,0.8,'triangle'],[440,0.8,'triangle'],[523,1.0,'triangle'],[440,0.8,'triangle'],
+    [349,0.8,'triangle'],[392,0.8,'triangle'],[440,0.8,'triangle'],[349,0.8,'triangle'],
+    [330,1.0,'triangle'],[392,0.8,'triangle'],[349,0.8,'triangle'],[330,0.8,'triangle'],
+    [294,1.2,'triangle']
+  ]
+};
+
+function startMusic(melodyKey) {
+  if (!musicEnabled || muted) return;
+  stopMusic();
+  const melody = MELODIES[melodyKey] || MELODIES.home;
+  const ctx = getAudio();
+  if (ctx.state === 'suspended') ctx.resume();
+  const beatDuration = melodyKey === 'calm' ? 0.6 : 0.35;
+  let time = 0;
+  melody.forEach(([freq, dur, type]) => {
+    musicNote(freq, dur * beatDuration, ctx.currentTime + time, type, 0.05);
+    time += dur * beatDuration;
+  });
+  musicTrack = setTimeout(() => startMusic(melodyKey), time * 1000);
+}
+
+function stopMusic() {
+  if (musicTrack) { clearTimeout(musicTrack); musicTrack = null; }
+  musicNodes.forEach(n => { try { n.stop(); } catch(e) {}});
+  musicNodes = [];
+}
+
+function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  const btn = document.getElementById('musicBtn');
+  if (btn) btn.textContent = musicEnabled ? '🎵' : '🎶';
+  localStorage.setItem('emilie_music', musicEnabled ? '1' : '0');
+  if (musicEnabled) startMusic(screen === 'home' ? 'home' : 'game');
+  else stopMusic();
+}
+
+function playBeep(freq=440, duration=0.15, type='sine', volume=0.3) {
 function showLoading(show = true) {
   const el = document.getElementById('loadingSpinner');
   if (el) el.classList.toggle('active', show);
@@ -1580,6 +1642,8 @@ function toggleMute() {
   muted = !muted;
   document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
   if (!muted) playBeep(500, 0.1, 'sine');
+  if (muted) stopMusic();
+  else if (musicEnabled) startMusic(screen === 'home' ? 'home' : 'game');
 }
 
 // === SYNTHÈSE VOCALE (SpeechSynthesis) ===
@@ -4712,6 +4776,16 @@ function render() {
   else if (screen === 'murmures') app.innerHTML = murmuresHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   else if (screen === 'parentalDashboard') { try { app.innerHTML = parentalDashboardHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
+  // Update background music on screen change
+  if (musicEnabled && !muted) {
+    const isHome = screen === 'home' || screen === 'parental' || screen === 'parentalDashboard';
+    const isGame = screen !== 'home' && screen !== 'parental' && screen !== 'parentalDashboard';
+    if (screen !== lastMusicScreen) {
+      lastMusicScreen = screen;
+      if (isHome) startMusic('home');
+      else if (isGame) startMusic('game');
+    }
+  }
   attachListeners();
   initStickerAlbum();
   // Draw charts after dashboard renders
@@ -5417,6 +5491,7 @@ function parentalDashboardHTML() {
       ${makeToggle('Délai anti-clic', 'antiClick', getSetting('antiClick', true))}
       ${makeToggle('Pause étoiles', 'pauseEtoiles', getSetting('pauseEtoiles', true))}
       ${makeToggle('Audio', 'audio', getSetting('audio', true))}
+      ${makeToggle('Musique fond', 'music', musicEnabled)}
       ${makeToggle('Mode calme', 'calm', calmMode)}
       ${makeToggle('Timer quiz', 'quizTimer', getSetting('quizTimer', true))}
       <div style="display:flex;align-items:center;gap:12px;">
@@ -5452,6 +5527,7 @@ function makeToggle(label, key, active) {
 
 function toggleParentSetting(key) {
   if (key === 'calm') { toggleCalmMode(); return; }
+  if (key === 'music') { toggleMusic(); render(); return; }
   if (key === 'audio') { muted = !muted; document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊'; }
   if (key === 'pauseEtoiles') pauseDuration = getSetting('pauseEtoiles', true) ? 8000 : 999999;
   if (key === 'antiClick') { /* handled via getSetting check */ }
@@ -5816,11 +5892,12 @@ function toggleCalmMode() {
   document.body.classList.toggle('calm-mode', calmMode);
   playBeep(calmMode ? 500 : 600, 0.1, 'sine');
   if (calmMode) {
-    // Hide score/timer elements
     document.querySelectorAll('.badge-count, #mathProgress, .rocket-race-timer').forEach(el => {
       if (el) el.style.display = 'none';
     });
   }
+  if (calmMode && musicEnabled) startMusic('calm');
+  else if (musicEnabled && !calmMode) startMusic(screen === 'home' ? 'home' : 'game');
 }
 
 function initCalmMode() {
@@ -6099,6 +6176,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Hide loading spinner
     showLoading(false);
+    // Start background music if enabled
+    if (musicEnabled && !muted) startMusic('home');
   } catch(e) {
     console.error('Init error:', e);
     showLoading(false);
