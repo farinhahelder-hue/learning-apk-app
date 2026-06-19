@@ -4188,6 +4188,132 @@ function histoireResultHTML() {
     <button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
 }
 
+// === MOTS À SAVOIR (ORTHOGRAPHE) ===
+const ORTHO_LISTS = [
+  { id:1, title:'Chiffres', words:['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf'] },
+  { id:2, title:'Nombres 10-19', words:['dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'] },
+  { id:3, title:'Nombres 20-100', words:['vingt','trente','quarante','cinquante','soixante','soixante-dix','quatre-vingt','quatre-vingt-dix','cent'] },
+  { id:4, title:'Mots en t', words:['la tête','un train','la terre','un manteau','des manteaux','toujours','une histoire','très','attraper','le travail','il travaille','elles travaillent'] },
+  { id:5, title:'Quotidien', words:["aujourd'hui",'une dent','demain','le dos','devant','donner','nous donnons','derrière','dire','elle dit','vous dites','dehors','demander','vous demandez'] },
+  { id:6, title:'Mots en p', words:['un pied','des pieds','mes parents','petit','petits','petite','petites','la pluie','après',"l'après-midi",'parce que','près de','appeler',"je m'appelle",'pendant'] },
+  { id:7, title:'Mots en b', words:['blanc','blancs','blanche','blanches','un bras','bleu','bleus','bleue','bleues',"de l'herbe",'bonjour','une botte','beaucoup','une jambe','bien',"s'habiller"] },
+  { id:8, title:'Mots en f', words:["j'ai faim",'la fête','une femme','un fruit','une feuille','des feuilles','un enfant','des enfants','une fille','un fils','fort','forte','faire','il fait','froid','froide'] },
+  { id:9, title:'Mots en v', words:['vendredi','vieux','vieille','vieilles','une ville','un cheval','des chevaux','je vais','avec','il va','avant','elles vont'] },
+  { id:10, title:'Mots en ch', words:['dimanche','un chapeau','chanter','elles chantent','un cheveu','chaud','chaude','gauche','un chien','chercher','nous cherchons','un chat','chacun','chacune'] }
+];
+let orthoState = { listIdx:0, mode:'voir', learned:[], quizIdx:0, quizScore:0, quizTotal:0, completed:false, epelIdx:0, epelReveal:0 };
+
+function startOrthoMots() {
+  orthoState = { listIdx:0, mode:'voir', learned:[], quizIdx:0, quizScore:0, quizTotal:0, completed:false, epelIdx:0, epelReveal:0 };
+  const saved = localStorage.getItem('emilie_ortho_learned');
+  if (saved) orthoState.learned = JSON.parse(saved);
+  screen = 'orthoMots'; render();
+}
+
+function orthoSetList(i) { orthoState.listIdx = i; orthoState.mode = 'voir'; orthoState.quizIdx = 0; orthoState.quizScore = 0; orthoState.epelIdx = 0; orthoState.epelReveal = 0; orthoState.completed = false; render(); }
+function orthoSetMode(m) { orthoState.mode = m; orthoState.quizIdx = 0; orthoState.quizScore = 0; orthoState.epelIdx = 0; orthoState.epelReveal = 0; render(); }
+
+function orthoToggleLearned(word) {
+  const idx = orthoState.learned.indexOf(word);
+  if (idx >= 0) orthoState.learned.splice(idx, 1);
+  else orthoState.learned.push(word);
+  localStorage.setItem('emilie_ortho_learned', JSON.stringify(orthoState.learned));
+  render();
+}
+
+function orthoNextEpel() {
+  const list = ORTHO_LISTS[orthoState.listIdx];
+  if (!list) return;
+  if (orthoState.epelIdx >= list.words.length) { orthoState.epelIdx = 0; orthoState.epelReveal = 0; render(); return; }
+  const w = list.words[orthoState.epelIdx];
+  if (orthoState.epelReveal < w.length) { orthoState.epelReveal++; render(); }
+  else { orthoState.epelIdx++; orthoState.epelReveal = 0; setTimeout(() => render(), 300); }
+}
+
+function orthoAnswerQuiz(chosen) {
+  const list = ORTHO_LISTS[orthoState.listIdx];
+  if (!list || orthoState.completed) return;
+  const correct = list.words[orthoState.quizIdx];
+  if (chosen === correct) { orthoState.quizScore++; playCorrectSound(); spawnConfetti(5); showFeedback(true); }
+  else { playWrongSound(); showFeedback(false); }
+  orthoState.quizIdx++;
+  if (orthoState.quizIdx >= list.words.length) { orthoState.completed = true; }
+  setTimeout(() => render(), 800);
+}
+
+function orthoMotsHTML() {
+  const list = ORTHO_LISTS[orthoState.listIdx];
+  if (!list) return '<div class="card"><p class="empty-msg">Liste introuvable</p></div>';
+  const learnedSet = new Set(orthoState.learned);
+  const pct = list.words.length > 0 ? Math.round(learnedSet.size / list.words.length * 100) : 0;
+  const modeBtns = ['voir','epeler','quiz'].map(m =>
+    `<button class="category-tab ${orthoState.mode===m?'active':''}" onclick="orthoSetMode('${m}')">${m==='voir'?'👀 Voir':m==='epeler'?'🔤 Épeler':'❓ Quiz'}</button>`
+  ).join('');
+
+  let content = '';
+  if (orthoState.mode === 'voir') {
+    content = `<div class="card" style="padding:16px;">
+      ${list.words.map(w => `
+        <div class="ortho-word-card ${learnedSet.has(w)?'learned':''}" onclick="readAloud('${w.replace(/'/g,"\\'")}');orthoToggleLearned('${w.replace(/'/g,"\\'")}')">
+          <span class="ortho-word">${w}</span>
+          <span class="ortho-check">${learnedSet.has(w)?'✅':''}</span>
+          <span class="ortho-speaker">🔊</span>
+        </div>
+      `).join('')}
+    </div>`;
+  } else if (orthoState.mode === 'epeler') {
+    const w = list.words[orthoState.epelIdx];
+    if (!w) { orthoState.epelIdx = 0; orthoState.epelReveal = 0; }
+    const word = list.words[orthoState.epelIdx] || list.words[0];
+    const revealed = word.slice(0, orthoState.epelReveal);
+    const remaining = word.slice(orthoState.epelReveal).split('').map(() => '_').join(' ');
+    const finished = orthoState.epelReveal >= word.length;
+    content = `<div class="card" style="text-align:center;padding:30px 16px;">
+      <div style="font-size:2.5rem;letter-spacing:6px;margin-bottom:20px;font-weight:900;color:#6366f1;">
+        ${revealed.split('').join(' ')}${finished?'':' '}${!finished ? remaining : ''}
+      </div>
+      ${finished ? `<p style="font-size:1.5rem;margin-bottom:12px;">🎉 ${word}</p>
+        <button class="primary-btn btn-blue" onclick="readAloud('${word.replace(/'/g,"\\'")}');">🔊 Réécouter</button>` : ''}
+      <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;">
+        ${!finished ? `<button class="primary-btn btn-purple" onclick="orthoNextEpel()">🔤 Lettre suivante</button>` : `<button class="primary-btn btn-green" onclick="orthoNextEpel()">➡️ Mot suivant</button>`}
+      </div>
+      <div style="margin-top:12px;font-size:0.85rem;color:#999;">Mot ${orthoState.epelIdx+1}/${list.words.length}</div>
+    </div>`;
+  } else if (orthoState.mode === 'quiz') {
+    if (orthoState.completed) {
+      const pct2 = orthoState.quizScore / list.words.length;
+      content = `<div class="card result-screen"><span class="result-emoji">${pct2>=1?'🏆':pct2>=0.7?'🌟':'💪'}</span>
+        <h2 class="result-title">${pct2>=1?'Parfait !':pct2>=0.7?'Bravo !':'Bien essayé !'}</h2>
+        <p class="result-score">${orthoState.quizScore}/${list.words.length}</p>
+        <button class="primary-btn btn-blue" onclick="orthoSetMode('quiz')">❓ Refaire le quiz</button></div>`;
+    } else {
+      const correct = list.words[orthoState.quizIdx];
+      const wrongs = list.words.filter(w => w !== correct).sort(() => Math.random()-0.5).slice(0, 2);
+      const choices = [correct, ...wrongs].sort(() => Math.random()-0.5);
+      content = `<div class="card" style="text-align:center;padding:24px 16px;">
+        <div style="font-size:2rem;margin-bottom:12px;">❓</div>
+        <p style="font-size:1.1rem;color:#666;margin-bottom:16px;">Quel mot est écrit correctement ?</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${choices.map(c => `<button class="choice-btn" onclick="orthoAnswerQuiz('${c.replace(/'/g,"\\'")}')" style="font-size:1.15rem;padding:14px;">${c}</button>`).join('')}
+        </div>
+        <div style="margin-top:12px;font-size:0.85rem;color:#999;">Question ${orthoState.quizIdx+1}/${list.words.length}</div>
+      </div>`;
+    }
+  }
+
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='home';render()">🏠</button>
+    <h2 class="module-title" style="color:#8b5cf6;">📝 Mes mots à savoir</h2>
+    <span class="badge-count" style="background:#8b5cf622;color:#8b5cf6;">${learnedSet.size}/${list.words.length}</span>
+  </div>
+  <div class="category-tabs" style="overflow-x:auto;white-space:nowrap;padding:0 4px;margin-bottom:8px;">
+    ${ORTHO_LISTS.map((l,i) => `<button class="category-tab ${i===orthoState.listIdx?'active':''}" onclick="orthoSetList(${i})" style="font-size:0.8rem;">Liste ${l.id}</button>`).join('')}
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;justify-content:center;">${modeBtns}</div>
+  <div class="progress-bar" style="margin-bottom:12px;"><div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,#8b5cf6,#c084fc);"></div></div>
+  ${content}`;
+}
+
 // === RENDER ===
 function render() {
   try {
@@ -4213,6 +4339,7 @@ function render() {
   else if (screen === 'geo') app.innerHTML = geoHTML();
   else if (screen === 'histoire') { try { app.innerHTML = histoireHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   else if (screen === 'conjugaison') app.innerHTML = conjugaisonMenuHTML();
+  else if (screen === 'orthoMots') app.innerHTML = orthoMotsHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   else if (screen === 'parentalDashboard') { try { app.innerHTML = parentalDashboardHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   attachListeners();
@@ -4394,6 +4521,10 @@ function homeHTML() {
       <button class="mini-game-btn word-hunt" onclick="startConjugaison()" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
         <span class="emoji">🔄</span>
         <span>Conjugaison</span>
+      </button>
+      <button class="mini-game-btn stickers" onclick="startOrthoMots()" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+        <span class="emoji">📝</span>
+        <span>Mots à savoir</span>
       </button>
     </div>
     </div>
