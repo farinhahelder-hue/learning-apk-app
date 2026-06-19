@@ -4224,7 +4224,12 @@ const ORTHO_LISTS = [
   { id:7, title:'Mots en b', words:['blanc','blancs','blanche','blanches','un bras','bleu','bleus','bleue','bleues',"de l'herbe",'bonjour','une botte','beaucoup','une jambe','bien',"s'habiller"] },
   { id:8, title:'Mots en f', words:["j'ai faim",'la fête','une femme','un fruit','une feuille','des feuilles','un enfant','des enfants','une fille','un fils','fort','forte','faire','il fait','froid','froide'] },
   { id:9, title:'Mots en v', words:['vendredi','vieux','vieille','vieilles','une ville','un cheval','des chevaux','je vais','avec','il va','avant','elles vont'] },
-  { id:10, title:'Mots en ch', words:['dimanche','un chapeau','chanter','elles chantent','un cheveu','chaud','chaude','gauche','un chien','chercher','nous cherchons','un chat','chacun','chacune'] }
+  { id:10, title:'Mots en ch', words:['dimanche','un chapeau','chanter','elles chantent','un cheveu','chaud','chaude','gauche','un chien','chercher','nous cherchons','un chat','chacun','chacune'] },
+  { id:11, title:'Mots en gn', words:['une montagne','un champignon','une ligne','un signal','la campagne','un peigne','un cygne','une araignée','une châtaigne','la vigne','un rognon','une magnifique','une poignée','la baignoire'] },
+  { id:12, title:'Mots en ill', words:['une fille','une famille','une pastille','une médaille','une oreille','une bouteille','un gorille','une grenouille','une chenille','le soleil','une feuille','un fauteuil'] },
+  { id:13, title:'Mots en ouille', words:['la bouillie','une grenouille','une citrouille','une mangouste','la rouille','une douille','une nouille','le brouillard','brouiller','le fouillis'] },
+  { id:14, title:'Féminins en -eur', words:['une danseuse','une chanteuse','une coiffeuse','une vendeuse','une nageuse','une skieuse','une patineuse','une chercheuse','une jardinière','une boulangère','une cuisinière','une fermière','une écolière'] },
+  { id:15, title:'Pluriel en -aux', words:['un cheval','un animal','un journal','un hôpital','un général','un canal','un signal','un métal','un minéral','un vitrail'] }
 ];
 let orthoState = { listIdx:0, mode:'voir', learned:[], quizIdx:0, quizScore:0, quizTotal:0, completed:false, epelIdx:0, epelReveal:0 };
 
@@ -4352,7 +4357,10 @@ const SONS_DATA = [
   { son:'[s]', emoji:'🐍', color:'#ec4899', mots:['une salade','le sport','ma sœur','la classe','la maîtresse','une cerise','cinq','un garçon','six','la piscine','la récréation'] },
   { son:'[k]', emoji:'🐱', color:'#f43f5e', mots:['le calcul','du café','un canard','quatre','qui','quoi','Christine','un accent','un koala','cinq','un coq'] },
   { son:'[i]', emoji:'🕯️', color:'#fbbf24', mots:['lundi','six','dix','un animal','un pyjama','le cycle'] },
-  { son:'[ʒ]', emoji:'✨', color:'#a855f7', mots:['jouer','un jour','jeudi','manger','rouge','une cage','un plongeoir','de la magie','la gymnastique'] }
+  { son:'[ʒ]', emoji:'✨', color:'#a855f7', mots:['jouer','un jour','jeudi','manger','rouge','une cage','un plongeoir','de la magie','la gymnastique'] },
+  { son:'[ə]', emoji:'🤫', color:'#14b8a6', mots:['le','me','te','se','ce','de','que','je','un petit','une fenêtre','le cheval','une semaine','le regard','demain'] },
+  { son:'[f]', emoji:'🪶', color:'#0ea5e9', mots:['une fourmi','une fleur','du café','une fête','la famille','un chiffre','une photo','un phare','une phrase','un téléphone','neuf','une écharpe','un coffre'] },
+  { son:'[v]', emoji:'🚐', color:'#8b5cf6', mots:['une voiture','la vie','une veste','un cheval','des chevaux','je vais','avec','il va','avant','elles vont','une vague','la vache','la ville','un verre'] }
 ];
 let sonsState = { detail: null, quiz: null, quizIdx: 0, quizScore: 0, completed: false };
 
@@ -4458,6 +4466,13 @@ const FANTOMES_DATA = [
   { mot: 'temps', muette: 's', indice: 'Le "s" final et le "p" sont muets.' },
   { mot: 'doigt', muette: 't', indice: 'Le "t" et le "g" sont muets.' },
   { mot: 'os', muette: 's', indice: 'Le "s" ne se prononce pas.' },
+  { mot: 'riz', muette: 'z', indice: 'Le "z" final est muet.' },
+  { mot: 'nez', muette: 'z', indice: 'Le "z" ne s\'entend pas.' },
+  { mot: 'noix', muette: 'x', indice: 'Le "x" final est silencieux.' },
+  { mot: 'choix', muette: 'x', indice: 'Le "x" ne se prononce pas.' },
+  { mot: 'prix', muette: 'x', indice: 'Le "x" final est muet.' },
+  { mot: 'clown', muette: 'n', indice: 'Le "n" final ne se prononce pas.' },
+  { mot: 'cornichon', muette: 'n', indice: 'Le "n" final est silencieux.' }
 ];
 let fantomesState = { index:0, score:0, total:0, completed:false };
 function startFantomes() {
@@ -4508,6 +4523,9 @@ const CHEF_RECETTES = [
   { titre:'Gâteau au chocolat', etapes:['Prends 3 œufs 🥚🥚🥚','Ajoute 2 cuillères de farine','Ajoute 4 carrés de chocolat 🍫🍫🍫🍫'], question:'Combien d\'ingrédients en tout ?', reponse:'9', choix:['7','8','9','10'] },
   { titre:'Salade de fruits', etapes:['Coupe 2 pommes 🍎🍎','Ajoute 3 bananes 🍌🍌🍌','Ajoute 1 orange 🍊'], question:'Combien de fruits en tout ?', reponse:'6', choix:['5','6','7','8'] },
   { titre:'Pizza maison', etapes:['Étale 1 pâte 🫓','Mets 5 champignons','Ajoute 6 olives'], question:'Combien d\'ingrédients sur la pizza ?', reponse:'12', choix:['10','11','12','14'] },
+  { titre:'Soupe de légumes', etapes:['Lave 3 carottes 🥕🥕🥕','Coupe 2 pommes de terre','Ajoute 1 poireau'], question:'Nombre de légumes dans la soupe ?', reponse:'6', choix:['5','6','7','8'] },
+  { titre:'Crêpes', etapes:['Mélange 2 œufs 🥚🥚','Ajoute 250g de farine','Ajoute 3 cuillères de sucre'], question:'Combien d\'ingrédients principaux ?', reponse:'3', choix:['2','3','4','5'] },
+  { titre:'Tarte aux pommes', etapes:['Épluche 4 pommes 🍎🍎🍎🍎','Prépare 1 pâte sablée','Saupoudre de 2 cuillères de cannelle'], question:'Combien de pommes dans la tarte ?', reponse:'4', choix:['2','3','4','5'] }
 ];
 let chefState = { index:0, score:0, total:0, completed:false, etapeIdx:0 };
 function startChef() {
@@ -4559,6 +4577,13 @@ const VOYAGE_DATA = [
   { question:'Un éléphant de 5 tonnes, c\'est possible ?', reponse:'oui', explication:'Un éléphant pèse entre 4 et 6 tonnes. 🐘' },
   { question:'Une pièce de 5 m de haut, c\'est normal ?', reponse:'non', explication:'Une pièce fait environ 2.50 m de haut. 5 m serait un hangar ! 🏠' },
   { question:'Un escargot de 30 cm, c\'est normal ?', reponse:'non', explication:'Un escargot fait 3-4 cm. 30 cm c\'est un escargot géant ! 🐌' },
+  { question:'Un enfant de 3 ans qui pèse 50 kg, c\'est possible ?', reponse:'non', explication:'Un enfant de 3 ans pèse environ 14 kg. 50 kg c\'est trop ! 👶' },
+  { question:'Une baleine de 30 mètres, c\'est possible ?', reponse:'oui', explication:'Une baleine bleue mesure jusqu\'à 33 mètres. 🐋' },
+  { question:'Une fourmi qui soulève 100 fois son poids, c\'est possible ?', reponse:'oui', explication:'Les fourmis peuvent porter 50 à 100 fois leur poids ! 💪🐜' },
+  { question:'Un livre de 500 pages qui pèse 2 kg, c\'est normal ?', reponse:'non', explication:'Un livre de 500 pages pèse environ 500g, pas 2 kg ! 📚' },
+  { question:'Une école de 3 km de long, c\'est possible ?', reponse:'non', explication:'Une école fait environ 100 mètres de long. 3 km serait une ville ! 🏫' },
+  { question:'Une pizza de 1 mètre de diamètre, ça existe ?', reponse:'oui', explication:'Oui, il existe des pizzas géantes de 1 mètre ! 🍕' },
+  { question:'Un arbre de 200 mètres de haut, c\'est possible ?', reponse:'non', explication:'Le plus grand arbre, le Séquoia, mesure 115 m. 200 m c\'est trop ! 🌲' }
 ];
 let voyageState = { index:0, score:0, total:0, completed:false };
 function startVoyage() {
@@ -4606,6 +4631,9 @@ const MURMURES_TEXTS = [
   { titre:'La Tour Eiffel', texte:'La Tour Eiffel a été construite en 1889 par Gustave Eiffel. Elle mesure 330 mètres de haut (avec les antennes). Elle a 1665 marches. Plus de 6 millions de personnes la visitent chaque année.', question:'En quelle année la Tour Eiffel a-t-elle été construite ?', reponse:'1889' },
   { titre:'Les abeilles', texte:'Une abeille butine environ 1000 fleurs par jour pour fabriquer du miel. Une ruche peut contenir 60000 abeilles. Chaque abeille produit 5 grammes de miel dans sa vie.', question:'Combien d\'abeilles dans une ruche ?', reponse:'60000' },
   { titre:'La Lune', texte:'La Lune se trouve à 384400 km de la Terre. Elle tourne autour de la Terre en 27 jours. Sa température est de -233°C la nuit et 123°C le jour.', question:'À combien de km se trouve la Lune de la Terre ?', reponse:'384400' },
+  { titre:'Les châteaux', texte:'Le château de Versailles a été construit par Louis XIV en 1682. Il contient 2300 pièces. Le parc s\'étend sur 800 hectares. Plus de 7 millions de personnes le visitent chaque année.', question:'Combien de pièces a le château de Versailles ?', reponse:'2300' },
+  { titre:'Les océans', texte:'La Terre est recouverte à 71% d\'eau. L\'océan Pacifique est le plus grand, il mesure 165 millions de km². Sa profondeur maximale est de 11000 mètres dans la fosse des Mariannes.', question:'Quelle est la profondeur maximale de l\'océan Pacifique ?', reponse:'11000' },
+  { titre:'Les volcans', texte:'Le Vésuve est un volcan italien qui est entré en éruption en 79 après J-C. Il a enseveli la ville de Pompéi sous 4 à 6 mètres de cendres. Aujourd\'hui, 3 millions de personnes vivent près de ce volcan.', question:'En quelle année le Vésuve a-t-il enseveli Pompéi ?', reponse:'79' }
 ];
 let murmuresState = { data:[], index:0, score:0, total:0, completed:false };
 function startMurmures() {
