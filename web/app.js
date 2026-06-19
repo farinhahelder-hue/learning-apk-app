@@ -221,7 +221,11 @@ const ALL_BADGES = [
   { id: 'level5', name: 'Niveau 5', emoji: '🏆', desc: 'Atteins le niveau 5', check: (p) => p.level >= 5 },
   { id: 'streak7', name: '7 Jours de Suite', emoji: '🔥', desc: 'Reviens 7 jours d\'affilée', check: (p) => p.streak_days >= 7 },
   { id: 'century', name: 'Centenaire', emoji: '💪', desc: '100 exercices complétés', check: (p) => p.total_exercises >= 100 },
-  { id: 'all_rounder', name: 'Tout-en-un', emoji: '🎯', desc: '50 points dans chaque matière', check: (p) => p.math_score >= 50 && p.french_score >= 50 && p.science_score >= 50 }
+  { id: 'all_rounder', name: 'Tout-en-un', emoji: '🎯', desc: '50 points dans chaque matière', check: (p) => p.math_score >= 50 && p.french_score >= 50 && p.science_score >= 50 },
+  // Streak milestones
+  { id: 'streak3', name: 'Régulière', emoji: '🌱', desc: '3 jours de suite', check: (p) => (p.streak_count || p.streak_days || 0) >= 3 },
+  { id: 'streak14', name: 'Super Emilie', emoji: '🌟', desc: '14 jours de suite', check: (p) => (p.streak_count || p.streak_days || 0) >= 14 },
+  { id: 'streak30', name: 'Légende', emoji: '👑', desc: '30 jours de suite', check: (p) => (p.streak_count || p.streak_days || 0) >= 30 }
 ];
 
 // === GAMIFICATION ENGINE ===
@@ -240,6 +244,18 @@ let xpEngine = {
       }
       this.progress = p;
       this.badges = await supabaseService.getBadges() || [];
+      // Streak check on init
+      if (p) {
+        const today = new Date().toISOString().split('T')[0];
+        if (p.streak_last_date !== today) {
+          // Check if streak was yesterday or broken
+          const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+          if (p.streak_last_date && p.streak_last_date !== yesterday) {
+            // Streak broken, but only reset if they actually missed a day
+            // Don't reset yet - will update on next completeSession
+          }
+        }
+      }
     } catch(e) { console.warn('xpEngine.init:', e); }
     this.loaded = true;
   },
@@ -290,6 +306,9 @@ let xpEngine = {
     const xpEarned = score * 10;
     const starsEarned = score / total >= 1 ? 3 : score / total >= 0.7 ? 2 : 1;
 
+    // Update streak
+    await this.updateStreak();
+
     await supabaseService.saveSession({
       subject, category, score, total_questions: total,
       xp_earned: xpEarned, stars_earned: starsEarned,
@@ -337,6 +356,8 @@ let xpEngine = {
         total_exercises: this.progress.total_exercises,
         correct_answers: this.progress.correct_answers,
         streak_days: this.progress.streak_days,
+        streak_count: this.progress.streak_count,
+        streak_last_date: this.progress.streak_last_date,
         last_play_date: new Date().toISOString().split('T')[0]
       });
     } catch(e) {}
@@ -345,11 +366,54 @@ let xpEngine = {
   ensureProgress() {
     if (!this.progress) {
       this.progress = {
-        total_xp: 0, level: 1, stars: 0, streak_days: 1,
+        total_xp: 0, level: 1, stars: 0, streak_days: 0, streak_count: 0,
         math_score: 0, french_score: 0, science_score: 0, discovery_score: 0,
         total_exercises: 0, correct_answers: 0
       };
     }
+  },
+
+  async updateStreak() {
+    this.ensureProgress();
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = this.progress.streak_last_date || this.progress.last_play_date;
+    if (lastDate === today) return;
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    let newVal;
+    if (lastDate === yesterday) {
+      newVal = (this.progress.streak_count || this.progress.streak_days || 0) + 1;
+    } else if (lastDate && lastDate !== today) {
+      newVal = 1;
+    } else {
+      newVal = Math.max(this.progress.streak_count || this.progress.streak_days || 0, 1);
+    }
+    this.progress.streak_count = newVal;
+    this.progress.streak_days = newVal;
+    this.progress.streak_last_date = today;
+    this.progress.last_play_date = today;
+
+    const sd = newVal;
+    const milestones = [
+      { key: 'streak3', days: 3, emoji: '🌱', name: 'Régulière' },
+      { key: 'streak7', days: 7, emoji: '🔥', name: '7 Jours de Suite' },
+      { key: 'streak14', days: 14, emoji: '🌟', name: 'Super Emilie' },
+      { key: 'streak30', days: 30, emoji: '👑', name: 'Légende' }
+    ];
+    for (const m of milestones) {
+      if (sd >= m.days) {
+        const already = this.badges.find(b => b.badge_id === m.key);
+        if (!already) {
+          const result = await supabaseService.addBadge(m.key, m.name, m.emoji);
+          if (result) {
+            this.badges.push(result);
+            spawnConfetti(30);
+            showReward(m.emoji, `${m.days} jours de suite ! 🎉`, `Badge "${m.name}" débloqué !`);
+          }
+        }
+      }
+    }
+
+    await this.syncToSupabase();
   }
 };
 
@@ -3913,6 +3977,7 @@ function homeHTML() {
   const starsVal = p.stars || 0;
   const badgeCount = xpEngine.badges ? xpEngine.badges.length : 0;
   const xpPct = Math.min(((xpVal % 100) / 100) * 100, 100);
+  const streakVal = p.streak_count || p.streak_days || 0;
   return `<div class="header screen-transition">
     <div class="mascot-star-container">
       <img src="icons/emilie-star.svg" class="mascot-star-img" alt="Émilie l'étoile" onclick="sayMessage('Bonjour Emilie, c\'est parti pour apprendre !')">
@@ -3932,7 +3997,7 @@ function homeHTML() {
   <div class="stats-bar">
     <div class="stat-item"><span>⭐</span><span id="totalStars">${starsVal}</span> étoiles</div>
     <div class="stat-item"><span>🏅</span><span id="totalBadges">${badgeCount}</span> badges</div>
-    <div class="stat-item"><span>🔥</span><span>${streak}</span> jours</div>
+    <div class="stat-item"><span>🔥</span><span>${streakVal}</span> jours</div>
     <div class="stat-item"><span>🎯</span><span id="levelDisplay">Niv.${levelVal}</span></div>
   </div>
   
@@ -3957,11 +4022,19 @@ function homeHTML() {
   <div class="streak-banner">
     <div class="streak-icon">🦭</div>
     <div class="streak-text">
-      <strong>Série de ${streak} jour${streak > 1 ? 's' : ''} !</strong><br>
-      <small>Continue comme ça, Câlin est fier de toi !</small>
+      <strong>Série de ${streakVal} jour${streakVal > 1 ? 's' : ''} !</strong><br>
+      <small>${streakVal >= 30 ? '👑 Légende ! Incroyable Emilie !' : streakVal >= 14 ? '🌟 Super Emilie, tu es une championne !' : streakVal >= 7 ? '🔥 7 jours de suite, quel talent !' : streakVal >= 3 ? '🌱 3 jours déjà, bravo !' : 'Continue comme ça, Câlin est fier de toi !'}</small>
     </div>
     <div class="streak-animals">🐿️🪼🦭</div>
   </div>
+
+  ${streakVal > 0 ? `<div class="streak-milestones" style="display:flex;gap:6px;justify-content:center;margin-top:-6px;font-size:1.2rem">
+    ${[3,7,14,30].map(m => `<span style="opacity:${streakVal >= m ? 1 : 0.2}">${m}j${streakVal >= m ? '✅' : ''}</span>`).join(' ')}
+  </div>` : ''}
+  
+  ${p.streak_last_date && p.streak_last_date !== new Date().toISOString().split('T')[0] ? `<div class="mascot-reminder" onclick="talkMascot('squirrel')" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:16px;padding:10px 16px;margin:4px auto;max-width:300px;text-align:center;cursor:pointer;font-weight:600">
+    🐿️ Noisette te cherche ! Tu n'as pas joué aujourd'hui. Clique pour un message !
+  </div>` : ''}
   
   <div class="subject-progress-section">
     <div class="subject-progress-row">
