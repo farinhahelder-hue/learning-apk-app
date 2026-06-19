@@ -4011,8 +4011,33 @@ async function startConjugaison() {
       { verbe: 'être', pronom: 'je', bonne_reponse: 'suis', mauvaise1: 'es', mauvaise2: 'est' },
       { verbe: 'être', pronom: 'tu', bonne_reponse: 'es', mauvaise1: 'suis', mauvaise2: 'est' },
       { verbe: 'être', pronom: 'il/elle', bonne_reponse: 'est', mauvaise1: 'es', mauvaise2: 'suis' },
+      { verbe: 'être', pronom: 'nous', bonne_reponse: 'sommes', mauvaise1: 'sont', mauvaise2: 'êtes' },
+      { verbe: 'être', pronom: 'vous', bonne_reponse: 'êtes', mauvaise1: 'sommes', mauvaise2: 'sont' },
+      { verbe: 'être', pronom: 'ils/elles', bonne_reponse: 'sont', mauvaise1: 'sommes', mauvaise2: 'êtes' },
       { verbe: 'avoir', pronom: 'j\'', bonne_reponse: 'ai', mauvaise1: 'as', mauvaise2: 'a' },
       { verbe: 'avoir', pronom: 'tu', bonne_reponse: 'as', mauvaise1: 'ai', mauvaise2: 'a' },
+      { verbe: 'avoir', pronom: 'il/elle', bonne_reponse: 'a', mauvaise1: 'ai', mauvaise2: 'as' },
+      { verbe: 'avoir', pronom: 'nous', bonne_reponse: 'avons', mauvaise1: 'avez', mauvaise2: 'ont' },
+      { verbe: 'avoir', pronom: 'vous', bonne_reponse: 'avez', mauvaise1: 'avons', mauvaise2: 'ont' },
+      { verbe: 'avoir', pronom: 'ils/elles', bonne_reponse: 'ont', mauvaise1: 'avons', mauvaise2: 'avez' },
+      { verbe: 'jouer', pronom: 'je', bonne_reponse: 'joue', mauvaise1: 'joues', mauvaise2: 'jouent' },
+      { verbe: 'jouer', pronom: 'tu', bonne_reponse: 'joues', mauvaise1: 'joue', mauvaise2: 'jouent' },
+      { verbe: 'jouer', pronom: 'il/elle', bonne_reponse: 'joue', mauvaise1: 'joues', mauvaise2: 'jouent' },
+      { verbe: 'jouer', pronom: 'nous', bonne_reponse: 'jouons', mauvaise1: 'jouez', mauvaise2: 'jouent' },
+      { verbe: 'jouer', pronom: 'vous', bonne_reponse: 'jouez', mauvaise1: 'jouons', mauvaise2: 'jouent' },
+      { verbe: 'jouer', pronom: 'ils/elles', bonne_reponse: 'jouent', mauvaise1: 'joue', mauvaise2: 'jouons' },
+      { verbe: 'manger', pronom: 'je', bonne_reponse: 'mange', mauvaise1: 'manges', mauvaise2: 'mangent' },
+      { verbe: 'manger', pronom: 'tu', bonne_reponse: 'manges', mauvaise1: 'mange', mauvaise2: 'mangent' },
+      { verbe: 'manger', pronom: 'il/elle', bonne_reponse: 'mange', mauvaise1: 'manges', mauvaise2: 'mangent' },
+      { verbe: 'manger', pronom: 'nous', bonne_reponse: 'mangeons', mauvaise1: 'mangez', mauvaise2: 'mangent' },
+      { verbe: 'manger', pronom: 'vous', bonne_reponse: 'mangez', mauvaise1: 'mangeons', mauvaise2: 'mangent' },
+      { verbe: 'manger', pronom: 'ils/elles', bonne_reponse: 'mangent', mauvaise1: 'mange', mauvaise2: 'mangeons' },
+      { verbe: 'parler', pronom: 'je', bonne_reponse: 'parle', mauvaise1: 'parles', mauvaise2: 'parlent' },
+      { verbe: 'parler', pronom: 'tu', bonne_reponse: 'parles', mauvaise1: 'parle', mauvaise2: 'parlent' },
+      { verbe: 'parler', pronom: 'il/elle', bonne_reponse: 'parle', mauvaise1: 'parles', mauvaise2: 'parlent' },
+      { verbe: 'parler', pronom: 'nous', bonne_reponse: 'parlons', mauvaise1: 'parlez', mauvaise2: 'parlent' },
+      { verbe: 'parler', pronom: 'vous', bonne_reponse: 'parlez', mauvaise1: 'parlons', mauvaise2: 'parlent' },
+      { verbe: 'parler', pronom: 'ils/elles', bonne_reponse: 'parlent', mauvaise1: 'parle', mauvaise2: 'parlons' },
     ];
   }
   conjugState.questions = data.map(d => {
@@ -4314,6 +4339,318 @@ function orthoMotsHTML() {
   ${content}`;
 }
 
+// === LES SONS (PHONÉTIQUE) ===
+const SONS_DATA = [
+  { son:'[t]', emoji:'🦷', color:'#ef4444', mots:['la tête','une table','la terre','le travail','une tartine','le tableau','un train','le téléphone','le maître','un stylo','la montagne','un manteau',"l'hôpital",'un château','une histoire','une dictée'] },
+  { son:'[d]', emoji:'🪘', color:'#f97316', mots:['une dent','une dame','un dessin','le directeur','une dictée','le dos','lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche','droit','timide','froid','danser','donner','dire','demander'] },
+  { son:'[p]', emoji:'🖐️', color:'#eab308', mots:['une poule','mes parents','mon père','du papier','un pied','la pluie','la peau','un lapin','une pomme','mon grand-père',"l'après-midi",'un chapeau',"l'hôpital",'une poupée'] },
+  { son:'[f]', emoji:'🌸', color:'#22c55e', mots:["j'ai faim",'ma famille','la farine','une fée','une femme','une ferme','le fermier','la fête','du feu','une feuille','un fils','des fleurs','mon frère','du fromage'] },
+  { son:'[ɔ̃]', emoji:'🫧', color:'#14b8a6', mots:['mon oncle','bonjour','la confiture','le monde','un pont','un ballon','un garçon','une maison','un camion','une chanson','un nombre','un nom'] },
+  { son:'[wa]', emoji:'🐦', color:'#06b6d4', mots:['un oiseau','une voiture','une étoile','le soir',"j'ai soif",'le bois','le roi',"j'ai froid",'une fois','une histoire','un voyage','joyeux'] },
+  { son:'[ɛ]', emoji:'☀️', color:'#6366f1', mots:['ma mère',"l'après-midi",'la tête','la fête','une maison','vrai','la neige','le soleil','treize'] },
+  { son:'[z]', emoji:'🐝', color:'#8b5cf6', mots:['la maison','mon cousin','un oiseau','une cerise','un lézard','le zoo','zéro','onze','deuxième','sixième'] },
+  { son:'[s]', emoji:'🐍', color:'#ec4899', mots:['une salade','le sport','ma sœur','la classe','la maîtresse','une cerise','cinq','un garçon','six','la piscine','la récréation'] },
+  { son:'[k]', emoji:'🐱', color:'#f43f5e', mots:['le calcul','du café','un canard','quatre','qui','quoi','Christine','un accent','un koala','cinq','un coq'] },
+  { son:'[i]', emoji:'🕯️', color:'#fbbf24', mots:['lundi','six','dix','un animal','un pyjama','le cycle'] },
+  { son:'[ʒ]', emoji:'✨', color:'#a855f7', mots:['jouer','un jour','jeudi','manger','rouge','une cage','un plongeoir','de la magie','la gymnastique'] }
+];
+let sonsState = { detail: null, quiz: null, quizIdx: 0, quizScore: 0, completed: false };
+
+function startSons() { sonsState = { detail: null, quiz: null, quizIdx: 0, quizScore: 0, completed: false }; screen = 'sons'; render(); }
+
+function sonsOpenDetail(i) { sonsState.detail = i; sonsState.quiz = null; render(); setTimeout(() => { const s = SONS_DATA[i]; if (s) readAloud(`Le son ${s.son}. ${s.mots.slice(0,3).join(', ')}`); }, 400); }
+
+function sonsStartQuiz() {
+  const questions = SONS_DATA.map((s, i) => {
+    const wrongs = SONS_DATA.filter((_, j) => j !== i).sort(() => Math.random()-0.5).slice(0, 2);
+    const choices = [s.son, ...wrongs.map(w => w.son)].sort(() => Math.random()-0.5);
+    return { idx: i, son: s.son, emoji: s.emoji, mots: s.mots.slice(0, 3), choices };
+  }).sort(() => Math.random()-0.5);
+  sonsState.quiz = questions; sonsState.quizIdx = 0; sonsState.quizScore = 0; sonsState.completed = false; sonsState.detail = null; render();
+  setTimeout(() => { const q = questions[0]; if (q) readAloud(`Quel est ce son ? Écoute : ${q.mots.join(', ')}`); }, 500);
+}
+
+function sonsAnswerQuiz(chosen, correct) {
+  if (sonsState.completed) return;
+  if (chosen === correct) { sonsState.quizScore++; playCorrectSound(); spawnConfetti(5); showFeedback(true); }
+  else { playWrongSound(); showFeedback(false); }
+  sonsState.quizIdx++;
+  if (sonsState.quizIdx >= SONS_DATA.length) sonsState.completed = true;
+  setTimeout(() => render(), 800);
+}
+
+function sonsHTML() {
+  if (sonsState.detail !== null) {
+    const s = SONS_DATA[sonsState.detail];
+    if (!s) return startSons();
+    return `<div class="module-header screen-transition">
+      <button class="back-btn" onclick="sonsState.detail=null;render();">⬅️</button>
+      <h2 class="module-title" style="color:${s.color};">${s.emoji} Son ${s.son}</h2>
+    </div>
+    <div class="card" style="text-align:center;padding:20px;">
+      <div style="font-size:4rem;margin-bottom:12px;">${s.emoji}</div>
+      <div style="font-size:1.8rem;font-weight:900;color:${s.color};margin-bottom:8px;">${s.son}</div>
+      <button class="primary-btn btn-purple" onclick="readAloud('${s.son}. Exemples : ${s.mots.slice(0,5).join(', ')}')">🔊 Écouter le son</button>
+    </div>
+    <div class="card" style="padding:16px;">
+      <h3 style="font-weight:800;margin-bottom:10px;">📖 Mots exemples</h3>
+      ${s.mots.map(m => `<div class="ortho-word-card" onclick="readAloud('${m.replace(/'/g,"\\'")}')"><span class="ortho-word">${m}</span><span class="ortho-speaker">🔊</span></div>`).join('')}
+    </div>`;
+  }
+
+  if (sonsState.quiz) {
+    if (sonsState.completed) {
+      const pct = sonsState.quizScore / SONS_DATA.length;
+      return `<div class="module-header screen-transition"><button class="back-btn" onclick="screen='home';render()">🏠</button>
+        <h2 class="module-title" style="color:#8b5cf6;">🎯 Quiz des sons</h2></div>
+        <div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+        <h2 class="result-title">${pct>=1?'Parfait !':pct>=0.7?'Bravo !':'Bien essayé !'}</h2>
+        <p class="result-score">${sonsState.quizScore}/${SONS_DATA.length}</p>
+        <button class="primary-btn btn-blue" onclick="sonsStartQuiz()">🎯 Rejouer</button>
+        <button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
+    }
+    const q = sonsState.quiz[sonsState.quizIdx];
+    if (!q) { sonsState.completed = true; render(); return ''; }
+    return `<div class="module-header screen-transition">
+      <button class="back-btn" onclick="sonsState.quiz=null;render();">⬅️</button>
+      <h2 class="module-title" style="color:#8b5cf6;">🎯 Reconnais le son</h2>
+      <span class="badge-count" style="background:#8b5cf622;color:#8b5cf6;">${sonsState.quizIdx+1}/${SONS_DATA.length}</span>
+    </div>
+    <div class="card" style="text-align:center;padding:20px;">
+      <div style="font-size:3rem;margin-bottom:8px;">${q.emoji}</div>
+      <p style="font-size:1rem;color:#666;margin-bottom:16px;">Écoute ces mots : <strong>${q.mots.join(', ')}</strong></p>
+      <button class="primary-btn btn-purple" style="margin-bottom:16px;" onclick="readAloud('${q.mots.join(', ')}')">🔊 Réécouter</button>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${q.choices.map(c => `<button class="choice-btn" onclick="sonsAnswerQuiz('${c}','${q.son}')" style="font-size:1.1rem;padding:14px;">${c}</button>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='home';render()">🏠</button>
+    <h2 class="module-title" style="color:#8b5cf6;">🔤 Les sons</h2>
+    <span style="font-size:1.2rem;">🎵🔊</span>
+  </div>
+  <button class="primary-btn btn-purple" style="margin-bottom:12px;width:100%;" onclick="sonsStartQuiz()">🎯 Quiz : reconnais le son !</button>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+    ${SONS_DATA.map((s, i) => `
+      <div class="son-card" style="background:${s.color}22;border:2px solid ${s.color};" onclick="sonsOpenDetail(${i})">
+        <div style="font-size:2.2rem;">${s.emoji}</div>
+        <div style="font-size:1.1rem;font-weight:900;color:${s.color};">${s.son}</div>
+        <div style="font-size:0.7rem;color:#666;">${s.mots.length} mots</div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// === JEUX PÉDAGOGIQUES ===
+// 1. Chasseur de Lettres Fantômes (lettres muettes)
+const FANTOMES_DATA = [
+  { mot: 'aujourd\'hui', muette: 'i', indice: 'Le "i" final ne se prononce pas.' },
+  { mot: 'beaucoup', muette: 'p', indice: 'Le "p" final est muet.' },
+  { mot: 'trop', muette: 'p', indice: 'Le "p" ne s\'entend pas à la fin.' },
+  { mot: 'chat', muette: 't', indice: 'Le "t" final est silencieux.' },
+  { mot: 'lapin', muette: 'n', indice: 'Le "n" final ne se prononce pas.' },
+  { mot: 'jardin', muette: 'n', indice: 'Le "n" final est muet.' },
+  { mot: 'grand', muette: 'd', indice: 'Le "d" final est silencieux du féminin "grande".' },
+  { mot: 'petit', muette: 't', indice: 'Le "t" est muet, on l\'entend dans "petite".' },
+  { mot: 'souris', muette: 's', indice: 'Le "s" final ne se prononce pas.' },
+  { mot: 'temps', muette: 's', indice: 'Le "s" final et le "p" sont muets.' },
+  { mot: 'doigt', muette: 't', indice: 'Le "t" et le "g" sont muets.' },
+  { mot: 'os', muette: 's', indice: 'Le "s" ne se prononce pas.' },
+];
+let fantomesState = { index:0, score:0, total:0, completed:false };
+function startFantomes() {
+  fantomesState = { index:0, score:0, total:FANTOMES_DATA.length, completed:false };
+  screen = 'fantomes'; render();
+  setTimeout(() => { const q = FANTOMES_DATA[0]; if (q) readAloud(`Trouve la lettre fantôme dans "${q.mot}".`); }, 500);
+}
+function fantomesAnswer(lettre) {
+  if (fantomesState.completed) return;
+  const q = FANTOMES_DATA[fantomesState.index];
+  const correct = q.muette === lettre;
+  if (correct) { fantomesState.score++; playCorrectSound(); spawnConfetti(5); showFeedback(true); }
+  else { playWrongSound(); showFeedback(false); }
+  setTimeout(() => {
+    fantomesState.index++;
+    if (fantomesState.index >= fantomesState.total) fantomesState.completed = true;
+    render();
+    if (!fantomesState.completed) { const nq = FANTOMES_DATA[fantomesState.index]; if (nq) readAloud(`Trouve la lettre fantôme dans "${nq.mot}".`); }
+  }, 800);
+}
+function fantomesHTML() {
+  if (fantomesState.completed) {
+    const pct = fantomesState.score / fantomesState.total;
+    return `<div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+      <h2 class="result-title">Chasse aux fantômes</h2><p class="result-score">${fantomesState.score}/${fantomesState.total}</p>
+      <button class="primary-btn btn-blue" onclick="startFantomes()">👻 Rejouer</button></div>`;
+  }
+  const q = FANTOMES_DATA[fantomesState.index];
+  if (!q) return '';
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  return `<div class="module-header"><button class="back-btn" onclick="screen='home';render()">🏠</button><h2 class="module-title" style="color:#8b5cf6;">👻 Lettres fantômes</h2><span class="badge-count">${fantomesState.index+1}/${fantomesState.total}</span></div>
+  <div class="card" style="text-align:center;padding:20px;">
+    <div style="font-size:2.5rem;margin-bottom:8px;">👻</div>
+    <p style="font-size:1.3rem;font-weight:800;margin-bottom:4px;">"${q.mot}"</p>
+    <p style="font-size:0.9rem;color:#666;margin-bottom:16px;">${q.indice}</p>
+    <p style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">Quelle lettre ne se prononce pas ?</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:320px;margin:0 auto;">
+      ${alphabet.map(l => {
+        const isCorrect = l === q.muette;
+        return `<button class="choice-btn" style="width:40px;height:40px;padding:0;font-size:1rem;font-weight:700;border-radius:10px;" onclick="fantomesAnswer('${l}')">${l}</button>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// 2. Défi du Chef Cuisinier (problèmes à étapes)
+const CHEF_RECETTES = [
+  { titre:'Gâteau au chocolat', etapes:['Prends 3 œufs 🥚🥚🥚','Ajoute 2 cuillères de farine','Ajoute 4 carrés de chocolat 🍫🍫🍫🍫'], question:'Combien d\'ingrédients en tout ?', reponse:'9', choix:['7','8','9','10'] },
+  { titre:'Salade de fruits', etapes:['Coupe 2 pommes 🍎🍎','Ajoute 3 bananes 🍌🍌🍌','Ajoute 1 orange 🍊'], question:'Combien de fruits en tout ?', reponse:'6', choix:['5','6','7','8'] },
+  { titre:'Pizza maison', etapes:['Étale 1 pâte 🫓','Mets 5 champignons','Ajoute 6 olives'], question:'Combien d\'ingrédients sur la pizza ?', reponse:'12', choix:['10','11','12','14'] },
+];
+let chefState = { index:0, score:0, total:0, completed:false, etapeIdx:0 };
+function startChef() {
+  chefState = { index:0, score:0, total:CHEF_RECETTES.length, completed:false, etapeIdx:0 };
+  screen = 'chef'; render();
+  setTimeout(() => { const c = CHEF_RECETTES[0]; if (c) readAloud(c.titre + '. ' + c.etapes.join('. ')); }, 500);
+}
+function chefAnswer(chosen) {
+  if (chefState.completed) return;
+  const c = CHEF_RECETTES[chefState.index];
+  if (chosen === c.reponse) { chefState.score++; playCorrectSound(); spawnConfetti(5); showFeedback(true); }
+  else { playWrongSound(); showFeedback(false); }
+  setTimeout(() => {
+    chefState.index++; chefState.etapeIdx = 0;
+    if (chefState.index >= chefState.total) chefState.completed = true;
+    render();
+    if (!chefState.completed) { const n = CHEF_RECETTES[chefState.index]; if (n) readAloud(n.titre + '. ' + n.etapes.join('. ')); }
+  }, 800);
+}
+function chefHTML() {
+  if (chefState.completed) {
+    const pct = chefState.score / chefState.total;
+    return `<div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+      <h2 class="result-title">${pct>=1?'Chef accompli !':pct>=0.7?'Bon chef !':'Continue...'}</h2><p class="result-score">${chefState.score}/${chefState.total}</p>
+      <button class="primary-btn btn-blue" onclick="startChef()">👨‍🍳 Rejouer</button><button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
+  }
+  const c = CHEF_RECETTES[chefState.index];
+  if (!c) return '';
+  return `<div class="module-header"><button class="back-btn" onclick="screen='home';render()">🏠</button><h2 class="module-title" style="color:#f59e0b;">👨‍🍳 Chef cuisinier</h2><span class="badge-count">${chefState.index+1}/${chefState.total}</span></div>
+  <div class="card" style="padding:16px;">
+    <div style="text-align:center;font-size:1.3rem;font-weight:900;margin-bottom:12px;">${c.titre}</div>
+    <div style="background:#fef3c7;border-radius:12px;padding:12px;margin-bottom:16px;">
+      ${c.etapes.map((e,i) => `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;"><span style="background:#f59e0b;color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;">${i+1}</span><span>${e}</span></div>`).join('')}
+    </div>
+    <p style="font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:12px;">${c.question}</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      ${c.choix.map(ch => `<button class="choice-btn" onclick="chefAnswer('${ch}')" style="font-size:1.2rem;padding:14px;">${ch}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+// 3. Carnet de Voyage Fou (grandeurs et mesures absurdes)
+const VOYAGE_DATA = [
+  { question:'Un moustique de 3 mètres, c\'est possible ?', reponse:'non', explication:'Un moustique mesure 1 cm, pas 3 mètres ! C\'est trop grand ! 🦟' },
+  { question:'Une fourmi de 2 cm, c\'est normal ?', reponse:'oui', explication:'Oui, une fourmi mesure entre 0.5 et 3 cm. 🐜' },
+  { question:'Un verre de 50 cm de haut, c\'est possible ?', reponse:'non', explication:'Un verre fait environ 10 cm. 50 cm serait un vase ! 🥤' },
+  { question:'Un crayon de 15 cm, c\'est normal ?', reponse:'oui', explication:'Oui, un crayon mesure environ 15 cm. ✏️' },
+  { question:'Une piscine de 10 km de long, c\'est possible ?', reponse:'non', explication:'Les plus grandes piscines font 50 m, pas 10 km ! 🏊' },
+  { question:'Un éléphant de 5 tonnes, c\'est possible ?', reponse:'oui', explication:'Un éléphant pèse entre 4 et 6 tonnes. 🐘' },
+  { question:'Une pièce de 5 m de haut, c\'est normal ?', reponse:'non', explication:'Une pièce fait environ 2.50 m de haut. 5 m serait un hangar ! 🏠' },
+  { question:'Un escargot de 30 cm, c\'est normal ?', reponse:'non', explication:'Un escargot fait 3-4 cm. 30 cm c\'est un escargot géant ! 🐌' },
+];
+let voyageState = { index:0, score:0, total:0, completed:false };
+function startVoyage() {
+  const shuffled = [...VOYAGE_DATA].sort(() => Math.random()-0.5);
+  voyageState = { data:shuffled, index:0, score:0, total:shuffled.length, completed:false };
+  screen = 'voyage'; render();
+  setTimeout(() => { const q = shuffled[0]; if (q) readAloud(q.question); }, 500);
+}
+function voyageAnswer(chosen) {
+  if (voyageState.completed) return;
+  const q = voyageState.data[voyageState.index];
+  const correct = chosen === q.reponse;
+  if (correct) { voyageState.score++; playCorrectSound(); spawnConfetti(5); showFeedback(true, q.explication, '💡'); }
+  else { playWrongSound(); showFeedback(false, q.explication, '💡'); }
+  setTimeout(() => {
+    voyageState.index++;
+    if (voyageState.index >= voyageState.total) voyageState.completed = true;
+    render();
+    if (!voyageState.completed) { const n = voyageState.data[voyageState.index]; if (n) readAloud(n.question); }
+  }, 1500);
+}
+function voyageHTML() {
+  if (voyageState.completed) {
+    const pct = voyageState.score / voyageState.total;
+    return `<div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+      <h2 class="result-title">${pct>=1?'Exploratrice !':pct>=0.7?'Bravo !':'Bien essayé !'}</h2><p class="result-score">${voyageState.score}/${voyageState.total}</p>
+      <button class="primary-btn btn-blue" onclick="startVoyage()">✈️ Refaire le voyage</button><button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
+  }
+  const q = voyageState.data[voyageState.index];
+  if (!q) return '';
+  return `<div class="module-header"><button class="back-btn" onclick="screen='home';render()">🏠</button><h2 class="module-title" style="color:#06b6d4;">✈️ Voyage fou</h2><span class="badge-count">${voyageState.index+1}/${voyageState.total}</span></div>
+  <div class="card" style="text-align:center;padding:24px;">
+    <div style="font-size:3rem;margin-bottom:12px;">🤔</div>
+    <p style="font-size:1.2rem;font-weight:800;margin-bottom:20px;line-height:1.4;">${q.question}</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button class="choice-btn" onclick="voyageAnswer('oui')" style="font-size:1.3rem;padding:16px 36px;background:#22c55e;color:white;border:none;">✅ Oui</button>
+      <button class="choice-btn" onclick="voyageAnswer('non')" style="font-size:1.3rem;padding:16px 36px;background:#ef4444;color:white;border:none;">❌ Non</button>
+    </div>
+  </div>`;
+}
+
+// 4. Les Murmures du Passé (lecture de repérage)
+const MURMURES_TEXTS = [
+  { titre:'Les dinosaures', texte:'Les dinosaures vivaient il y a 65 millions d\'années. Le plus grand, le Brachiosaure, mesurait 25 mètres de long et pesait 50 tonnes. Il mangeait 400 kg de plantes par jour !', question:'Combien de kg de plantes par jour mangeait le Brachiosaure ?', reponse:'400' },
+  { titre:'La Tour Eiffel', texte:'La Tour Eiffel a été construite en 1889 par Gustave Eiffel. Elle mesure 330 mètres de haut (avec les antennes). Elle a 1665 marches. Plus de 6 millions de personnes la visitent chaque année.', question:'En quelle année la Tour Eiffel a-t-elle été construite ?', reponse:'1889' },
+  { titre:'Les abeilles', texte:'Une abeille butine environ 1000 fleurs par jour pour fabriquer du miel. Une ruche peut contenir 60000 abeilles. Chaque abeille produit 5 grammes de miel dans sa vie.', question:'Combien d\'abeilles dans une ruche ?', reponse:'60000' },
+  { titre:'La Lune', texte:'La Lune se trouve à 384400 km de la Terre. Elle tourne autour de la Terre en 27 jours. Sa température est de -233°C la nuit et 123°C le jour.', question:'À combien de km se trouve la Lune de la Terre ?', reponse:'384400' },
+];
+let murmuresState = { data:[], index:0, score:0, total:0, completed:false };
+function startMurmures() {
+  const shuffled = [...MURMURES_TEXTS].sort(() => Math.random()-0.5);
+  murmuresState = { data:shuffled, index:0, score:0, total:shuffled.length, completed:false };
+  screen = 'murmures'; render();
+  setTimeout(() => { const q = shuffled[0]; if (q) readAloud(q.texte); }, 500);
+}
+function murmuresAnswer() {
+  if (murmuresState.completed) return;
+  const input = document.getElementById('murmuresInput');
+  if (!input) return;
+  const val = input.value.trim();
+  const q = murmuresState.data[murmuresState.index];
+  const correct = val === q.reponse;
+  if (correct) { murmuresState.score++; playCorrectSound(); spawnConfetti(5); showFeedback(true); }
+  else { playWrongSound(); showFeedback(false, `La réponse était : ${q.reponse}`, '💡'); }
+  setTimeout(() => {
+    murmuresState.index++;
+    if (murmuresState.index >= murmuresState.total) murmuresState.completed = true;
+    render();
+    if (!murmuresState.completed) { const n = murmuresState.data[murmuresState.index]; if (n) readAloud(n.texte); }
+  }, 1500);
+}
+function murmuresHTML() {
+  if (murmuresState.completed) {
+    const pct = murmuresState.score / murmuresState.total;
+    return `<div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+      <h2 class="result-title">${pct>=1?'Détective !':pct>=0.7?'Bravo !':'Continue...'}</h2><p class="result-score">${murmuresState.score}/${murmuresState.total}</p>
+      <button class="primary-btn btn-blue" onclick="startMurmures()">📜 Rejouer</button><button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
+  }
+  const q = murmuresState.data[murmuresState.index];
+  if (!q) return '';
+  return `<div class="module-header"><button class="back-btn" onclick="screen='home';render()">🏠</button><h2 class="module-title" style="color:#7c3aed;">📜 Murmures du passé</h2><span class="badge-count">${murmuresState.index+1}/${murmuresState.total}</span></div>
+  <div class="card" style="padding:16px;">
+    <div style="font-size:0.95rem;line-height:1.6;margin-bottom:16px;padding:12px;background:#f8f9fa;border-radius:12px;">${q.texte}</div>
+    <p style="font-size:1.1rem;font-weight:700;margin-bottom:10px;">${q.question}</p>
+    <div style="display:flex;gap:8px;">
+      <input id="murmuresInput" type="text" style="flex:1;padding:12px;border:2px solid #ddd;border-radius:12px;font-size:1.1rem;font-family:inherit;text-align:center;" placeholder="Ta réponse..." autocomplete="off">
+      <button class="primary-btn btn-purple" onclick="murmuresAnswer()">Valider</button>
+    </div>
+    <button class="primary-btn" style="margin-top:8px;background:#f3f4f6;color:#374151;width:100%;" onclick="readAloud('${q.texte.replace(/'/g,"\\'")}')">🔊 Réécouter le texte</button>
+  </div>`;
+}
+
 // === RENDER ===
 function render() {
   try {
@@ -4340,6 +4677,11 @@ function render() {
   else if (screen === 'histoire') { try { app.innerHTML = histoireHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   else if (screen === 'conjugaison') app.innerHTML = conjugaisonMenuHTML();
   else if (screen === 'orthoMots') app.innerHTML = orthoMotsHTML();
+  else if (screen === 'sons') app.innerHTML = sonsHTML();
+  else if (screen === 'fantomes') app.innerHTML = fantomesHTML();
+  else if (screen === 'chef') app.innerHTML = chefHTML();
+  else if (screen === 'voyage') app.innerHTML = voyageHTML();
+  else if (screen === 'murmures') app.innerHTML = murmuresHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   else if (screen === 'parentalDashboard') { try { app.innerHTML = parentalDashboardHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   attachListeners();
@@ -4525,6 +4867,26 @@ function homeHTML() {
       <button class="mini-game-btn stickers" onclick="startOrthoMots()" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
         <span class="emoji">📝</span>
         <span>Mots à savoir</span>
+      </button>
+      <button class="mini-game-btn rocket" onclick="startSons()" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+        <span class="emoji">🔤</span>
+        <span>Les sons</span>
+      </button>
+      <button class="mini-game-btn stickers" onclick="startFantomes()" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
+        <span class="emoji">👻</span>
+        <span>Lettres fantômes</span>
+      </button>
+      <button class="mini-game-btn rocket" onclick="startChef()" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+        <span class="emoji">👨‍🍳</span>
+        <span>Chef cuisinier</span>
+      </button>
+      <button class="mini-game-btn word-hunt" onclick="startVoyage()" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+        <span class="emoji">✈️</span>
+        <span>Voyage fou</span>
+      </button>
+      <button class="mini-game-btn stickers" onclick="startMurmures()" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+        <span class="emoji">📜</span>
+        <span>Murmures passé</span>
       </button>
     </div>
     </div>
