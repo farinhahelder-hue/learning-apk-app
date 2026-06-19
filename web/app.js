@@ -3358,6 +3358,309 @@ function closeDecouverteDetail() {
   document.getElementById('decouverteDetailOverlay').classList.remove('show');
 }
 
+// === FRACTIONS VISUELLES ===
+let fractionsState = {
+  mode: null, // 'pizza' or 'partage'
+  niveau: 1,
+  exercices: [],
+  index: 0,
+  score: 0,
+  total: 0,
+  selectedSlices: [],
+  completed: false
+};
+
+function startFractions() {
+  screen = 'fractions';
+  fractionsState = { mode: null, niveau: 1, exercices: [], index: 0, score: 0, total: 0, selectedSlices: [], completed: false };
+  render();
+}
+
+function startPizzaGame() {
+  fractionsState.mode = 'pizza';
+  fractionsState.index = 0;
+  fractionsState.score = 0;
+  fractionsState.completed = false;
+  fractionsState.selectedSlices = [];
+  // Load exercises from Supabase or use defaults
+  loadFractionsData('pizza', fractionsState.niveau);
+}
+
+function startPartageGame() {
+  fractionsState.mode = 'partage';
+  fractionsState.index = 0;
+  fractionsState.score = 0;
+  fractionsState.completed = false;
+  loadFractionsData('partage', fractionsState.niveau);
+}
+
+async function loadFractionsData(type, niveau) {
+  let data = null;
+  if (supabase) {
+    data = await supabaseService._fetch('fractions_exercices', { eq: { type, niveau }, order: 'id', ascending: true });
+  }
+  if (!data || data.length === 0) {
+    // Fallback data
+    data = getFallbackFractions(type, niveau);
+  }
+  fractionsState.exercices = data;
+  fractionsState.total = data.length;
+  render();
+  showReplayBtn(true);
+  setTimeout(() => readAloud(data[0]?.consigne_fr || 'Colorie les parts!', 0.85), 600);
+}
+
+function getFallbackFractions(type, niveau) {
+  if (type === 'pizza') {
+    const fallback = {
+      1: [{ consigne_fr:'Colorie 1 part sur 2 de la pizza 🍕', numerateur:1, denominateur:2, reponse_correcte:'1' }],
+      2: [{ consigne_fr:'Colorie 1 part sur 4 de la pizza 🍕', numerateur:1, denominateur:4, reponse_correcte:'1' },
+          { consigne_fr:'Colorie 3 parts sur 4 de la pizza 🍕', numerateur:3, denominateur:4, reponse_correcte:'3' }],
+      3: [{ consigne_fr:'Colorie 1 part sur 3 de la pizza 🍕', numerateur:1, denominateur:3, reponse_correcte:'1' },
+          { consigne_fr:'Colorie 2 parts sur 3 de la pizza 🍕', numerateur:2, denominateur:3, reponse_correcte:'2' }],
+      4: [{ consigne_fr:'Quelle est la plus grande : 1/2 ou 1/4 ?', numerateur:1, denominateur:2, reponse_correcte:'1_2' },
+          { consigne_fr:'Quelle est la plus petite : 1/2 ou 1/4 ?', numerateur:1, denominateur:4, reponse_correcte:'1_4' }]
+    };
+    const items = fallback[niveau] || fallback[1];
+    return items.map((item, i) => ({ id: i, ...item, type: 'pizza', emoji_theme:'🍕' }));
+  } else {
+    const fallback = {
+      1: [{ consigne_fr:'6 bonbons pour 2 amis. Combien chacun ?', nb_objets:6, nb_amis:2, reponse_correcte:'3' }],
+      2: [{ consigne_fr:'9 crayons pour 3 amis. Combien chacun ?', nb_objets:9, nb_amis:3, reponse_correcte:'3' }],
+      3: [{ consigne_fr:'10 étoiles pour 2 amis. Combien chacune ?', nb_objets:10, nb_amis:2, reponse_correcte:'5' }],
+      4: [{ consigne_fr:'12 crayons pour 4 amis. Combien chacun ?', nb_objets:12, nb_amis:4, reponse_correcte:'3' }]
+    };
+    const items = fallback[niveau] || fallback[1];
+    return items.map((item, i) => ({ id: i, ...item, type: 'partage', emoji_theme:'🍬' }));
+  }
+}
+
+function fractionsHTML() {
+  if (fractionsState.mode === null) {
+    return `<div class="module-header screen-transition">
+      <button class="back-btn" onclick="screen='home';render()">⬅️</button>
+      <h2 class="module-title math">🍕 Les Fractions</h2>
+    </div>
+    <div class="card" style="text-align:center;padding:30px 20px;">
+      <p style="font-size:2rem;margin-bottom:20px;">🍕🎁</p>
+      <p style="font-size:1.1rem;color:#666;margin-bottom:24px;">Choisis un jeu pour apprendre les fractions !</p>
+      <button class="primary-btn btn-blue" style="margin-bottom:12px;width:100%;font-size:1.2rem;" onclick="startPizzaGame()">🍕 La pizza d'Émilie</button>
+      <button class="primary-btn btn-green" style="width:100%;font-size:1.2rem;" onclick="startPartageGame()">🎁 Partage équitable</button>
+    </div>`;
+  }
+  if (fractionsState.completed) return fractionsResultHTML();
+  if (fractionsState.mode === 'pizza') return pizzaGameHTML();
+  return partageGameHTML();
+}
+
+function pizzaGameHTML() {
+  const ex = fractionsState.exercices[fractionsState.index];
+  if (!ex) return fractionsResultHTML();
+  const totalParts = ex.denominateur;
+  const numerateur = ex.numerateur;
+  const angle = 360 / totalParts;
+  const slices = fractionsState.selectedSlices;
+  
+  // Build SVG pizza
+  let svgParts = '';
+  for (let i = 0; i < totalParts; i++) {
+    const sel = slices.includes(i);
+    const startAngle = i * angle - 90;
+    const endAngle = (i + 1) * angle - 90;
+    const x1 = 50 + 45 * Math.cos(startAngle * Math.PI / 180);
+    const y1 = 50 + 45 * Math.sin(startAngle * Math.PI / 180);
+    const x2 = 50 + 45 * Math.cos(endAngle * Math.PI / 180);
+    const y2 = 50 + 45 * Math.sin(endAngle * Math.PI / 180);
+    const large = angle > 180 ? 1 : 0;
+    svgParts += `<path d="M50,50 L${x1.toFixed(1)},${y1.toFixed(1)} A45,45 0 ${large},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z"
+      fill="${sel ? '#FFD700' : '#F5DEB3'}" stroke="#D2691E" stroke-width="2"
+      class="pizza-slice${sel ? ' selected' : ''}"
+      onclick="togglePizzaSlice(${i})"
+      style="cursor:pointer;transition:fill 0.3s, transform 0.2s;${sel ? 'filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));' : ''}" />`;
+  }
+  
+  // Small pizza topping emojis
+  const toppings = ['🍕','🧀','🍅','🌿','🍄','🫒'];
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='fractions';render()">⬅️</button>
+    <h2 class="module-title math">🍕 La pizza d'Émilie</h2>
+    <span class="badge-count badge-math">${fractionsState.score}/${fractionsState.total}</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill progress-math" style="width:${(fractionsState.index / fractionsState.total) * 100}%"></div></div>
+  <div class="card" style="text-align:center;">
+    <p class="pizza-consigne">${ex.consigne_fr}</p>
+    <div class="pizza-container">
+      <svg viewBox="0 0 100 100" width="200" height="200" style="max-width:220px;">
+        <circle cx="50" cy="50" r="47" fill="#D2691E" />
+        <circle cx="50" cy="50" r="45" fill="#FDF5E6" />
+        ${svgParts}
+        <circle cx="50" cy="50" r="6" fill="#D2691E" />
+        <!-- toppings -->
+        ${Array.from({length:totalParts}, (_,i) => {
+          const a = (i + 0.5) * angle - 90;
+          const r = 25;
+          const tx = 50 + r * Math.cos(a * Math.PI / 180);
+          const ty = 50 + r * Math.sin(a * Math.PI / 180);
+          return `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="8">${toppings[i % toppings.length]}</text>`;
+        }).join('')}
+      </svg>
+    </div>
+    <p style="font-size:0.9rem;color:#D2691E;margin:8px 0;">Clique sur les parts à colorier 🖱️</p>
+    <p style="font-size:1.2rem;font-weight:bold;margin:8px 0;">${slices.length}/${numerateur} parts sélectionnées</p>
+    <button class="primary-btn ${slices.length === numerateur ? 'btn-green' : 'btn-gray'}"
+      onclick="validatePizzaAnswer()" ${slices.length === numerateur ? '' : 'disabled'}>
+      ✅ Valider
+    </button>
+    <button class="btn-reward" style="background:#6b7280;margin-left:8px;" onclick="fractionsState.selectedSlices=[];render();">🔄 Effacer</button>
+  </div>`;
+}
+
+function togglePizzaSlice(index) {
+  const slices = fractionsState.selectedSlices;
+  const idx = slices.indexOf(index);
+  if (idx >= 0) slices.splice(idx, 1);
+  else if (slices.length < fractionsState.exercices[fractionsState.index].numerateur) slices.push(index);
+  render();
+}
+
+function validatePizzaAnswer() {
+  const slices = fractionsState.selectedSlices;
+  const ex = fractionsState.exercices[fractionsState.index];
+  const correct = fractionsState.exercices[fractionsState.index].reponse_correcte;
+  const selectedCount = slices.length;
+  
+  // For comparison level (niveau 4)
+  if (fractionsState.niveau === 4) {
+    // correct is like "1_2" meaning "the pizza with 1/2 is larger"
+    // We show two pizzas in comparison mode
+  }
+  
+  const isCorrect = String(selectedCount) === String(correct);
+  
+  if (isCorrect) {
+    fractionsState.score++;
+    playCorrectSound();
+    spawnConfetti(8);
+    showFeedback(true, 'Bravo ! Tu as bien colorié la fraction ! 🍕', '🌟');
+    readAloud('Bravo, quelle fraction !', 0.9);
+  } else {
+    playWrongSound();
+    showFeedback(false, 'Presque ! Regarde bien combien de parts colorier ! 🍕', '💪');
+    readAloud('Essaie encore, tu vas y arriver !', 0.9);
+  }
+  
+  fractionsState.selectedSlices = [];
+  questionCount++;
+  
+  setTimeout(() => {
+    fractionsState.index++;
+    if (fractionsState.index >= fractionsState.total) {
+      fractionsState.completed = true;
+      xpEngine.completeSession('math', 'fractions_pizza', fractionsState.score, fractionsState.total, 15);
+    }
+    render();
+    if (questionCount > 0 && questionCount % 5 === 0) triggerPauseEtoiles();
+  }, 1200);
+}
+
+function partageGameHTML() {
+  const ex = fractionsState.exercices[fractionsState.index];
+  if (!ex) return fractionsResultHTML();
+  const nbAmis = ex.nb_amis || 2;
+  const nbObjets = ex.nb_objets || 6;
+  const emoji = ex.emoji_theme || '🍬';
+  const reponse = parseInt(ex.reponse_correcte);
+  
+  // Simple version: counte visuel avec répartition automatique
+  const amisColors = ['#FF6B9D','#4ECDC4','#C3A6FF','#FFA552','#95E1D3','#FFE66D'];
+  const parts = Math.floor(nbObjets / nbAmis);
+  const reste = nbObjets % nbAmis;
+  
+  let amisHTML = '';
+  for (let a = 0; a < nbAmis; a++) {
+    const count = parts + (a < reste ? 1 : 0);
+    amisHTML += `<div class="ami-box">
+      <div class="ami-avatar" style="background:${amisColors[a % amisColors.length]}">${String.fromCharCode(65 + a)}</div>
+      <div class="ami-objets">${Array.from({length: count}, () => emoji).join('')}</div>
+      <div class="ami-count">${count} ${emoji}</div>
+    </div>`;
+  }
+  
+  const equalityText = `${nbObjets} ÷ ${nbAmis} = ${parts}${reste > 0 ? ` reste ${reste}` : ''}`;
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='fractions';render()">⬅️</button>
+    <h2 class="module-title math">🎁 Partage équitable</h2>
+    <span class="badge-count badge-math">${fractionsState.score}/${fractionsState.total}</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill progress-math" style="width:${(fractionsState.index / fractionsState.total) * 100}%"></div></div>
+  <div class="card" style="text-align:center;">
+    <p class="pizza-consigne">${ex.consigne_fr}</p>
+    <div class="partage-container">
+      <div class="partage-objets-row">
+        ${Array.from({length: nbObjets}, (_, i) => `<span class="partage-objet" style="animation-delay:${i * 0.05}s">${emoji}</span>`).join('')}
+      </div>
+      <div class="partage-egalite">= ${nbObjets} ${emoji}</div>
+      <div class="partage-amis">${amisHTML}</div>
+      <div class="partage-equality" style="font-size:1.2rem;font-weight:bold;color:var(--rose);margin:12px 0;">
+        ${equalityText}
+      </div>
+    </div>
+    
+    <div class="choices" style="justify-content:center;gap:10px;">
+      ${Array.from({length: 6}, (_, i) => {
+        const val = i + 1;
+        return `<button class="choice-btn choice-big" onclick="validatePartageAnswer(${val})" style="min-width:50px;">${val}</button>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function validatePartageAnswer(chosen) {
+  const ex = fractionsState.exercices[fractionsState.index];
+  const correct = parseInt(ex.reponse_correcte);
+  const isCorrect = chosen === correct;
+  
+  if (isCorrect) {
+    fractionsState.score++;
+    playCorrectSound();
+    spawnConfetti(8);
+    showFeedback(true, `Bravo ! ${ex.nb_objets} ÷ ${ex.nb_amis} = ${correct} ! 🎁`, '🌟');
+    readAloud(`Bravo ! ${ex.nb_objets} divisé par ${ex.nb_amis} est égal à ${correct} !`, 0.85);
+  } else {
+    playWrongSound();
+    showFeedback(false, 'Presque ! Recompte les objets par ami ! 🎁', '💪');
+  }
+  
+  questionCount++;
+  setTimeout(() => {
+    fractionsState.index++;
+    if (fractionsState.index >= fractionsState.total) {
+      fractionsState.completed = true;
+      xpEngine.completeSession('math', 'fractions_partage', fractionsState.score, fractionsState.total, 15);
+    }
+    render();
+    if (questionCount > 0 && questionCount % 5 === 0) triggerPauseEtoiles();
+  }, 1200);
+}
+
+function fractionsResultHTML() {
+  const pct = fractionsState.score / fractionsState.total;
+  const emoji = pct >= 1 ? '🏆' : pct >= 0.7 ? '🌟' : '💪';
+  const msg = pct >= 1 ? 'Parfait ! Championne des fractions !' : pct >= 0.7 ? 'Bravo, continue !' : 'Bien essayé !';
+  showReplayBtn(false);
+  return `<div class="card result-screen screen-transition">
+    <span class="result-emoji">${emoji}</span>
+    <div style="font-size:2rem;margin-bottom:10px;">🍕🎁</div>
+    <h2 class="result-title">${msg}</h2>
+    <p class="result-score">${fractionsState.score}/${fractionsState.total} bonnes réponses</p>
+    <p class="result-stars">+${fractionsState.score * 2} ⭐ étoiles</p>
+    <button class="primary-btn btn-blue" onclick="screen='fractions';render()">🍕 Rejouer</button>
+    <button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button>
+  </div>`;
+}
+
 // === RENDER ===
 function render() {
   const app = document.getElementById('app');
@@ -3377,6 +3680,7 @@ function render() {
   else if (screen === 'challenge') app.innerHTML = challengeHTML();
   else if (screen === 'visualMath') app.innerHTML = visualMathHTML();
   else if (screen === 'chenille') app.innerHTML = chenilleHTML();
+  else if (screen === 'fractions') app.innerHTML = fractionsHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
   attachListeners();
@@ -3544,6 +3848,10 @@ function homeHTML() {
       <button class="mini-game-btn word-hunt" onclick="startChenille(2)" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
         <span class="emoji">🐛</span>
         <span>Chenille</span>
+      </button>
+      <button class="mini-game-btn rocket" onclick="startFractions()" style="background: linear-gradient(135deg, #FF6B9D, #e85a8a);">
+        <span class="emoji">🍕</span>
+        <span>Fractions</span>
       </button>
     </div>
   </div>

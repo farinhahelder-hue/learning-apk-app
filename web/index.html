@@ -375,6 +375,27 @@
     .choice-btn.btn-wait { opacity: 0.5; cursor: wait; }
     .choice-btn.btn-ready { opacity: 1; cursor: pointer; animation: popIn 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
 
+    /* ===================== FRACTIONS PIZZA ===================== */
+    .pizza-container { margin: 10px auto; max-width: 220px; cursor: pointer; }
+    .pizza-slice { transition: fill 0.3s, transform 0.2s, filter 0.3s; }
+    .pizza-slice:hover { fill: #FFEC8B !important; }
+    .pizza-slice.selected { filter: drop-shadow(0 2px 6px rgba(255,215,0,0.6)); }
+    .pizza-consigne { font-size: 1.2rem; font-weight: 700; color: #D2691E; margin-bottom: 12px; }
+    .btn-gray { background: #9ca3af !important; opacity: 0.6; cursor: not-allowed; }
+    .btn-green { background: #16a34a !important; }
+
+    /* ===================== PARTAGE ===================== */
+    .partage-container { text-align: center; }
+    .partage-objets-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin: 12px 0; min-height: 50px; }
+    .partage-objet { font-size: 1.8rem; animation: slideIn 0.3s ease-out both; }
+    @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .partage-egalite { font-size: 1.3rem; font-weight: bold; color: var(--rose); margin: 8px 0; }
+    .partage-amis { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+    .ami-box { text-align: center; padding: 12px; border-radius: 16px; background: #f8f9fa; min-width: 100px; }
+    .ami-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.2rem; margin: 0 auto 8px; }
+    .ami-objets { font-size: 1.3rem; letter-spacing: 2px; min-height: 30px; }
+    .ami-count { font-size: 0.9rem; font-weight: bold; color: #666; margin-top: 4px; }
+
     /* ===================== BOUTON RÉÉCOUTE ===================== */
     .replay-btn {
       position: fixed; bottom: 90px; right: 16px;
