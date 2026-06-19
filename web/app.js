@@ -24,18 +24,9 @@ let quizTimeTotal = 30;
 let challengeMode = null; // null, 'defi', 'rapide'
 let challengeState = {};
 
-// Global error handler
+// Global error handler (overridden at bottom for enriched fallback)
 window.onerror = function(msg, src, line, col, err) {
   console.error('GLOBAL ERROR:', msg, 'at', src, 'line', line, err);
-  const app = document.getElementById('app');
-  if (app && !app.innerHTML.trim()) {
-    app.innerHTML = `<div style="text-align:center;padding:40px;">
-      <div style="font-size:3rem;">🌟</div>
-      <h2>Oups ! Un problème est survenu</h2>
-      <p style="color:#666;">Rafraîchis la page ou réessaie plus tard.</p>
-      <button onclick="location.reload()" style="padding:12px 30px;border-radius:20px;border:none;background:#FF6B9D;color:white;font-family:inherit;font-size:1.1rem;cursor:pointer;">⟳ Rafraîchir</button>
-    </div>`;
-  }
   return false;
 };
 
@@ -1672,22 +1663,23 @@ function readAloud(text, rate = 0.85, pitch = 1.1) {
   utterance.lang = 'fr-FR';
   utterance.rate = getSetting('speechRate', 0.85) * (slowSpeech ? 0.8 : 1);
   utterance.pitch = pitch;
-  // Voice priority: Google français > fr-FR > fr > any
+
+  function speakWithFrench() {
+    const voices = window.speechSynthesis.getVoices();
+    const frVoice = voices.find(v => v.name && v.name.includes('Google') && v.lang.startsWith('fr'))
+      || voices.find(v => v.lang === 'fr-FR')
+      || voices.find(v => v.lang.startsWith('fr'));
+    if (frVoice) utterance.voice = frVoice;
+    window.speechSynthesis.speak(utterance);
+  }
+
   const voices = window.speechSynthesis.getVoices();
-  const frVoice = voices.find(v => v.name && v.name.includes('Google') && v.lang.startsWith('fr'))
-    || voices.find(v => v.lang === 'fr-FR')
-    || voices.find(v => v.lang.startsWith('fr'));
-  if (frVoice) utterance.voice = frVoice;
   if (voices.length === 0) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      const v = window.speechSynthesis.getVoices().find(v => v.name && v.name.includes('Google') && v.lang.startsWith('fr'))
-        || window.speechSynthesis.getVoices().find(v => v.lang.startsWith('fr'));
-      if (v) utterance.voice = v;
-      window.speechSynthesis.speak(utterance);
-    };
+    window.speechSynthesis.onvoiceschanged = speakWithFrench;
+    setTimeout(speakWithFrench, 1000);
     return;
   }
-  setTimeout(() => window.speechSynthesis.speak(utterance), 500);
+  speakWithFrench();
 }
 
 function replayLastRead() { if (lastReadText) readAloud(lastReadText); }
@@ -5054,10 +5046,6 @@ function homeHTML() {
       <span class="emoji">🌟</span><span>Découvertes</span>
       <span class="card-mascot jelly">🪼</span>
     </button>
-    <button class="subject-btn btn-science" data-subject="science">
-      <span class="emoji">🔬</span><span>Sciences</span>
-      <span class="card-mascot">🐿️</span>
-    </button>
     <button class="subject-btn btn-trophy" data-subject="trophy">
       <span class="emoji">🏆</span><span>Trophées</span>
     </button>
@@ -5097,8 +5085,8 @@ function quizHTML() {
   const mascotEmoji = module === 'math' ? '🪼' : module === 'french' ? '🦭' : '🐿️';
   const gridClass = typeof ex.a === 'number' && ex.c.length === 4 ? 'grid2' : '';
   
-  // Start timer for this question
-  setTimeout(() => startQuizTimer(30, handleTimeout), 100);
+  // Start timer for this question (only if not already running)
+  if (!quizTimer) setTimeout(() => startQuizTimer(30, handleTimeout), 100);
   
   return `<div class="module-header screen-transition">
     <button class="back-btn" data-action="back">⬅️</button>
@@ -5889,7 +5877,12 @@ async function resetProgress() {
 }
 
 function shuffle(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 // === MODE NUIT ===
@@ -5905,11 +5898,9 @@ function toggleCalmMode() {
   localStorage.setItem('emilie_calm_mode', calmMode ? 'true' : 'false');
   document.body.classList.toggle('calm-mode', calmMode);
   playBeep(calmMode ? 500 : 600, 0.1, 'sine');
-  if (calmMode) {
-    document.querySelectorAll('.badge-count, #mathProgress, .rocket-race-timer').forEach(el => {
-      if (el) el.style.display = 'none';
-    });
-  }
+  document.querySelectorAll('.badge-count, #mathProgress, .rocket-race-timer').forEach(el => {
+    if (el) el.style.display = calmMode ? 'none' : '';
+  });
   if (calmMode && musicEnabled) startMusic('calm');
   else if (musicEnabled && !calmMode) startMusic(screen === 'home' ? 'home' : 'game');
 }

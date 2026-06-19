@@ -76,9 +76,9 @@ body {
 
 .primary-btn {
   display: block; width: 100%; padding: 16px; border: none; border-radius: 18px;
-.category-tabs  cursor: pointer; color: white; transition: transform 0.15s, opacity 0.15s;
+  cursor: pointer; color: white; transition: transform 0.15s, opacity 0.15s;
 }
-.math-category-tabs.btn-purple { background: #8b5cf6; }
+.btn-purple { background: #8b5cf6; }
 .btn-blue { background: #3b82f6; }
 .btn-pink { background: #ec4899; }
 .btn-green { background: #22c55e; }
