@@ -24,10 +24,26 @@ let quizTimeTotal = 30;
 let challengeMode = null; // null, 'defi', 'rapide'
 let challengeState = {};
 
+// Global error handler
+window.onerror = function(msg, src, line, col, err) {
+  console.error('GLOBAL ERROR:', msg, 'at', src, 'line', line, err);
+  const app = document.getElementById('app');
+  if (app && !app.innerHTML.trim()) {
+    app.innerHTML = `<div style="text-align:center;padding:40px;">
+      <div style="font-size:3rem;">🌟</div>
+      <h2>Oups ! Un problème est survenu</h2>
+      <p style="color:#666;">Rafraîchis la page ou réessaie plus tard.</p>
+      <button onclick="location.reload()" style="padding:12px 30px;border-radius:20px;border:none;background:#FF6B9D;color:white;font-family:inherit;font-size:1.1rem;cursor:pointer;">⟳ Rafraîchir</button>
+    </div>`;
+  }
+  return false;
+};
+
 // === SUPABASE SERVICE ===
 const SUPABASE_URL = 'https://wgkcowgnzysuzclhzxxk.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_FrquHYqydyvPiuhG9mHh_g_6XISLPl6';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let supabase = null;
+try { if (window.supabase && typeof window.supabase.createClient === 'function') supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) { console.warn('Supabase init error:', e); }
 
 const supabaseService = {
   _cache: {},
@@ -1533,6 +1549,7 @@ function toggleAccordion(id) {
 // === SLIDE-IN HELPER ===
 function slideTransition(newHTML) {
   const app = document.getElementById('app');
+  if (!app) { return; }
   app.classList.add('slide-out');
   setTimeout(() => {
     app.innerHTML = newHTML;
@@ -4173,33 +4190,35 @@ function histoireResultHTML() {
 
 // === RENDER ===
 function render() {
+  try {
   const app = document.getElementById('app');
-  if (screen === 'home') slideTransition(homeHTML());
+  if (!app) { console.warn('render: app element not found'); return; }
+  if (screen === 'home') { try { slideTransition(homeHTML()); } catch(e) { console.warn('homeHTML error:', e); app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   else if (screen === 'rocketRace') app.innerHTML = rocketRaceHTML();
   else if (screen === 'wordHunt') app.innerHTML = wordHuntHTML();
   else if (screen === 'stickers') app.innerHTML = stickerAlbumHTML();
-  else if (screen === 'homework') app.innerHTML = homeworkHTML();
-  else if (screen === 'lessons') app.innerHTML = lessonsHTML();
-  else if (screen === 'lessonDetail') app.innerHTML = lessonDetailHTML();
-  else if (screen === 'decouvertes') app.innerHTML = decouvertesHTML();
-  else if (screen === 'decouverteDetail') app.innerHTML = decouverteDetailHTML();
+  else if (screen === 'homework') { try { app.innerHTML = homeworkHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
+  else if (screen === 'lessons') { try { app.innerHTML = lessonsHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
+  else if (screen === 'lessonDetail') { try { app.innerHTML = lessonDetailHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
+  else if (screen === 'decouvertes') { try { app.innerHTML = decouvertesHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
+  else if (screen === 'decouverteDetail') { try { app.innerHTML = decouverteDetailHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   else if (screen === 'math' || screen === 'french' || screen === 'science') {
-    if (done) app.innerHTML = resultHTML();
-    else app.innerHTML = quizHTML();
+    if (done) { try { app.innerHTML = resultHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Erreur</p></div>'; } }
+    else { try { app.innerHTML = quizHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Erreur quiz</p></div>'; } }
   } else if (screen === 'trophy') app.innerHTML = trophyHTML();
   else if (screen === 'challenge') app.innerHTML = challengeHTML();
   else if (screen === 'visualMath') app.innerHTML = visualMathHTML();
   else if (screen === 'chenille') app.innerHTML = chenilleHTML();
   else if (screen === 'fractions') app.innerHTML = fractionsHTML();
   else if (screen === 'geo') app.innerHTML = geoHTML();
-  else if (screen === 'histoire') app.innerHTML = histoireHTML();
+  else if (screen === 'histoire') { try { app.innerHTML = histoireHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   else if (screen === 'conjugaison') app.innerHTML = conjugaisonMenuHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
-  else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
+  else if (screen === 'parentalDashboard') { try { app.innerHTML = parentalDashboardHTML(); } catch(e) { app.innerHTML = '<div class="card"><p>Chargement...</p></div>'; } }
   attachListeners();
   initStickerAlbum();
   // Draw charts after dashboard renders
-  if (screen === 'parentalDashboard') { drawParentalCharts(); }
+  if (screen === 'parentalDashboard') { try { drawParentalCharts(); } catch(e) { console.warn('Charts error:', e); } }
   // Lecture automatique des questions
   if (screen === 'visualMath' || screen === 'chenille') {
     showReplayBtn(true);
@@ -4210,6 +4229,13 @@ function render() {
   }
   // Cacher le bouton réécoute sur les écrans non-exercice
   if (screen === 'home' || screen === 'parental' || screen === 'parentalDashboard' || done) showReplayBtn(false);
+  } catch(e) {
+    console.error('render error:', e);
+    const app = document.getElementById('app');
+    if (app && !app.innerHTML.trim()) {
+      app.innerHTML = '<div class="card" style="text-align:center;padding:30px;margin:20px;"><div style="font-size:3rem;">🌟</div><h2>Chargement...</h2><p style="color:#666;">Rafraîchis si ça persiste.</p><button onclick="location.reload()" class="btn-reward">⟳ Rafraîchir</button></div>';
+    }
+  }
 }
 
 function homeHTML() {
@@ -5511,7 +5537,18 @@ function endChallenge() {
 }
 
 // === INIT ===
+// Global error handler
+window.onerror = function(msg, url, line, col, err) {
+  console.error('Global error:', msg, 'at', line, err?.stack);
+  const app = document.getElementById('app');
+  if (app && !app.innerHTML.trim()) {
+    app.innerHTML = '<div class="card" style="text-align:center;padding:30px;margin:20px;"><div style="font-size:3rem;">🌟</div><h2>Oups ! Un problème...</h2><p style="color:#666;">Rafraîchis la page ou réessaie.</p><button onclick="location.reload()" class="btn-reward" style="margin-top:12px;">⟳ Rafraîchir</button></div>';
+  }
+  return true;
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
+  try {
   createFloatingAnimals();
   
   // Init XP Engine
@@ -5534,6 +5571,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   setTimeout(() => {
     showFeedback(true, 'Bienvenue Emilie ! 🐿️🪼🦭 Noisette, Bulle et Câlin sont là pour t\'aider !', '🌟');
   }, 800);
+  } catch(e) {
+    console.error('Init error:', e);
+  }
 });
 
-render();
+try { render(); } catch(e) { console.error('Initial render error:', e); }

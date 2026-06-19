@@ -1,7 +1,7 @@
 // Emilie App CE1 - Service Worker
 // Cache les pages pour un fonctionnement hors ligne
 
-const CACHE_NAME = 'emilie-app-v1';
+const CACHE_NAME = 'emilie-app-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -11,7 +11,8 @@ const ASSETS = [
   '/icons/icon-192.svg',
   '/icons/icon-512.svg',
   'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap',
-  'https://unpkg.com/@supabase/supabase-js@2'
+  'https://unpkg.com/@supabase/supabase-js@2',
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js'
 ];
 
 self.addEventListener('install', (event) => {
