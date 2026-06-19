@@ -2890,6 +2890,239 @@ function checkCalcMentalAnswer(niveau, btn, chosen, answer) {
   }, 800);
 }
 
+// =====================================================
+// MINI-JEUX MATHS VISUELS
+// =====================================================
+
+// --- ÉTAT PARTAGÉ ---
+let visualMath = {
+  mode: null, // 'boulangerie','ferme','gateaux','chenille'
+  questions: [],
+  index: 0,
+  score: 0,
+  total: 0,
+  completed: false,
+  level: 1
+};
+
+function startVisualMath(mode) {
+  visualMath = { mode, questions: [], index: 0, score: 0, total: 0, completed: false, level: 1 };
+  let ops;
+  if (mode === 'boulangerie') {
+    ops = window._mathOps ? window._mathOps.filter(o => o.type_operation === 'addition') : [];
+    if (ops.length === 0) {
+      // Fallback questions
+      for (let i = 1; i <= 5; i++) for (let j = 1; j <= 5; j++) { if (i + j <= 10) ops.push({ operande1: i, operande2: j, resultat: i + j, emoji_theme: '🥐' }); }
+    }
+  } else if (mode === 'ferme') {
+    ops = window._mathOps ? window._mathOps.filter(o => o.type_operation === 'soustraction') : [];
+    if (ops.length === 0) {
+      for (let i = 2; i <= 8; i++) for (let j = 1; j < i; j++) ops.push({ operande1: i, operande2: j, resultat: i - j, emoji_theme: '🐔' });
+    }
+  } else if (mode === 'gateaux') {
+    ops = window._mathOps ? window._mathOps.filter(o => o.type_operation === 'multiplication') : [];
+    if (ops.length === 0) {
+      [2,3,4,5,10].forEach(t => { for (let m = 1; m <= 5; m++) ops.push({ operande1: t, operande2: m, resultat: t * m, emoji_theme: '🎂' }); });
+    }
+  }
+  ops = shuffle(ops);
+  visualMath.questions = ops.slice(0, 12);
+  visualMath.total = visualMath.questions.length;
+  screen = 'visualMath';
+  module = 'math';
+  render();
+}
+
+function visualMathHTML() {
+  const vm = visualMath;
+  if (vm.completed) return visualMathResultHTML();
+  
+  const q = vm.questions[vm.index];
+  if (!q) return visualMathResultHTML();
+  
+  const emoji = q.emoji_theme || '🥐';
+  const opName = vm.mode === 'boulangerie' ? '➕' : vm.mode === 'ferme' ? '➖' : '✖️';
+  const title = vm.mode === 'boulangerie' ? '🥐 Boulangerie d\'Émilie' : vm.mode === 'ferme' ? '🐔 La Ferme d\'Émilie' : '🎂 Les Gâteaux';
+  const opSym = vm.mode === 'boulangerie' ? '+' : vm.mode === 'ferme' ? '-' : '×';
+  
+  // Generate visual objects
+  let objects = '';
+  const a = q.operande1, b = q.operande2;
+  
+  if (vm.mode === 'gateaux') {
+    // Grid layout for multiplication
+    objects = '<div class="gateaux-grille">';
+    for (let r = 0; r < a; r++) {
+      objects += '<div class="gateaux-rangee">';
+      for (let c = 0; c < b; c++) objects += `<span class="gateau-item" style="animation-delay:${(r * b + c) * 0.05}s">${emoji}</span>`;
+      objects += '</div>';
+    }
+    objects += '</div>';
+    objects += `<div class="gateaux-legende">${a} rangées de ${b} ${emoji} = ${a} × ${b}</div>`;
+  } else {
+    // Line layout with animations
+    const animType = vm.mode === 'ferme' ? 'exit' : 'slide';
+    // Show first group
+    for (let i = 0; i < a; i++) objects += `<span class="visuel-objet ${animType}" style="animation-delay:${i * 0.08}s">${emoji}</span>`;
+    if (vm.mode === 'boulangerie') {
+      objects += `<span class="visuel-plus">${opSym}</span>`;
+      for (let i = 0; i < b; i++) objects += `<span class="visuel-objet slide" style="animation-delay:${(a + i) * 0.08}s">${emoji}</span>`;
+    }
+  }
+  
+  const total = a + b;
+  const choices = generateMathChoices(total, vm.mode === 'boulangerie' ? a + b : vm.mode === 'ferme' ? a - b : a * b);
+  const correct = vm.mode === 'boulangerie' ? a + b : vm.mode === 'ferme' ? a - b : a * b;
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='home';render()">⬅️</button>
+    <h2 class="module-title math">${title}</h2>
+    <span class="badge-count badge-math">${vm.score}/${vm.total}</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill progress-math" style="width:${(vm.index / vm.total) * 100}%"></div></div>
+  <div class="card visuel-math-card">
+    <p class="visuel-consigne">${vm.mode === 'boulangerie' ? `${a} ${emoji} + ${b} ${emoji} = ?` : vm.mode === 'ferme' ? `${a} ${emoji} − ${b} ${emoji} = ?` : `${a} × ${b} = ?`}</p>
+    <div class="visuel-objects">${objects}</div>
+    <div class="choices grid2">
+      ${choices.map(c => `<button class="choice-btn choice-big" onclick="handleVisualMathAnswer(this, ${c}, ${correct})">${c}</button>`).join('')}
+    </div>
+    <div class="mascot-tip"><em>${vm.mode === 'boulangerie' ? '🥐 Compte les croissants tous ensemble !' : vm.mode === 'ferme' ? '🐔 Regarde les animaux qui restent !' : '🎂 Compte les gâteaux rangée par rangée !'}</em></div>
+  </div>`;
+}
+
+function generateMathChoices(correct, maxVal) {
+  const choices = new Set([correct]);
+  while (choices.size < 4) {
+    const offset = Math.floor(Math.random() * 5) - 2;
+    const v = correct + offset;
+    if (v >= 0 && v !== correct && v <= maxVal + 3) choices.add(v);
+  }
+  return [...choices].sort(() => Math.random() - 0.5);
+}
+
+function handleVisualMathAnswer(btn, chosen, correct) {
+  if (visualMath.completed) return;
+  const ok = chosen === correct;
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  document.querySelectorAll('.choice-btn').forEach(b => { if (Number(b.textContent) === correct) b.classList.add('correct'); });
+  
+  if (ok) {
+    visualMath.score++;
+    playCorrectSound();
+    xpEngine.addCorrectAnswer('math');
+  } else {
+    playWrongSound();
+    xpEngine.addWrongAnswer();
+    // Show the correct answer visually
+    setTimeout(() => {
+      const feedback = document.createElement('div');
+      feedback.className = 'visuel-feedback';
+      feedback.textContent = `La réponse était ${correct} !`;
+      btn.parentElement.parentElement.appendChild(feedback);
+    }, 300);
+  }
+  
+  setTimeout(() => {
+    visualMath.index++;
+    if (visualMath.index >= visualMath.total) {
+      visualMath.completed = true;
+      xpEngine.completeSession('math', visualMath.mode, visualMath.score, visualMath.total, 15);
+    }
+    render();
+  }, ok ? 800 : 1500);
+}
+
+function visualMathResultHTML() {
+  const vm = visualMath;
+  const pct = vm.score / vm.total;
+  const emoji = pct >= 1 ? '🏆' : pct >= 0.7 ? '🌟' : '💪';
+  const msg = pct >= 1 ? 'Parfait ! Quelle championne !' : pct >= 0.7 ? 'Bravo, continue comme ça !' : 'Bien essayé !';
+  return `<div class="card result-screen screen-transition">
+    <span class="result-emoji">${emoji}</span>
+    <div style="font-size:2rem;margin-bottom:10px;">🐿️🪼🦭</div>
+    <h2 class="result-title">${msg}</h2>
+    <p class="result-score">${vm.score}/${vm.total} bonnes réponses</p>
+    <p class="result-stars">+${vm.score * 2} ⭐ étoiles</p>
+    <button class="primary-btn btn-blue" onclick="screen='home';render()">🏠 Retour</button>
+  </div>`;
+}
+
+// --- CHENILLE DES TABLES ---
+let chenilleState = null;
+
+function startChenille(table) {
+  const seq = [];
+  for (let i = 1; i <= 10; i++) seq.push(table * i);
+  // Hide 3 random values
+  const hidden = shuffle([1,2,3,4,5,6,7,8,9,10]).slice(0, 3);
+  chenilleState = { table, seq, hidden, index: 0, score: 0, total: hidden.length };
+  screen = 'chenille';
+  module = 'math';
+  render();
+}
+
+function chenilleHTML() {
+  const c = chenilleState;
+  if (!c) return '';
+  const currentPos = c.hidden[c.index];
+  const currentVal = c.seq[currentPos - 1];
+  
+  const segments = c.seq.map((v, i) => {
+    const pos = i + 1;
+    const isHidden = c.hidden.includes(pos) && c.hidden.indexOf(pos) >= c.index;
+    const isDone = c.hidden.includes(pos) && c.hidden.indexOf(pos) < c.index;
+    const isCurrent = pos === currentPos;
+    return `<div class="chenille-segment ${isCurrent ? 'current' : ''} ${isDone ? 'done' : ''}">
+      ${isDone ? v : isCurrent ? '?' : v}
+    </div>`;
+  }).join('');
+  
+  const choices = generateMathChoices(currentVal, c.seq[c.seq.length - 1] + 10);
+  
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='home';render()">⬅️</button>
+    <h2 class="module-title math">🐛 Table des ${c.table}</h2>
+    <span class="badge-count badge-math">${c.score}/${c.total}</span>
+  </div>
+  <div class="card" style="text-align:center;">
+    <p class="visuel-consigne">Trouve le nombre qui manque !</p>
+    <div class="chenille-container">
+      <div class="chenille-tete">🐛</div>
+      ${segments}
+      <div class="chenille-queue">🦋</div>
+    </div>
+    <div class="choices grid2" style="margin-top:20px;">
+      ${choices.map(ch => `<button class="choice-btn choice-big" onclick="handleChenilleAnswer(this, ${ch}, ${currentVal})">${ch}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function handleChenilleAnswer(btn, chosen, correct) {
+  if (!chenilleState) return;
+  const ok = chosen === correct;
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  if (ok) {
+    chenilleState.score++;
+    playCorrectSound();
+    xpEngine.addCorrectAnswer('math');
+  } else {
+    playWrongSound();
+    xpEngine.addWrongAnswer();
+  }
+  setTimeout(() => {
+    chenilleState.index++;
+    if (chenilleState.index >= chenilleState.total) {
+      xpEngine.completeSession('math', 'chenille', chenilleState.score, chenilleState.total, 10);
+      chenilleState = null;
+      screen = 'home';
+      showVictory('🐛', 'Chenille complétée !', `${chenilleState ? chenilleState.score : 0}/${chenilleState ? chenilleState.total : 0}`);
+    }
+    render();
+  }, ok ? 600 : 1000);
+}
+
 function problemesHTML(items) {
   return items.map(i => `
     <div class="lesson-card" onclick="showDecouverteItem('Problème n°${i.id}', '<div style=\"text-align:left;\"><p style=\"font-size:1.1rem;background:#f0fdf4;padding:12px;border-radius:12px;\">${i.enonce}</p><br><strong>Opération :</strong> ${i.operation}<br><strong>Réponse :</strong> ${i.reponse}<br><strong>Niveau :</strong> ${i.niveau}</div>')">
@@ -3044,6 +3277,8 @@ function render() {
     else app.innerHTML = quizHTML();
   } else if (screen === 'trophy') app.innerHTML = trophyHTML();
   else if (screen === 'challenge') app.innerHTML = challengeHTML();
+  else if (screen === 'visualMath') app.innerHTML = visualMathHTML();
+  else if (screen === 'chenille') app.innerHTML = chenilleHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
   attachListeners();
@@ -3185,6 +3420,22 @@ function homeHTML() {
       <button class="mini-game-btn rocket" onclick="startChallenge('defi')" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
         <span class="emoji">⚡</span>
         <span>Défi Maths</span>
+      </button>
+      <button class="mini-game-btn word-hunt" onclick="startVisualMath('boulangerie')" style="background: linear-gradient(135deg, #f59e0b, #b45309);">
+        <span class="emoji">🥐</span>
+        <span>Boulangerie</span>
+      </button>
+      <button class="mini-game-btn rocket" onclick="startVisualMath('ferme')" style="background: linear-gradient(135deg, #16a34a, #15803d);">
+        <span class="emoji">🐔</span>
+        <span>Ferme</span>
+      </button>
+      <button class="mini-game-btn rocket" onclick="startVisualMath('gateaux')" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+        <span class="emoji">🎂</span>
+        <span>Gâteaux</span>
+      </button>
+      <button class="mini-game-btn word-hunt" onclick="startChenille(2)" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+        <span class="emoji">🐛</span>
+        <span>Chenille</span>
       </button>
     </div>
   </div>

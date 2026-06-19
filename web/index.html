@@ -1210,6 +1210,96 @@
     .plan-time { font-size: 0.75rem; color: #9ca3af; min-width: 40px; text-align: right; }
     .plan-item.done .plan-act { text-decoration: line-through; color: #16a34a; }
 
+    /* ===================== VISUAL MATH MINI-JEUX ===================== */
+    .visuel-math-card { text-align: center; padding: 20px 16px; }
+    .visuel-consigne { font-size: 1.3rem; font-weight: 800; color: #374151; margin-bottom: 15px; }
+    .visuel-objects {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      min-height: 60px;
+    }
+    .visuel-objet {
+      font-size: 2rem;
+      animation: visuelSlideIn 0.4s ease both;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .visuel-objet.exit { animation: visuelExit 0.5s ease both; }
+    .visuel-plus { font-size: 2rem; margin: 0 8px; align-self: center; color: #f59e0b; font-weight: bold; }
+    .visuel-feedback {
+      margin-top: 12px;
+      padding: 10px;
+      background: #fef3c7;
+      border-radius: 12px;
+      font-weight: 700;
+      color: #92400e;
+      animation: popIn 0.3s ease;
+    }
+    .choice-big {
+      font-size: 1.5rem !important;
+      padding: 18px !important;
+      min-height: 70px;
+    }
+    @keyframes visuelSlideIn {
+      from { transform: translateX(-30px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes visuelExit {
+      from { transform: translateY(0); opacity: 1; }
+      to   { transform: translateY(40px); opacity: 0; }
+    }
+
+    /* Gâteaux grille */
+    .gateaux-grille { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 15px; }
+    .gateaux-rangee { display: flex; gap: 6px; }
+    .gateau-item {
+      font-size: 1.8rem;
+      animation: popIn 0.3s ease both;
+    }
+    .gateaux-legende { font-size: 0.9rem; color: #ec4899; font-weight: 700; margin-top: 8px; }
+
+    /* Chenille */
+    .chenille-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin: 20px 0;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+    .chenille-tete { font-size: 2.5rem; margin-right: 4px; }
+    .chenille-queue { font-size: 2rem; margin-left: 4px; }
+    .chenille-segment {
+      min-width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1rem;
+      background: #f3e8ff;
+      border: 3px solid #e9d5ff;
+      transition: all 0.3s;
+    }
+    .chenille-segment.current {
+      border-color: #7c3aed;
+      background: #ede9fe;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .chenille-segment.done {
+      background: #d1fae5;
+      border-color: #34d399;
+      color: #065f46;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
     /* ===================== MODE NUIT ===================== */
     .night-mode {
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e) !important;
