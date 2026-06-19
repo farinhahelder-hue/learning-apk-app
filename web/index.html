@@ -155,6 +155,7 @@
     .feedback-overlay.show { display: flex; }
     .feedback-overlay.correct-fb { background: rgba(40, 167, 69, 0.92); }
     .feedback-overlay.wrong-fb   { background: rgba(220, 53, 69, 0.88); }
+    .feedback-overlay.wrong-fb-soft { background: rgba(255, 152, 0, 0.88); }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.8); }
@@ -337,6 +338,55 @@
     .victory-title { font-size: 2rem; font-weight: 900; color: var(--rose); margin: 8px 0; }
     .victory-score { font-size: 1.2rem; color: #666; margin-bottom: 5px; }
     .victory-xp { font-size: 1rem; color: var(--orange); font-weight: 700; margin-bottom: 15px; }
+
+    /* ===================== PAUSE ÉTOILES ===================== */
+    .pause-etoiles-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(26,26,62,0.95); z-index: 800;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+    .pause-etoiles-overlay.show { display: flex; }
+    .pause-content { text-align: center; position: relative; width: 100%; max-width: 360px; padding: 30px; }
+    .pause-stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .pause-star {
+      position: absolute; animation: floatStar 3s ease-in-out infinite alternate;
+      opacity: 0.8; pointer-events: none;
+    }
+    @keyframes floatStar {
+      0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0.3; }
+      100% { transform: translateY(-30px) rotate(20deg) scale(1.1); opacity: 0.9; }
+    }
+    .pause-message { font-size: 1.6rem; font-weight: 800; color: #FFE66D; margin: 60px 0 20px; position: relative; }
+    .pause-countdown {
+      font-size: 4rem; font-weight: 900; color: #4ECDC4;
+      margin: 15px 0; animation: pulse 1s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    .pause-skip-btn {
+      background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3);
+      color: white; padding: 14px 36px; border-radius: 50px; font-size: 1.1rem;
+      font-weight: 700; cursor: pointer; margin-top: 10px; font-family: 'Nunito', cursive;
+      transition: background 0.2s;
+    }
+    .pause-skip-btn:hover { background: rgba(255,255,255,0.35); }
+
+    /* ===================== DÉLAI ANTI-CLIC ===================== */
+    .choice-btn.btn-wait { opacity: 0.5; cursor: wait; }
+    .choice-btn.btn-ready { opacity: 1; cursor: pointer; animation: popIn 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
+
+    /* ===================== BOUTON RÉÉCOUTE ===================== */
+    .replay-btn {
+      position: fixed; bottom: 90px; right: 16px;
+      width: 60px; height: 60px; border-radius: 50%;
+      border: none; background: var(--rose); color: white;
+      font-size: 1.6rem; cursor: pointer; z-index: 400;
+      box-shadow: 0 4px 16px rgba(255,107,157,0.4);
+      transition: transform 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .replay-btn:active { transform: scale(0.9); }
+    .night-mode .replay-btn { background: #667eea; box-shadow: 0 4px 16px rgba(102,126,234,0.4); }
 
     /* ===================== TIMER CIRCULAIRE ===================== */
     .timer-ring-container {
@@ -1170,6 +1220,8 @@
     .calm-mode .sparkle-ring { animation-duration: 8s !important; }
     .calm-mode .feedback-overlay.correct-fb { background: rgba(16, 185, 129, 0.8) !important; }
     .calm-mode .feedback-overlay.wrong-fb { background: rgba(251, 191, 36, 0.8) !important; }
+    .calm-mode .feedback-overlay.wrong-fb-soft { background: rgba(251, 191, 36, 0.8) !important; }
+    .calm-mode .pause-etoiles-overlay { display: none !important; }
     .calm-mode .confetti-burst { display: none !important; }
     .calm-mode .progress-fill::after { animation: none !important; }
     .calm-mode .result-emoji { animation: none !important; }
@@ -1365,6 +1417,10 @@
     .night-mode .rocket-result-box { background: rgba(40, 35, 90, 0.98) !important; }
     .night-mode .rocket-result-title { color: #c4b5fd !important; }
     .night-mode .rocket-result-stats { color: #a5b4fc !important; }
+    .night-mode .feedback-overlay.wrong-fb-soft { background: rgba(251, 191, 36, 0.85) !important; }
+    .night-mode .pause-etoiles-overlay { background: rgba(10, 10, 30, 0.97) !important; }
+    .night-mode .pause-message { color: #c4b5fd !important; }
+    .night-mode .pause-countdown { color: #667eea !important; }
   </style>
 </head>
 <body>
@@ -1394,6 +1450,9 @@
 
   <!-- ===================== BOUTON SON ===================== -->
   <button class="mute-btn" id="muteBtn" onclick="toggleMute()" title="Son">🔊</button>
+
+  <!-- ===================== BOUTON RÉÉCOUTE ===================== -->
+  <button class="replay-btn" onclick="replayLastRead()" title="Réécouter" style="display:none;" id="replayBtn">🔊</button>
 
   <!-- ===================== ROCKET RACE RESULT OVERLAY ===================== -->
   <div id="rocketResultOverlay" class="rocket-result-overlay">
@@ -1447,6 +1506,16 @@
       <div class="victory-score" id="victoryScore">10/10 bonnes réponses</div>
       <div class="victory-xp" id="victoryXp">+100 XP gagnés</div>
       <button class="btn-reward" onclick="closeVictory()">Continuer 🎉</button>
+    </div>
+  </div>
+
+  <!-- ===================== PAUSE ÉTOILES ===================== -->
+  <div id="pauseEtoilesOverlay" class="pause-etoiles-overlay">
+    <div class="pause-content">
+      <div class="pause-stars" id="pauseStarsContainer"></div>
+      <p class="pause-message" id="pauseMessage">Prends une grande inspiration... 🌬️</p>
+      <div class="pause-countdown" id="pauseCountdown">8</div>
+      <button class="pause-skip-btn" onclick="skipPause()">Je suis prête ! 💪</button>
     </div>
   </div>
 

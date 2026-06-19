@@ -13,6 +13,9 @@ let routineActive = localStorage.getItem('emilie_routine_active') === 'true';
 let autoAudio = true;
 let dailyPlan = { activites: [], ordre: [], complete: [] };
 let questionCount = 0; // for pause etoiles counter
+let pauseDuration = 8000;
+let pauseActive = false;
+let buttonsEnabled = false;
 // Timer state
 let quizTimer = null;
 let quizTimeLeft = 0;
@@ -1450,8 +1453,8 @@ function playCorrectSound() {
 }
 
 function playWrongSound() {
-  playBeep(220, 0.2, 'sawtooth', 0.2);
-  setTimeout(() => playBeep(180, 0.25, 'sawtooth', 0.2), 200);
+  playBeep(260, 0.25, 'sine', 0.12);
+  setTimeout(() => playBeep(220, 0.25, 'sine', 0.1), 200);
 }
 
 function playLevelUp() {
@@ -1467,29 +1470,38 @@ function toggleMute() {
 }
 
 // === SYNTHÈSE VOCALE (SpeechSynthesis) ===
-function sayMessage(text, rate = 0.9) {
-  if (muted) return;
-  if (!window.speechSynthesis) return;
+let lastReadText = '';
+let slowSpeech = localStorage.getItem('emilie_slow_speech') === 'true';
+
+function readAloud(text, rate = 0.85, pitch = 1.1) {
+  if (muted || !window.speechSynthesis) return;
+  lastReadText = text;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'fr-FR';
-  utterance.rate = rate;
-  utterance.pitch = 1.1;
-  // Try to find a French voice
+  utterance.rate = slowSpeech ? 0.65 : rate;
+  utterance.pitch = pitch;
+  // Voice priority: Google français > fr-FR > fr > any
   const voices = window.speechSynthesis.getVoices();
-  const frVoice = voices.find(v => v.lang.startsWith('fr'));
+  const frVoice = voices.find(v => v.name && v.name.includes('Google') && v.lang.startsWith('fr'))
+    || voices.find(v => v.lang === 'fr-FR')
+    || voices.find(v => v.lang.startsWith('fr'));
   if (frVoice) utterance.voice = frVoice;
-  // If voices not yet loaded, wait and retry
   if (voices.length === 0) {
     window.speechSynthesis.onvoiceschanged = () => {
-      const v = window.speechSynthesis.getVoices().find(v => v.lang.startsWith('fr'));
+      const v = window.speechSynthesis.getVoices().find(v => v.name && v.name.includes('Google') && v.lang.startsWith('fr'))
+        || window.speechSynthesis.getVoices().find(v => v.lang.startsWith('fr'));
       if (v) utterance.voice = v;
       window.speechSynthesis.speak(utterance);
     };
     return;
   }
-  window.speechSynthesis.speak(utterance);
+  setTimeout(() => window.speechSynthesis.speak(utterance), 500);
 }
+
+function replayLastRead() { if (lastReadText) readAloud(lastReadText); }
+
+function sayMessage(text, rate = 0.9) { readAloud(text, rate); }
 
 function sayBravo() {
   const msgs = [
@@ -1499,7 +1511,7 @@ function sayBravo() {
     'Félicitations, quel talent !',
     'Magnifique, tu progresses chaque jour !'
   ];
-  sayMessage(msgs[Math.floor(Math.random() * msgs.length)]);
+  readAloud(msgs[Math.floor(Math.random() * msgs.length)], 0.9);
 }
 
 function sayTryAgain() {
@@ -1509,7 +1521,16 @@ function sayTryAgain() {
     'Tu peux le faire, un peu de concentration !',
     'Allez, un dernier effort !'
   ];
-  sayMessage(msgs[Math.floor(Math.random() * msgs.length)], 0.95);
+  readAloud(msgs[Math.floor(Math.random() * msgs.length)], 0.95);
+}
+
+function replayBtnHTML() {
+  return `<button class="replay-btn" onclick="replayLastRead()" title="Réécouter la consigne">🔊</button>`;
+}
+
+function showReplayBtn(show = true) {
+  const btn = document.getElementById('replayBtn');
+  if (btn) btn.style.display = show ? 'flex' : 'none';
 }
 
 // === APPLAUDISSEMENT GÉNÉRÉ (bruit blanc filtré) ===
@@ -1550,6 +1571,69 @@ function playPerfectScore() {
   playLevelUp();
   setTimeout(() => playApplause(1.5), 600);
   setTimeout(() => sayBravo(), 800);
+}
+
+// === PAUSE ÉTOILES (toutes les 5 questions) ===
+function triggerPauseEtoiles() {
+  if (pauseActive || calmMode) return;
+  pauseActive = true;
+  const msgs = [
+    'Tu fais du super travail, Emilie ! 🌟',
+    'Prends une grande inspiration... 🌬️',
+    'Tes neurones travaillent bien ! 🧠✨',
+    'Une petite pause bien méritée ! ⭐',
+    'Respire et continue comme ça ! 🦋',
+    'Tu progresses chaque jour, bravo ! 🌈'
+  ];
+  const msg = msgs[Math.floor(Math.random() * msgs.length)];
+  const overlay = document.getElementById('pauseEtoilesOverlay');
+  if (!overlay) return;
+  overlay.classList.add('show');
+  const starsHTML = Array.from({length: 15}, (_, i) =>
+    `<div class="pause-star" style="left:${Math.random()*90}%;top:${Math.random()*90}%;animation-delay:${Math.random()*2}s;font-size:${1.5+Math.random()*2}rem">⭐</div>`
+  ).join('');
+  overlay.innerHTML = `
+    <div class="pause-content">
+      <div class="pause-stars">${starsHTML}</div>
+      <p class="pause-message">${msg}</p>
+      <div class="pause-countdown" id="pauseCountdown">8</div>
+      <button class="pause-skip-btn" onclick="skipPause()">Je suis prête ! 💪</button>
+    </div>
+  `;
+  let count = 8;
+  const interval = setInterval(() => {
+    count--;
+    const el = document.getElementById('pauseCountdown');
+    if (el) el.textContent = count;
+    if (count <= 0) { clearInterval(interval); endPause(); }
+  }, 1000);
+  setTimeout(() => { clearInterval(interval); endPause(); }, pauseDuration);
+}
+
+function skipPause() { endPause(); }
+
+function endPause() {
+  pauseActive = false;
+  const overlay = document.getElementById('pauseEtoilesOverlay');
+  if (overlay) overlay.classList.remove('show');
+}
+
+// === DÉLAI ANTI-CLIC IMPULSIF ===
+function delayEnableButtons(selector = '.choice-btn', delay = 1500) {
+  buttonsEnabled = false;
+  document.querySelectorAll(selector).forEach(b => {
+    b.disabled = true;
+    b.classList.add('btn-wait');
+  });
+  setTimeout(() => {
+    buttonsEnabled = true;
+    document.querySelectorAll(selector).forEach(b => {
+      b.disabled = false;
+      b.classList.remove('btn-wait');
+      b.classList.add('btn-ready');
+    });
+    playBeep(600, 0.08, 'sine', 0.15);
+  }, delay);
 }
 
 // === PARTICULES ANIMAUX ===
@@ -2151,13 +2235,14 @@ const correctMsgs = [
 ];
 
 const wrongMsgs = [
-  'Presque ! Essaie encore 🐿️','Courage Emilie ! 🪼','Tu peux le faire ! 🦭',
-  'Pas grave, réessaie ! ⭐','Câlin croit en toi ! 💛'
+  'Presque ! Tu veux réessayer ? 💪','Ce n\'est pas grave, essaie encore ! 🌈',
+  'Même les championnes font des erreurs ! Courage Emilie ! 🦋',
+  'Pas grave, recommence, je crois en toi ! 🌟','Tu progresses déjà, continue ! 💛'
 ];
 
 function showFeedback(correct, customMsg, customEmoji) {
   const overlay = document.getElementById('feedbackOverlay');
-  overlay.className = 'feedback-overlay show ' + (correct ? 'correct-fb' : 'wrong-fb');
+  overlay.className = 'feedback-overlay show ' + (correct ? 'correct-fb' : 'wrong-fb-soft');
   document.getElementById('feedbackEmoji').textContent = customEmoji || (correct ? '⭐' : '💙');
   document.getElementById('feedbackAnimals').textContent = correct ? '🐿️🪼🦭' : '🐿️💪🦭';
   document.getElementById('feedbackText').textContent = customMsg ||
@@ -2438,6 +2523,9 @@ function loadMathExercice(category) {
   
   // Réinitialiser la sélection
   sel = null;
+  delayEnableButtons('#mathExerciseArea .choice-btn', 1500);
+  // Lire la question
+  if (ex) readAloud(ex.q.replace(/<[^>]*>/g,''), 0.85);
 }
 
 // Variable globale pour l'exercice actuel
@@ -2445,7 +2533,7 @@ let currentExercise = null;
 
 // Fonction pour vérifier la réponse en mode math (mode standalone)
 function handleMathAnswer(btn, chosen, answer) {
-  if (sel !== null) return;
+  if (sel !== null || !buttonsEnabled) return;
   sel = chosen;
   
   const correct = String(chosen) === String(answer);
@@ -2474,8 +2562,10 @@ function handleMathAnswer(btn, chosen, answer) {
     xpEngine.addWrongAnswer();
   }
   
+  questionCount++;
   setTimeout(() => {
     loadMathExercice(currentMathCategory);
+    if (questionCount > 0 && questionCount % 5 === 0) triggerPauseEtoiles();
   }, correct ? 1500 : 2000);
 }
 
@@ -2884,9 +2974,11 @@ function checkCalcMentalAnswer(niveau, btn, chosen, answer) {
     xpEngine.addWrongAnswer();
   }
   
+  questionCount++;
   setTimeout(() => {
     calcMentalState.index++;
     showCalcMentalQuestion(niveau);
+    if (questionCount > 0 && questionCount % 5 === 0) triggerPauseEtoiles();
   }, 800);
 }
 
@@ -3023,6 +3115,7 @@ function handleVisualMathAnswer(btn, chosen, correct) {
     }, 300);
   }
   
+  questionCount++;
   setTimeout(() => {
     visualMath.index++;
     if (visualMath.index >= visualMath.total) {
@@ -3030,6 +3123,7 @@ function handleVisualMathAnswer(btn, chosen, correct) {
       xpEngine.completeSession('math', visualMath.mode, visualMath.score, visualMath.total, 15);
     }
     render();
+    if (questionCount > 0 && questionCount % 5 === 0) triggerPauseEtoiles();
   }, ok ? 800 : 1500);
 }
 
@@ -3111,15 +3205,19 @@ function handleChenilleAnswer(btn, chosen, correct) {
     playWrongSound();
     xpEngine.addWrongAnswer();
   }
+  questionCount++;
   setTimeout(() => {
     chenilleState.index++;
     if (chenilleState.index >= chenilleState.total) {
-      xpEngine.completeSession('math', 'chenille', chenilleState.score, chenilleState.total, 10);
+      const finScore = chenilleState.score;
+      const finTotal = chenilleState.total;
+      xpEngine.completeSession('math', 'chenille', finScore, finTotal, 10);
       chenilleState = null;
       screen = 'home';
-      showVictory('🐛', 'Chenille complétée !', `${chenilleState ? chenilleState.score : 0}/${chenilleState ? chenilleState.total : 0}`);
+      showVictory('🐛', 'Chenille complétée !', `${finScore}/${finTotal}`);
     }
     render();
+    if (questionCount > 0 && questionCount % 5 === 0) triggerPauseEtoiles();
   }, ok ? 600 : 1000);
 }
 
@@ -3285,6 +3383,16 @@ function render() {
   initStickerAlbum();
   // Draw weekly chart after dashboard renders
   if (screen === 'parentalDashboard') drawWeeklyChart();
+  // Lecture automatique des questions
+  if (screen === 'visualMath' || screen === 'chenille') {
+    showReplayBtn(true);
+    setTimeout(() => {
+      const consigne = document.querySelector('.visuel-consigne');
+      if (consigne) readAloud(consigne.textContent.replace(/<[^>]*>/g,''), 0.85);
+    }, 800);
+  }
+  // Cacher le bouton réécoute sur les écrans non-exercice
+  if (screen === 'home' || screen === 'parental' || screen === 'parentalDashboard' || done) showReplayBtn(false);
 }
 
 function homeHTML() {
@@ -3475,11 +3583,16 @@ function homeHTML() {
 function quizHTML() {
   // Pour le module Maths, utiliser le système d'onglets avec #mathExerciseArea
   if (module === 'math') {
+    const qProg = Math.min(((questionCount % 5) / 5) * 100, 100);
+    const barColor = qProg < 33 ? '#FF6B9D' : qProg < 66 ? '#FFA552' : '#4ECDC4';
     return `<div class="module-header screen-transition">
       <button class="back-btn" data-action="back">⬅️</button>
       <h2 class="module-title math">🔢 Maths avec 🪼 Bulle</h2>
       <span class='badge-count badge-math' id='mathProgress'>${score}/10</span>
     </div>
+    
+    <div class="progress-bar" style="margin:0 16px 8px"><div class="progress-fill" style="width:${qProg}%;background:${barColor}"></div></div>
+    <div style="text-align:center;font-size:0.9rem;color:#888;margin-bottom:4px">${questionCount > 0 ? `Question ${(questionCount % 5) + 1} sur 5 ${questionCount % 5 === 4 ? '🎯' : ''}` : ''}</div>
     
     <div id="mathExerciseArea"></div>
     <div class="mascot-tip" style="text-align:center;">
@@ -3504,7 +3617,8 @@ function quizHTML() {
     <span class="badge-count badge-${cls}">${qIdx + 1}/${exercises.length}</span>
   </div>
   
-  <div class="progress-bar"><div class="progress-fill progress-${cls}" style="width:${prog}%"></div></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:${prog}%;background:${prog < 33 ? '#FF6B9D' : prog < 66 ? '#FFA552' : '#4ECDC4'}"></div></div>
+  ${exercises.length - qIdx <= 2 ? `<div style="text-align:center;font-size:0.9rem;color:#FF6B9D;font-weight:bold">Plus que ${exercises.length - qIdx} question${exercises.length - qIdx > 1 ? 's' : ''} ! 🎯</div>` : ''}
   
   <div class="question-card" style="position: relative;">
     <span class="quiz-mascot ${mascotClass}">${mascotEmoji}</span>
@@ -3912,11 +4026,17 @@ function startModule(sub) {
     screen = sub;
     playBeep(500, 0.1, 'sine');
     render();
+    // Lire la première question
+    setTimeout(() => {
+      showReplayBtn(true);
+      const firstEx = exercises[0];
+      if (firstEx) readAloud(firstEx.q.replace(/<[^>]*>/g,''), 0.85);
+    }, 600);
   }
 }
 
 function handleChoice(choice) {
-    if (sel !== null) return;
+    if (sel !== null || !buttonsEnabled) return;
   sel = choice;
   const ex = exercises[qIdx];
   const correct = JSON.stringify(choice) === JSON.stringify(ex.a);
@@ -3940,6 +4060,7 @@ function handleChoice(choice) {
   }
   
   render();
+  questionCount++;
   
   setTimeout(() => {
     if (qIdx + 1 >= exercises.length) {
@@ -3974,6 +4095,14 @@ function handleChoice(choice) {
       sel = null;
     }
     render();
+    if (questionCount > 0 && questionCount % 5 === 0) triggerPauseEtoiles();
+    if (!done) { 
+      delayEnableButtons('.choice-btn', 1500);
+      showReplayBtn(true);
+      // Lire la question suivante
+      const nextEx = exercises[qIdx];
+      if (nextEx) readAloud(nextEx.q.replace(/<[^>]*>/g,''), 0.85);
+    }
   }, correct ? 1200 : 1500);
 }
 
