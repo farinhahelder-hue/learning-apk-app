@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --rose: #FF6B9D;
@@ -403,6 +404,9 @@
       font-size: 1rem; color: #92400e; font-weight: 600;
       animation: popIn 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);
     }
+
+    /* ===================== CHART.JS ===================== */
+    #subjectChart, #weekChart, #pieChart { width: 100% !important; max-height: 200px; }
 
     /* ===================== BOUTON RÉÉCOUTE ===================== */
     .replay-btn {

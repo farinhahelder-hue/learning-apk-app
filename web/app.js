@@ -1474,12 +1474,12 @@ let lastReadText = '';
 let slowSpeech = localStorage.getItem('emilie_slow_speech') === 'true';
 
 function readAloud(text, rate = 0.85, pitch = 1.1) {
-  if (muted || !window.speechSynthesis) return;
+  if (muted || !getSetting('audio', true) || !window.speechSynthesis) return;
   lastReadText = text;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'fr-FR';
-  utterance.rate = slowSpeech ? 0.65 : rate;
+  utterance.rate = getSetting('speechRate', 0.85) * (slowSpeech ? 0.8 : 1);
   utterance.pitch = pitch;
   // Voice priority: Google français > fr-FR > fr > any
   const voices = window.speechSynthesis.getVoices();
@@ -1575,7 +1575,7 @@ function playPerfectScore() {
 
 // === PAUSE ÉTOILES (toutes les 5 questions) ===
 function triggerPauseEtoiles() {
-  if (pauseActive || calmMode) return;
+  if (pauseActive || calmMode || !getSetting('pauseEtoiles', true)) return;
   pauseActive = true;
   const msgs = [
     'Tu fais du super travail, Emilie ! 🌟',
@@ -1620,6 +1620,7 @@ function endPause() {
 
 // === DÉLAI ANTI-CLIC IMPULSIF ===
 function delayEnableButtons(selector = '.choice-btn', delay = 1500) {
+  if (!getSetting('antiClick', true)) delay = 0;
   buttonsEnabled = false;
   document.querySelectorAll(selector).forEach(b => {
     b.disabled = true;
@@ -1632,7 +1633,7 @@ function delayEnableButtons(selector = '.choice-btn', delay = 1500) {
       b.classList.remove('btn-wait');
       b.classList.add('btn-ready');
     });
-    playBeep(600, 0.08, 'sine', 0.15);
+    if (delay > 0) playBeep(600, 0.08, 'sine', 0.15);
   }, delay);
 }
 
@@ -3891,8 +3892,8 @@ function render() {
   else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
   attachListeners();
   initStickerAlbum();
-  // Draw weekly chart after dashboard renders
-  if (screen === 'parentalDashboard') drawWeeklyChart();
+  // Draw charts after dashboard renders
+  if (screen === 'parentalDashboard') { drawParentalCharts(); }
   // Lecture automatique des questions
   if (screen === 'visualMath' || screen === 'chenille') {
     showReplayBtn(true);
@@ -4372,6 +4373,24 @@ function parentalHTML() {
   </div>`;
 }
 
+let currentSettings = JSON.parse(localStorage.getItem('emilie_settings') || '{}');
+
+function getSetting(key, defaultValue = true) {
+  if (currentSettings[key] !== undefined) return currentSettings[key];
+  return defaultValue;
+}
+
+function toggleSetting(key) {
+  currentSettings[key] = !getSetting(key);
+  localStorage.setItem('emilie_settings', JSON.stringify(currentSettings));
+  render();
+}
+
+function setSetting(key, value) {
+  currentSettings[key] = value;
+  localStorage.setItem('emilie_settings', JSON.stringify(currentSettings));
+}
+
 function parentalDashboardHTML() {
   const p = xpEngine.progress || {};
   const sessions = window._parentalSessions || [];
@@ -4384,25 +4403,67 @@ function parentalDashboardHTML() {
   const mathSc = p.math_score || 0;
   const frenchSc = p.french_score || 0;
   const scienceSc = p.science_score || 0;
+  const geoScore = p.discovery_score || 0;
+  const histoireScore = p.history_score || 0;
 
-  // Build weekly chart data
-  const weeklyLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-  const dayTotals = [0,0,0,0,0,0,0];
+  // Stats per subject (success rate)
+  const subjectScores = { 'Maths': mathSc, 'Français': frenchSc, 'Sciences': scienceSc, 'Géo': geoScore, 'Histoire': histoireScore };
+  const subjectMax = Math.max(...Object.values(subjectScores), 1);
+  
+  // Favorite mini-game
+  const gameCounts = {};
+  sessions.forEach(s => { const cat = s.category || s.subject; gameCounts[cat] = (gameCounts[cat] || 0) + 1; });
+  const favGame = Object.entries(gameCounts).sort((a,b) => b[1]-a[1])[0];
+  
+  // Weekly report text
+  const reportLines = [];
+  if (totalEx > 0) {
+    reportLines.push(`Cette semaine, Emilie a complété ${totalEx} exercices.`);
+    for (const [subject, score] of Object.entries(subjectScores)) {
+      if (score > 0) {
+        const pct = Math.min(Math.round(score / 50 * 100), 100);
+        if (pct >= 80) reportLines.push(`Elle excelle en ${subject} (${pct}% de réussite) 🎉`);
+        else if (pct >= 50) reportLines.push(`Elle progresse bien en ${subject} (${pct}%)`);
+        else if (pct > 0) reportLines.push(`Elle découvre ${subject} (${pct}%)`);
+      }
+    }
+    if (favGame) reportLines.push(`Mini-jeu préféré : ${favGame[0]} (${favGame[1]} parties)`);
+    reportLines.push(`Streak actuel : ${streakDays} jours 🔥`);
+  } else { reportLines.push('Aucune session cette semaine. Lance des exercices ! 🚀'); }
+  const weeklyReport = reportLines.join('\n');
+
+  // Daily XP for week chart
+  const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const dayXP = [0,0,0,0,0,0,0];
+  const sessionCounts = { 'math':0, 'french':0, 'science':0, 'histoire':0, 'geo':0 };
   sessions.forEach(s => {
     const d = new Date(s.created_at);
-    const dayIdx = (d.getDay() + 6) % 7; // Monday=0
-    dayTotals[dayIdx] += s.xp_earned || 0;
+    const dayIdx = (d.getDay() + 6) % 7;
+    dayXP[dayIdx] += s.xp_earned || 0;
+    if (s.subject === 'math') sessionCounts.math++;
+    else if (s.subject === 'french') sessionCounts.french++;
+    else if (s.subject === 'science') sessionCounts.science++;
+    else sessionCounts.geo++;
   });
 
   const sessionRows = sessions.slice(0, 10).map(s => {
     const date = new Date(s.created_at);
     return `<tr>
       <td>${date.toLocaleDateString('fr-FR', {day:'numeric',month:'short'})}</td>
-      <td>${s.subject}</td>
+      <td>${s.subject}${s.category ? ' ('+s.category+')' : ''}</td>
       <td>${s.score}/${s.total_questions}</td>
       <td>+${s.xp_earned || 0} XP</td>
     </tr>`;
   }).join('');
+
+  // Build chart data as JSON for Chart.js init
+  const chartData = JSON.stringify({
+    subjectLabels: Object.keys(subjectScores).filter(k => subjectScores[k] > 0),
+    subjectValues: Object.values(subjectScores).filter(v => v > 0),
+    weekLabels: dayNames,
+    weekXP: dayXP,
+    sessionCounts: Object.values(sessionCounts)
+  });
 
   return `<div class="module-header screen-transition">
     <button class="back-btn" onclick="screen='home';render();" style="font-size:1rem;">⬅️</button>
@@ -4418,39 +4479,32 @@ function parentalDashboardHTML() {
       <div class="trophy-card"><div class="trophy-value">${starCount}</div><div class="trophy-label">⭐ Étoiles</div></div>
       <div class="trophy-card"><div class="trophy-value">${badgeCount}</div><div class="trophy-label">🏅 Badges</div></div>
     </div>
-    <div style="display:flex;justify-content:space-around;margin-top:12px;font-size:0.9rem;">
+    <div style="display:flex;justify-content:space-around;margin-top:12px;font-size:0.9rem;flex-wrap:wrap;gap:4px;">
       <span>🔥 ${streakDays} jours de suite</span>
       <span>📝 ${totalEx} exercices</span>
+      ${favGame ? `<span>🎮 Préféré : ${favGame[0]}</span>` : ''}
     </div>
   </div>
 
-  <div class="card">
-    <h3 style="font-weight:900;margin-bottom:12px;">📈 Progression par matière</h3>
-    <div class="subject-progress-section" style="box-shadow:none;padding:0;margin:0;">
-      <div class="subject-progress-row">
-        <span class="subj-icon">🔢</span>
-        <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill math-fill" style="width:${Math.min(mathSc/2,100)}%"></div></div></div>
-        <span class="subj-score">${mathSc} pts</span>
-      </div>
-      <div class="subject-progress-row">
-        <span class="subj-icon">📖</span>
-        <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill french-fill" style="width:${Math.min(frenchSc/2,100)}%"></div></div></div>
-        <span class="subj-score">${frenchSc} pts</span>
-      </div>
-      <div class="subject-progress-row">
-        <span class="subj-icon">🔬</span>
-        <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill science-fill" style="width:${Math.min(scienceSc/2,100)}%"></div></div></div>
-        <span class="subj-score">${scienceSc} pts</span>
-      </div>
-    </div>
+  <div class="card" style="padding:15px;">
+    <h3 style="font-weight:900;margin-bottom:8px;">📈 Score par matière</h3>
+    <canvas id="subjectChart" height="180"></canvas>
+  </div>
+
+  <div class="card" style="padding:15px;">
+    <h3 style="font-weight:900;margin-bottom:8px;">📊 Activité hebdomadaire (XP)</h3>
+    <canvas id="weekChart" height="150"></canvas>
+  </div>
+
+  <div class="card" style="padding:15px;">
+    <h3 style="font-weight:900;margin-bottom:8px;">🕒 Répartition des sessions</h3>
+    <canvas id="pieChart" height="150"></canvas>
   </div>
 
   <div class="card">
-    <h3 style="font-weight:900;margin-bottom:12px;">📊 Activité hebdomadaire</h3>
-    <canvas id="weeklyChart" width="400" height="200"></canvas>
-    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.7rem;color:#999;">
-      ${weeklyLabels.map((l,i) => `<span>${l}<br><strong style="color:#7c3aed;">${dayTotals[i]}XP</strong></span>`).join('')}
-    </div>
+    <h3 style="font-weight:900;margin-bottom:12px;">📋 Rapport hebdomadaire</h3>
+    <div style="background:#f8f9fa;border-radius:12px;padding:14px;font-size:0.9rem;line-height:1.6;white-space:pre-wrap;text-align:left;">${weeklyReport}</div>
+    <button class="btn-reward" style="margin-top:10px;font-size:0.85rem;background:#6b7280;" onclick="copyReport()">📋 Copier le rapport</button>
   </div>
 
   <div class="card" style="overflow-x:auto;">
@@ -4458,7 +4512,24 @@ function parentalDashboardHTML() {
     ${sessions.length ? `<table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
       <thead><tr style="border-bottom:2px solid #eee;"><th style="text-align:left;padding:6px;">Date</th><th style="text-align:left;">Matière</th><th style="text-align:left;">Score</th><th style="text-align:left;">XP</th></tr></thead>
       <tbody>${sessionRows}</tbody>
-    </table>` : `<p class="empty-msg">Aucune session pour l'instant. Lancez des exercices ! 🚀</p>`}
+    </table>` : `<p class="empty-msg">Aucune session pour l'instant</p>`}
+  </div>
+
+  <div class="card">
+    <h3 style="font-weight:900;margin-bottom:12px;">⚙️ Paramètres enfant</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      ${makeToggle('Délai anti-clic', 'antiClick', getSetting('antiClick', true))}
+      ${makeToggle('Pause étoiles', 'pauseEtoiles', getSetting('pauseEtoiles', true))}
+      ${makeToggle('Audio', 'audio', getSetting('audio', true))}
+      ${makeToggle('Mode calme', 'calm', calmMode)}
+      ${makeToggle('Timer quiz', 'quizTimer', getSetting('quizTimer', true))}
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="flex:1;font-weight:700;">🗣️ Vitesse lecture : ${getSetting('speechRate', 0.85)}</span>
+        <input type="range" min="0.5" max="1.2" step="0.05" value="${getSetting('speechRate', 0.85)}"
+          onchange="setSetting('speechRate', parseFloat(this.value));slowSpeech=parseFloat(this.value)<0.7;render();"
+          style="flex:1;">
+      </div>
+    </div>
   </div>
 
   <div class="card" style="text-align:center;">
@@ -4467,20 +4538,121 @@ function parentalDashboardHTML() {
     </button>
     <p style="font-size:0.75rem;color:#999;margin-top:8px;">Cette action est irréversible.</p>
   </div>
-  
-  <div class="card" style="text-align:center;">
-    <h3 style="font-weight:900;margin-bottom:12px;">⚙️ Paramètres</h3>
-    <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
-      <button class="btn-reward" style="background:${calmMode ? '#16a34a' : '#6b7280'};font-size:0.9rem;" onclick="toggleCalmMode()">
-        ${calmMode ? '✅' : '🌙'} Mode Calme : ${calmMode ? 'ACTIF' : 'DÉSACTIVÉ'}
-      </button>
-      <p style="font-size:0.8rem;color:#999;">Sons doux, animations ralenties, fond beige</p>
-    </div>
-  </div>
 
   <div style="text-align:center;padding:16px;color:#999;">
-    🐿️🪼🦭 Émilie CE1 • Données synchronisées avec Supabase
+    🐿️🪼🦭 Émilie CE1 • Données synchronisées Supabase
+  </div>
+  <div id="chartDataContainer" style="display:none;" data-chart='${chartData}'></div>`;
+}
+
+function makeToggle(label, key, active) {
+  return `<div style="display:flex;align-items:center;gap:10px;">
+    <span style="flex:1;font-weight:700;">${label}</span>
+    <button class="btn-reward" style="background:${active ? '#16a34a' : '#6b7280'};font-size:0.8rem;padding:6px 18px;border:none;" onclick="toggleParentSetting('${key}')">
+      ${active ? '✅ ON' : '⭕ OFF'}
+    </button>
   </div>`;
+}
+
+function toggleParentSetting(key) {
+  if (key === 'calm') { toggleCalmMode(); return; }
+  if (key === 'audio') { muted = !muted; document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊'; }
+  if (key === 'pauseEtoiles') pauseDuration = getSetting('pauseEtoiles', true) ? 8000 : 999999;
+  if (key === 'antiClick') { /* handled via getSetting check */ }
+  toggleSetting(key);
+  render();
+}
+
+function copyReport() {
+  const reportEl = document.querySelector('.card:nth-child(5) div:first-of-type');
+  if (reportEl) {
+    navigator.clipboard.writeText(reportEl.textContent).then(() => {
+      showFeedback(true, 'Rapport copié dans le presse-papier ! 📋', '📋');
+    });
+  }
+}
+
+function drawParentalCharts() {
+  if (typeof Chart === 'undefined') return;
+  const container = document.getElementById('chartDataContainer');
+  if (!container) return;
+  const data = JSON.parse(container.dataset.chart);
+  
+  // Destroy existing charts if any
+  if (window._subjectChart) { window._subjectChart.destroy(); }
+  if (window._weekChart) { window._weekChart.destroy(); }
+  if (window._pieChart) { window._pieChart.destroy(); }
+
+  const colors = ['#4ECDC4', '#FF6B9D', '#C3A6FF', '#FFA552', '#95E1D3', '#FFE66D'];
+
+  // Subject bar chart
+  const ctx1 = document.getElementById('subjectChart');
+  if (ctx1 && data.subjectLabels.length > 0) {
+    window._subjectChart = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: data.subjectLabels,
+        datasets: [{
+          label: 'Score',
+          data: data.subjectValues,
+          backgroundColor: colors.slice(0, data.subjectLabels.length),
+          borderRadius: 8,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
+      }
+    });
+  }
+
+  // Week line chart
+  const ctx2 = document.getElementById('weekChart');
+  if (ctx2) {
+    window._weekChart = new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: data.weekLabels,
+        datasets: [{
+          label: 'XP',
+          data: data.weekXP,
+          borderColor: '#7c3aed',
+          backgroundColor: 'rgba(124,58,237,0.1)',
+          fill: true, tension: 0.3,
+          pointBackgroundColor: '#7c3aed',
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
+      }
+    });
+  }
+
+  // Pie chart
+  const ctx3 = document.getElementById('pieChart');
+  if (ctx3 && data.sessionCounts.some(v => v > 0)) {
+    const pieLabels = ['Maths', 'Français', 'Sciences', 'Géo/Histoire'];
+    const pieData = data.sessionCounts;
+    window._pieChart = new Chart(ctx3, {
+      type: 'doughnut',
+      data: {
+        labels: pieLabels,
+        datasets: [{
+          data: pieData,
+          backgroundColor: colors,
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Nunito' } } } }
+      }
+    });
+  }
 }
 
 function getBtnClass(c) {
@@ -4830,6 +5002,7 @@ function timerSVG(remaining, total, size = 56, stroke = 4) {
 
 // === QUIZ TIMER ===
 function startQuizTimer(timeoutSeconds, onTimeout) {
+  if (!getSetting('quizTimer', true)) return; // timer disabled
   clearQuizTimer();
   quizTimeTotal = timeoutSeconds;
   quizTimeLeft = timeoutSeconds;
