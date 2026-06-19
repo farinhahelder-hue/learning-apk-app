@@ -2414,14 +2414,27 @@ function checkAIExercise(index) {
 
 // === FEEDBACK ===
 const correctMsgs = [
-  'Bravo Emilie ! 🌟','Super ! 🎉','Excellent ! 🐿️','Génial ! 🪼','Parfait ! 🦭',
-  'Tu es brillante ! ✨','Incroyable ! 💖','Continue comme ça ! 🔥'
+  '🐿️🌟 Bravo Emilie ! Tu es incroyable ! Noisette est fier de toi !',
+  '🪼✨ Excellent travail ! Continue comme ça ! Bulle t\'applaudit !',
+  '🦭🚀 Super ! Tu apprends si vite ! Câlin te congratule !',
+  '⭐🏆 Magnifique ! Tu es une championne ! Toutes les mascottes dansent !',
+  '🌈✨ Fantastique ! Emilie, tu es la meilleure ! Les étoiles brillent !',
+  '🧠💡 Wow ! Quelle intelligence ! Noisette fait la cabriole !',
+  '💪🎉 Parfait ! Tu es trop forte ! Bulle te fait un High-five !',
+  '🌟🦭 Excellent ! Câlin te fait un gros câlin !',
+  '🏆✨ Tu gères ! Les mascottes sont impressionnées !',
+  '⭐🪼 Super star ! Ta fusée monte vers les étoiles !'
 ];
 
 const wrongMsgs = [
-  'Presque ! Tu veux réessayer ? 💪','Ce n\'est pas grave, essaie encore ! 🌈',
-  'Même les championnes font des erreurs ! Courage Emilie ! 🦋',
-  'Pas grave, recommence, je crois en toi ! 🌟','Tu progresses déjà, continue ! 💛'
+  '🐿️💪 Presque ! Essaie encore une fois ! Noisette croit en toi !',
+  '🪼🌈 Tu peux le faire ! Réessaie ! Bulle t\'aide !',
+  '🦭⭐ Pas tout à fait, mais continue ! Câlin t\'encourage !',
+  '💪🤗 Courage Emilie ! Tu vas y arriver ! Les mascottes sont avec toi !',
+  '🌟🔄 Pas grave ! Chaque erreur est une occasion d\'apprendre !',
+  '✨💫 On se concentre et on recommence ! Tu es capable !',
+  '🦭🌟 Câlin sait que tu peux réussir ! Retente ta chance !',
+  '🐿️💪 Ne lâche rien ! Noisette t\'attend au tournant !'
 ];
 
 function showFeedback(correct, customMsg, customEmoji) {
