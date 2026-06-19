@@ -8,6 +8,11 @@ let streak = 1;
 let combo = 0;
 let muted = false;
 let nightMode = localStorage.getItem('emilie_night_mode') === 'true';
+let calmMode = localStorage.getItem('emilie_calm_mode') === 'true';
+let routineActive = localStorage.getItem('emilie_routine_active') === 'true';
+let autoAudio = true;
+let dailyPlan = { activites: [], ordre: [], complete: [] };
+let questionCount = 0; // for pause etoiles counter
 // Timer state
 let quizTimer = null;
 let quizTimeLeft = 0;
@@ -1422,6 +1427,7 @@ function getAudio() {
 
 function playBeep(freq=440, duration=0.15, type='sine', volume=0.3) {
   if (muted) return;
+  if (calmMode) volume *= 0.7;
   try {
     const ctx = getAudio();
     const osc = ctx.createOscillator();
@@ -3059,13 +3065,15 @@ function homeHTML() {
       <div class="sparkle-ring"></div>
     </div>
     <h1>Bonjour Emilie !</h1>
-    <p>Qu'est-ce qu'on apprend aujourd'hui ?</p>
+    ${routineActive ? '' : '<p>Qu\'est-ce qu\'on apprend aujourd\'hui ?</p>'}
     <div class="header-mascots">
       <div class="mascot-header squirrel" onclick="talkMascot('squirrel')" title="Noisette dit bonjour !">🐿️</div>
       <div class="mascot-header jelly" onclick="talkMascot('jelly')" title="Bulle flotte !">🪼</div>
       <div class="mascot-header seal" onclick="talkMascot('seal')" title="Câlin t'encourage !">🦭</div>
     </div>
   </div>
+  
+  ${planHTML()}
   
   <div class="stats-bar">
     <div class="stat-item"><span>⭐</span><span id="totalStars">${starsVal}</span> étoiles</div>
@@ -3572,6 +3580,16 @@ function parentalDashboardHTML() {
     </button>
     <p style="font-size:0.75rem;color:#999;margin-top:8px;">Cette action est irréversible.</p>
   </div>
+  
+  <div class="card" style="text-align:center;">
+    <h3 style="font-weight:900;margin-bottom:12px;">⚙️ Paramètres</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <button class="btn-reward" style="background:${calmMode ? '#16a34a' : '#6b7280'};font-size:0.9rem;" onclick="toggleCalmMode()">
+        ${calmMode ? '✅' : '🌙'} Mode Calme : ${calmMode ? 'ACTIF' : 'DÉSACTIVÉ'}
+      </button>
+      <p style="font-size:0.8rem;color:#999;">Sons doux, animations ralenties, fond beige</p>
+    </div>
+  </div>
 
   <div style="text-align:center;padding:16px;color:#999;">
     🐿️🪼🦭 Émilie CE1 • Données synchronisées avec Supabase
@@ -3822,6 +3840,72 @@ function toggleNightMode() {
   playBeep(nightMode ? 400 : 600, 0.1, 'sine');
 }
 
+function toggleCalmMode() {
+  calmMode = !calmMode;
+  localStorage.setItem('emilie_calm_mode', calmMode ? 'true' : 'false');
+  document.body.classList.toggle('calm-mode', calmMode);
+  playBeep(calmMode ? 500 : 600, 0.1, 'sine');
+  if (calmMode) {
+    // Hide score/timer elements
+    document.querySelectorAll('.badge-count, #mathProgress, .rocket-race-timer').forEach(el => {
+      if (el) el.style.display = 'none';
+    });
+  }
+}
+
+function initCalmMode() {
+  if (calmMode) document.body.classList.add('calm-mode');
+}
+
+// === ROUTINE VISUELLE ===
+async function loadDailyPlan() {
+  if (!supabase) return;
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await supabase.from('daily_plan')
+      .select('*').eq('user_id', 'emilie').eq('date', today).single();
+    if (data) {
+      dailyPlan = {
+        activites: data.activites || [],
+        ordre: data.ordre || [],
+        complete: data.complete || [],
+        modeCalme: data.mode_calme || false
+      };
+      if (data.mode_calme && !calmMode) toggleCalmMode();
+      routineActive = dailyPlan.ordre.length > 0;
+    }
+  } catch(e) {}
+}
+
+function completeActivity(index) {
+  if (!dailyPlan.complete.includes(index)) {
+    dailyPlan.complete.push(index);
+    playCorrectSound();
+    if (supabase) {
+      supabase.from('daily_plan').update({ complete: dailyPlan.complete })
+        .eq('user_id', 'emilie').eq('date', new Date().toISOString().split('T')[0]);
+    }
+    updateProgressUI();
+  }
+}
+
+function planHTML() {
+  if (!routineActive || dailyPlan.activites.length === 0) return '';
+  return `<div class="daily-plan">
+    <div class="plan-header">📋 Mon Plan du Jour</div>
+    ${dailyPlan.activites.map((act, i) => {
+      const done = dailyPlan.complete.includes(i);
+      const locked = routineActive && i > 0 && !dailyPlan.complete.includes(i - 1) && dailyPlan.complete.length < i;
+      return `<div class="plan-item ${done ? 'done' : ''} ${locked ? 'locked' : ''}"
+        onclick="${done || locked ? '' : "completeActivity(" + i + ")"}">
+        <span class="plan-check">${done ? '✅' : (locked ? '🔒' : '⬜')}</span>
+        <span class="plan-act">${act}</span>
+        <span class="plan-time">5 min</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
 function initNightMode() {
   if (nightMode) document.body.classList.add('night-mode');
 }
@@ -3977,6 +4061,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Init night mode
   initNightMode();
+  
+  // Init calm mode
+  initCalmMode();
+  
+  // Load daily plan
+  await loadDailyPlan();
   
   // Preload speech synthesis voices
   if (window.speechSynthesis) window.speechSynthesis.getVoices();

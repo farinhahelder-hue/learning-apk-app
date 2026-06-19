@@ -1155,6 +1155,61 @@
 
     .star-display .emoji { font-size: 1.2rem; }
 
+    /* ===================== MODE CALME ===================== */
+    .calm-mode {
+      background: #FFF8F0 !important;
+    }
+    .calm-mode * {
+      animation-duration: 2s !important;
+      transition-duration: 0.6s !important;
+    }
+    .calm-mode .confetti-animal,
+    .calm-mode .animal-float,
+    .calm-mode .confetti-piece { display: none !important; }
+    .calm-mode .mascot-star-img { animation-duration: 6s !important; }
+    .calm-mode .sparkle-ring { animation-duration: 8s !important; }
+    .calm-mode .feedback-overlay.correct-fb { background: rgba(16, 185, 129, 0.8) !important; }
+    .calm-mode .feedback-overlay.wrong-fb { background: rgba(251, 191, 36, 0.8) !important; }
+    .calm-mode .confetti-burst { display: none !important; }
+    .calm-mode .progress-fill::after { animation: none !important; }
+    .calm-mode .result-emoji { animation: none !important; }
+    .calm-mode .choice-btn:active { transform: scale(0.97) !important; }
+    .calm-mode .star-display { display: none; }
+    .calm-mode .badge-count { display: none; }
+
+    /* ===================== PLAN DU JOUR ===================== */
+    .daily-plan {
+      background: white;
+      border-radius: 20px;
+      padding: 15px 18px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
+    .plan-header {
+      font-weight: 900;
+      font-size: 1rem;
+      color: #7c3aed;
+      margin-bottom: 10px;
+    }
+    .plan-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      background: #faf5ff;
+    }
+    .plan-item:hover { background: #f3e8ff; }
+    .plan-item.done { background: #f0fdf4; opacity: 0.8; }
+    .plan-item.locked { background: #f3f4f6; opacity: 0.5; cursor: default; }
+    .plan-check { font-size: 1.2rem; width: 28px; text-align: center; }
+    .plan-act { flex: 1; font-size: 0.9rem; font-weight: 700; color: #374151; }
+    .plan-time { font-size: 0.75rem; color: #9ca3af; min-width: 40px; text-align: right; }
+    .plan-item.done .plan-act { text-decoration: line-through; color: #16a34a; }
+
     /* ===================== MODE NUIT ===================== */
     .night-mode {
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e) !important;
