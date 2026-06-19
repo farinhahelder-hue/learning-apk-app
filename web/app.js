@@ -6040,33 +6040,39 @@ window.onerror = function(msg, url, line, col, err) {
   return true;
 };
 
-document.addEventListener('DOMContentLoaded', async () => {
+// Render immediately (DOM is ready since script is at bottom of <body>)
+try { render(); } catch(e) { console.error('Initial render error:', e); }
+
+document.addEventListener('DOMContentLoaded', () => {
   try {
-  createFloatingAnimals();
-  
-  // Init XP Engine
-  await xpEngine.init();
-  updateProgressUI();
-  
-  // Init night mode
-  initNightMode();
-  
-  // Init calm mode
-  initCalmMode();
-  
-  // Load daily plan
-  await loadDailyPlan();
-  
-  // Preload speech synthesis voices
-  if (window.speechSynthesis) window.speechSynthesis.getVoices();
-  
-  // Welcome message
-  setTimeout(() => {
-    showFeedback(true, 'Bienvenue Emilie ! 🐿️🪼🦭 Noisette, Bulle et Câlin sont là pour t\'aider !', '🌟');
-  }, 800);
+    createFloatingAnimals();
+    initNightMode();
+    initCalmMode();
+    if (window.speechSynthesis) window.speechSynthesis.getVoices();
+    
+    // Init XP in background with timeout to avoid blocking
+    Promise.race([
+      xpEngine.init(),
+      new Promise(resolve => setTimeout(resolve, 3000))
+    ]).then(() => {
+      updateProgressUI();
+    }).catch(e => console.warn('Background init:', e));
+    
+    // Load daily plan in background with timeout
+    Promise.race([
+      loadDailyPlan(),
+      new Promise(resolve => setTimeout(resolve, 2000))
+    ]).catch(e => console.warn('Daily plan:', e));
+    
+    // Welcome message
+    setTimeout(() => {
+      showFeedback(true, 'Bienvenue Emilie ! 🐿️🪼🦭 Noisette, Bulle et Câlin sont là pour t\'aider !', '🌟');
+    }, 800);
+    
+    // Hide loading spinner
+    showLoading(false);
   } catch(e) {
     console.error('Init error:', e);
+    showLoading(false);
   }
 });
-
-try { render(); } catch(e) { console.error('Initial render error:', e); }
