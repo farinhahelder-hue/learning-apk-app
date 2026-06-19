@@ -4589,6 +4589,24 @@ function parentalDashboardHTML() {
   </div>
 
   <div class="card">
+    <h3 style="font-weight:900;margin-bottom:12px;">📋 Plan du jour</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <p style="font-size:0.85rem;color:#666;">Choisis les activités du plan du jour :</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="planConfigItems">
+        ${['🔢 Calcul', '📖 Lecture', '✏️ Dictée', '🔣 Conjugaison', '🧩 Problèmes', '📐 Géométrie', '🌍 Géo', '🏰 Histoire', '🎮 Mini-jeu', '🎵 Poésie'].map(a => {
+          const checked = dailyPlan.activites.includes(a) || dailyPlan.ordre.includes(a.split(' ')[1] || a);
+          return `<label style="background:${checked ? '#dbeafe' : '#f3f4f6'};padding:6px 12px;border-radius:20px;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" ${checked ? 'checked' : ''} onchange="togglePlanActivity('${a}')" style="accent-color:#3b82f6;">
+            ${a}
+          </label>`;
+        }).join('')}
+      </div>
+      <button class="btn-reward" style="background:#3b82f6;font-size:0.85rem;margin-top:6px;" onclick="saveDailyPlan()">💾 Sauvegarder le plan</button>
+      ${dailyPlan.activites.length > 0 ? `<div style="font-size:0.85rem;margin-top:4px;">✅ Plan actif (${dailyPlan.activites.length} activités, ${dailyPlan.complete.length} faites)</div>` : ''}
+    </div>
+  </div>
+
+  <div class="card">
     <h3 style="font-weight:900;margin-bottom:12px;">⚙️ Paramètres enfant</h3>
     <div style="display:flex;flex-direction:column;gap:12px;">
       ${makeToggle('Délai anti-clic', 'antiClick', getSetting('antiClick', true))}
@@ -5032,8 +5050,43 @@ function completeActivity(index) {
       supabase.from('daily_plan').update({ complete: dailyPlan.complete })
         .eq('user_id', 'emilie').eq('date', new Date().toISOString().split('T')[0]);
     }
+    // Victory if all done
+    if (dailyPlan.complete.length >= dailyPlan.activites.length) {
+      setTimeout(() => {
+        spawnConfetti(40);
+        showReward('🎉', 'Bravo Emilie !', 'Tu as fini tout ton plan du jour ! Tu es une championne ! 🌟');
+        playPerfectScore();
+      }, 300);
+    }
     updateProgressUI();
   }
+}
+
+// Plan du jour configuration (parental dashboard)
+function togglePlanActivity(name) {
+  const idx = dailyPlan.activites.indexOf(name);
+  if (idx >= 0) {
+    dailyPlan.activites.splice(idx, 1);
+    dailyPlan.ordre = dailyPlan.ordre.filter(o => o !== name.split(' ')[1]);
+  } else {
+    dailyPlan.activites.push(name);
+    dailyPlan.ordre.push(name);
+  }
+}
+
+async function saveDailyPlan() {
+  if (!supabase) return;
+  const today = new Date().toISOString().split('T')[0];
+  await supabase.from('daily_plan').upsert({
+    user_id: 'emilie', date: today,
+    activites: dailyPlan.activites,
+    ordre: dailyPlan.ordre,
+    complete: dailyPlan.complete,
+    mode_calme: calmMode
+  }, { onConflict: 'user_id,date' });
+  routineActive = dailyPlan.activites.length > 0;
+  localStorage.setItem('emilie_routine_active', routineActive);
+  screen = 'home'; render();
 }
 
 function planHTML() {
