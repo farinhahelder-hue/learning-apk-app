@@ -1589,6 +1589,20 @@ function toggleMusic() {
 }
 
 function playBeep(freq=440, duration=0.15, type='sine', volume=0.3) {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = volume;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
 function showLoading(show = true) {
   const el = document.getElementById('loadingSpinner');
   if (el) el.classList.toggle('active', show);
