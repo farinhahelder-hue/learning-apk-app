@@ -35,9 +35,12 @@ class WorldMapScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Niveau ${gs.level} 👑',
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w800, fontSize: 16)),
                       Text('${gs.xp} XP',
-                          style: const TextStyle(color: AppTheme.textGrey, fontWeight: FontWeight.w600)),
+                          style: const TextStyle(
+                              color: AppTheme.textGrey,
+                              fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -81,40 +84,55 @@ class WorldMapScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [color.withOpacity(0.8), color],
-                          begin: Alignment.topLeft, end: Alignment.bottomRight,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
-                          BoxShadow(color: color.withOpacity(0.35), blurRadius: 12, offset: const Offset(0, 6)),
+                          BoxShadow(
+                              color: color.withOpacity(0.35),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6)),
                         ],
                       ),
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(world['emoji'] as String, style: const TextStyle(fontSize: 42)),
+                          Text(world['emoji'] as String,
+                              style: const TextStyle(fontSize: 42)),
                           const Spacer(),
                           Text(world['title'] as String,
                               style: const TextStyle(
-                                color: Colors.white, fontSize: 15,
+                                color: Colors.white,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w800,
                               )),
                           const SizedBox(height: 6),
                           Row(
-                            children: List.generate(3, (s) => Icon(
-                              s < (wp.totalStars * 3 / totalStars).round()
-                                  ? Icons.star_rounded
-                                  : Icons.star_outline_rounded,
-                              color: Colors.yellow.shade200,
-                              size: 18,
-                            )),
+                            children: List.generate(
+                                3,
+                                (s) => Icon(
+                                      s <
+                                              (wp.totalStars * 3 / totalStars)
+                                                  .round()
+                                          ? Icons.star_rounded
+                                          : Icons.star_outline_rounded,
+                                      color: Colors.yellow.shade200,
+                                      size: 18,
+                                    )),
                           ),
                           Text('${wp.totalStars}/$totalStars ⭐',
-                              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
+                              style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 12)),
                         ],
                       ),
                     ),
-                  ).animate(delay: Duration(milliseconds: 80 * i)).fadeIn().scale(begin: const Offset(0.9, 0.9));
+                  )
+                      .animate(delay: Duration(milliseconds: 80 * i))
+                      .fadeIn()
+                      .scale(begin: const Offset(0.9, 0.9));
                 },
               ),
             ),

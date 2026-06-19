@@ -22,17 +22,22 @@ class ProgressService extends ChangeNotifier {
   }
 
   Future<void> _saveProgress() async {
-    await _prefs.setString(
-        'user_progress', json.encode(_progress.toMap()));
+    await _prefs.setString('user_progress', json.encode(_progress.toMap()));
     notifyListeners();
   }
 
   Future<void> addPoints(String subject, int points) async {
     _progress.totalPoints += points;
     switch (subject) {
-      case 'math':    _progress.mathPoints    += points; break;
-      case 'french':  _progress.frenchPoints  += points; break;
-      case 'science': _progress.sciencePoints += points; break;
+      case 'math':
+        _progress.mathPoints += points;
+        break;
+      case 'french':
+        _progress.frenchPoints += points;
+        break;
+      case 'science':
+        _progress.sciencePoints += points;
+        break;
     }
     _checkLevelUp();
     _checkBadges();
@@ -51,20 +56,31 @@ class ProgressService extends ChangeNotifier {
       if (_progress.earnedBadges.contains(id)) continue;
       bool earned = false;
       switch (id) {
-        case 'first_exercise': earned = _progress.totalPoints > 0; break;
-        case 'math_10':        earned = _progress.mathPoints    >= 100; break;
-        case 'french_10':      earned = _progress.frenchPoints  >= 100; break;
-        case 'science_10':     earned = _progress.sciencePoints >= 100; break;
-        case 'total_500':      earned = _progress.totalPoints   >= 500; break;
+        case 'first_exercise':
+          earned = _progress.totalPoints > 0;
+          break;
+        case 'math_10':
+          earned = _progress.mathPoints >= 100;
+          break;
+        case 'french_10':
+          earned = _progress.frenchPoints >= 100;
+          break;
+        case 'science_10':
+          earned = _progress.sciencePoints >= 100;
+          break;
+        case 'total_500':
+          earned = _progress.totalPoints >= 500;
+          break;
       }
       if (earned) _progress.earnedBadges.add(id);
     }
   }
 
   Future<void> updateStreak() async {
-    final now  = DateTime.now();
+    final now = DateTime.now();
     final diff = now.difference(_progress.lastPlayDate).inDays;
-    if (diff == 1)      _progress.streakDays++;
+    if (diff == 1)
+      _progress.streakDays++;
     else if (diff > 1) _progress.streakDays = 1;
     _progress.lastPlayDate = now;
     await _saveProgress();
@@ -72,10 +88,14 @@ class ProgressService extends ChangeNotifier {
 
   int getSubjectProgress(String subject) {
     switch (subject) {
-      case 'math':    return _progress.mathPoints;
-      case 'french':  return _progress.frenchPoints;
-      case 'science': return _progress.sciencePoints;
-      default:        return 0;
+      case 'math':
+        return _progress.mathPoints;
+      case 'french':
+        return _progress.frenchPoints;
+      case 'science':
+        return _progress.sciencePoints;
+      default:
+        return 0;
     }
   }
 

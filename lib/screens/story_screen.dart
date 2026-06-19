@@ -8,7 +8,8 @@ import 'world_map_screen.dart';
 
 class StoryScreen extends StatefulWidget {
   const StoryScreen({super.key});
-  @override State<StoryScreen> createState() => _StoryScreenState();
+  @override
+  State<StoryScreen> createState() => _StoryScreenState();
 }
 
 class _StoryScreenState extends State<StoryScreen> {
@@ -23,7 +24,7 @@ class _StoryScreenState extends State<StoryScreen> {
     gs.worldsProgress.forEach((_, wp) => totalStars += wp.totalStars);
 
     final current = Story.currentChapter(totalStars);
-    final next    = Story.nextChapter(totalStars);
+    final next = Story.nextChapter(totalStars);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,7 +44,8 @@ class _StoryScreenState extends State<StoryScreen> {
               // Chapitre actuel
               if (current != null)
                 _ChapterCard(
-                  chapter: current, isActive: true,
+                  chapter: current,
+                  isActive: true,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const WorldMapScreen()),
@@ -69,9 +71,13 @@ class _StoryScreenState extends State<StoryScreen> {
                 final ch = e.value;
                 final unlocked = totalStars >= ch.requiredStars;
                 return _TimelineItem(
-                  chapter: ch, unlocked: unlocked,
+                  chapter: ch,
+                  unlocked: unlocked,
                   isCurrent: current?.id == ch.id,
-                ).animate(delay: Duration(milliseconds: 100 * e.key)).fadeIn().slideX(begin: 0.1);
+                )
+                    .animate(delay: Duration(milliseconds: 100 * e.key))
+                    .fadeIn()
+                    .slideX(begin: 0.1);
               }),
             ],
           ),
@@ -85,7 +91,8 @@ class _ChapterCard extends StatelessWidget {
   final StoryChapter chapter;
   final bool isActive;
   final VoidCallback onTap;
-  const _ChapterCard({required this.chapter, required this.isActive, required this.onTap});
+  const _ChapterCard(
+      {required this.chapter, required this.isActive, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +103,16 @@ class _ChapterCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)],
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(28),
-          boxShadow: [BoxShadow(color: Colors.purple.withOpacity(0.4), blurRadius: 20, offset: const Offset(0,8))],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.purple.withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 8))
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,29 +121,41 @@ class _ChapterCard extends StatelessWidget {
               children: [
                 Text(chapter.emoji, style: const TextStyle(fontSize: 40)),
                 const SizedBox(width: 12),
-                Expanded(child: Column(
+                Expanded(
+                    child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Mission en cours 🟣',
-                        style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                        style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
                     Text(chapter.title,
-                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800)),
                   ],
                 )),
               ],
             ),
             const SizedBox(height: 16),
             Text(chapter.narrative,
-                style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.5)),
+                style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                    height: 1.5)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: onTap,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.purple,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
               ),
-              child: const Text('🚀 Jouer cette mission !', style: TextStyle(fontWeight: FontWeight.w700)),
+              child: const Text('🚀 Jouer cette mission !',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -162,12 +187,17 @@ class _NextChapterTeaser extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Prochaine mission 🔒',
-                    style: TextStyle(color: AppTheme.textGrey, fontSize: 12, fontWeight: FontWeight.w600)),
+                    style: TextStyle(
+                        color: AppTheme.textGrey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600)),
                 Text(chapter.title,
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 15)),
                 const SizedBox(height: 4),
                 Text('🔒 Encore $starsNeeded ⭐ pour débloquer',
-                    style: const TextStyle(color: AppTheme.primaryPink, fontSize: 13)),
+                    style: const TextStyle(
+                        color: AppTheme.primaryPink, fontSize: 13)),
               ],
             ),
           ),
@@ -181,7 +211,8 @@ class _TimelineItem extends StatelessWidget {
   final StoryChapter chapter;
   final bool unlocked;
   final bool isCurrent;
-  const _TimelineItem({required this.chapter, required this.unlocked, required this.isCurrent});
+  const _TimelineItem(
+      {required this.chapter, required this.unlocked, required this.isCurrent});
 
   @override
   Widget build(BuildContext context) {
@@ -190,13 +221,15 @@ class _TimelineItem extends StatelessWidget {
         Column(
           children: [
             Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: unlocked ? AppTheme.primaryBlue : Colors.grey.shade300,
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Text(unlocked ? '✅' : '🔒', style: const TextStyle(fontSize: 16)),
+                child: Text(unlocked ? '✅' : '🔒',
+                    style: const TextStyle(fontSize: 16)),
               ),
             ),
             Container(width: 2, height: 32, color: Colors.grey.shade300),
@@ -208,7 +241,9 @@ class _TimelineItem extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isCurrent ? AppTheme.primaryBlue.withOpacity(0.08) : Colors.white,
+              color: isCurrent
+                  ? AppTheme.primaryBlue.withOpacity(0.08)
+                  : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isCurrent ? AppTheme.primaryBlue : Colors.grey.shade200,
@@ -229,13 +264,17 @@ class _TimelineItem extends StatelessWidget {
                 ),
                 if (isCurrent)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: AppTheme.primaryBlue,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text('EN COURS',
-                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700)),
                   ),
               ],
             ),

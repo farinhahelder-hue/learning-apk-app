@@ -10,7 +10,8 @@ import '../../widgets/exercise_card.dart';
 class MathExerciseScreen extends StatefulWidget {
   final String category;
   final String title;
-  const MathExerciseScreen({super.key, required this.category, required this.title});
+  const MathExerciseScreen(
+      {super.key, required this.category, required this.title});
 
   @override
   State<MathExerciseScreen> createState() => _MathExerciseScreenState();
@@ -40,28 +41,40 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
   }
 
   void _onCorrect() {
-    setState(() { _score++; });
+    setState(() {
+      _score++;
+    });
     if (_current < _exercises.length - 1) {
       Future.delayed(const Duration(milliseconds: 300), () {
-        setState(() { _current++; });
+        setState(() {
+          _current++;
+        });
       });
-    } else _finish();
+    } else
+      _finish();
   }
 
   void _onWrong() {
-    setState(() { _wrong++; });
+    setState(() {
+      _wrong++;
+    });
     if (_current < _exercises.length - 1) {
       Future.delayed(const Duration(milliseconds: 1500), () {
-        setState(() { _current++; });
+        setState(() {
+          _current++;
+        });
       });
-    } else _finish();
+    } else
+      _finish();
   }
 
   void _finish() {
     final pts = _score * 10;
     context.read<ProgressService>().addPoints('math', pts);
     if (_score == _exercises.length) _confetti.play();
-    setState(() { _finished = true; });
+    setState(() {
+      _finished = true;
+    });
   }
 
   @override
@@ -86,14 +99,19 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
       ),
       body: Stack(
         children: [
-          if (_finished) _buildResults()
-          else _buildExercise(),
+          if (_finished) _buildResults() else _buildExercise(),
           Align(
             alignment: Alignment.topCenter,
             child: ConfettiWidget(
               confettiController: _confetti,
               blastDirectionality: BlastDirectionality.explosive,
-              colors: const [Colors.red, Colors.blue, Colors.yellow, Colors.green, Colors.pink],
+              colors: const [
+                Colors.red,
+                Colors.blue,
+                Colors.yellow,
+                Colors.green,
+                Colors.pink
+              ],
             ),
           ),
         ],
@@ -139,11 +157,20 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(pct == 1 ? '🏆' : pct >= 0.7 ? '🌟' : '💪',
+            Text(
+                pct == 1
+                    ? '🏆'
+                    : pct >= 0.7
+                        ? '🌟'
+                        : '💪',
                 style: const TextStyle(fontSize: 80)),
             const SizedBox(height: 16),
             Text(
-              pct == 1 ? 'Parfait Emilie !' : pct >= 0.7 ? 'Très bien !' : 'Continue à pratiquer !',
+              pct == 1
+                  ? 'Parfait Emilie !'
+                  : pct >= 0.7
+                      ? 'Très bien !'
+                      : 'Continue à pratiquer !',
               style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
               textAlign: TextAlign.center,
             ),
@@ -152,14 +179,24 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
                 style: const TextStyle(fontSize: 18, color: AppTheme.textGrey)),
             Text('+${_score * 10} points ⭐',
                 style: const TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.mathColor)),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.mathColor)),
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                setState(() { _current = 0; _score = 0; _wrong = 0; _finished = false; _exercises.shuffle(); });
+                setState(() {
+                  _current = 0;
+                  _score = 0;
+                  _wrong = 0;
+                  _finished = false;
+                  _exercises.shuffle();
+                });
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.mathColor),
-              child: const Text('Rejouer ! 🔄', style: TextStyle(color: Colors.white)),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: AppTheme.mathColor),
+              child: const Text('Rejouer ! 🔄',
+                  style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 12),
             TextButton(

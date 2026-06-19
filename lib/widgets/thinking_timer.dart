@@ -6,8 +6,8 @@ import '../utils/app_theme.dart';
 /// Cercle qui se vide progressivement, change de couleur (vert→orange→rouge)
 /// Compatible neurodivergences : visuel uniquement, pas de son angoissant
 class ThinkingTimer extends StatefulWidget {
-  final int seconds;           // durée totale
-  final VoidCallback? onEnd;   // appelé quand temps écoulé
+  final int seconds; // durée totale
+  final VoidCallback? onEnd; // appelé quand temps écoulé
   final double size;
   final bool autoStart;
 
@@ -49,7 +49,10 @@ class ThinkingTimerState extends State<ThinkingTimer>
     _running = true;
     _ctrl.forward(from: 0);
     _ticker = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (!mounted) { t.cancel(); return; }
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
       setState(() => _remaining--);
       if (_remaining <= 0) {
         t.cancel();
@@ -75,7 +78,7 @@ class ThinkingTimerState extends State<ThinkingTimer>
     final ratio = _remaining / widget.seconds;
     if (ratio > 0.6) return const Color(0xFF4CAF50); // vert
     if (ratio > 0.3) return const Color(0xFFFF9800); // orange
-    return const Color(0xFFF44336);                   // rouge
+    return const Color(0xFFF44336); // rouge
   }
 
   @override

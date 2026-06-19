@@ -12,8 +12,8 @@ import '../../services/audio_service.dart';
 
 /// Mode de jeu pour les tables de multiplication
 enum MultiplicationMode {
-  separated,  // Une table à la fois (×2, ×3, ×4, ×5)
-  mixed,       // Mélange de toutes les tables
+  separated, // Une table à la fois (×2, ×3, ×4, ×5)
+  mixed, // Mélange de toutes les tables
 }
 
 /// Écran de tables de multiplication avec 2 modes:
@@ -23,10 +23,12 @@ class MultiplicationTablesScreen extends StatefulWidget {
   const MultiplicationTablesScreen({super.key});
 
   @override
-  State<MultiplicationTablesScreen> createState() => _MultiplicationTablesScreenState();
+  State<MultiplicationTablesScreen> createState() =>
+      _MultiplicationTablesScreenState();
 }
 
-class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen> {
+class _MultiplicationTablesScreenState
+    extends State<MultiplicationTablesScreen> {
   MultiplicationMode _mode = MultiplicationMode.separated;
   int? _selectedTable;
   List<MultiplicationExercise> _exercises = [];
@@ -39,7 +41,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   int _remainingSeconds = 30;
   late ConfettiController _confetti;
   final Mascot _mascot = Mascots.barbeNoire;
-  
+
   // Compteur de série (streak)
   int _streak = 0;
   bool _showStreakBadge = false;
@@ -85,24 +87,26 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     final random = Random();
     final exercises = <MultiplicationExercise>[];
     final tables = [2, 3, 4, 5];
-    
+
     // Générer 15 exercices pour le mode mixte (plus dynamique)
     for (int i = 0; i < 15; i++) {
       final table = tables[random.nextInt(tables.length)];
       final multiplier = random.nextInt(9) + 1;
       final correctAnswer = table * multiplier;
-      
+
       final distractors = <int>{};
       while (distractors.length < 3) {
         final offset = random.nextInt(5) - 2;
         final distractor = correctAnswer + offset;
-        if (distractor > 0 && distractor != correctAnswer && !distractors.contains(distractor)) {
+        if (distractor > 0 &&
+            distractor != correctAnswer &&
+            !distractors.contains(distractor)) {
           distractors.add(distractor);
         }
       }
-      
+
       final options = [correctAnswer, ...distractors].toList()..shuffle();
-      
+
       exercises.add(MultiplicationExercise(
         table: table,
         multiplier: multiplier,
@@ -110,7 +114,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
         options: options,
       ));
     }
-    
+
     setState(() {
       _exercises = exercises;
       _selectedTable = null; // Mixte n'a pas de table spécifique
@@ -142,23 +146,25 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   List<MultiplicationExercise> _generateExercises(int table) {
     final random = Random();
     final exercises = <MultiplicationExercise>[];
-    
+
     for (int i = 1; i <= 10; i++) {
       final multiplier = (random.nextInt(9) + 1); // 1-9 pour varier
       final correctAnswer = table * multiplier;
-      
+
       // Générer 3 distracteurs proches de la bonne réponse
       final distractors = <int>{};
       while (distractors.length < 3) {
         final offset = random.nextInt(5) - 2; // -2 à +2
         final distractor = correctAnswer + offset;
-        if (distractor > 0 && distractor != correctAnswer && !distractors.contains(distractor)) {
+        if (distractor > 0 &&
+            distractor != correctAnswer &&
+            !distractors.contains(distractor)) {
           distractors.add(distractor);
         }
       }
-      
+
       final options = [correctAnswer, ...distractors].toList()..shuffle();
-      
+
       exercises.add(MultiplicationExercise(
         table: table,
         multiplier: multiplier,
@@ -166,7 +172,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
         options: options,
       ));
     }
-    
+
     return exercises;
   }
 
@@ -204,10 +210,10 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   void _checkAnswer(int answer) {
     if (_isCorrect != null) return;
     _timer?.cancel();
-    
+
     final correct = answer == _exercises[_current].correctAnswer;
     final audio = context.read<AudioService>();
-    
+
     setState(() {
       _selectedAnswer = answer.toString();
       _isCorrect = correct;
@@ -230,7 +236,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
         audio.onWrongAnswer(); // Son erreur
       }
     });
-    
+
     if (!correct) {
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) _nextQuestion();
@@ -307,7 +313,13 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
             child: ConfettiWidget(
               confettiController: _confetti,
               blastDirectionality: BlastDirectionality.explosive,
-              colors: const [Colors.yellow, Colors.orange, Colors.pink, Colors.blue, Colors.green],
+              colors: const [
+                Colors.yellow,
+                Colors.orange,
+                Colors.pink,
+                Colors.blue,
+                Colors.green
+              ],
             ),
           ),
           // Badge streak
@@ -318,7 +330,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.amber,
                     borderRadius: BorderRadius.circular(30),
@@ -377,7 +390,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
           ),
         ).animate().fadeIn(delay: 200.ms),
         const SizedBox(height: 40),
-        
+
         // Mode Séparé
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -425,9 +438,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
             ),
           ),
         ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.1),
-        
+
         const SizedBox(height: 16),
-        
+
         // Mode Mixte
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -475,9 +488,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
             ),
           ),
         ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.1),
-        
+
         const SizedBox(height: 40),
-        
+
         // Si mode séparé, montrer les tables
         if (_mode == MultiplicationMode.separated)
           Expanded(
@@ -513,11 +526,14 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                       ),
                     ],
                   ),
-                ).animate(delay: Duration(milliseconds: 100 * table)).fadeIn().scale();
+                )
+                    .animate(delay: Duration(milliseconds: 100 * table))
+                    .fadeIn()
+                    .scale();
               }).toList(),
             ),
           ),
-        
+
         const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.all(20),
@@ -540,7 +556,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
 
   Widget _buildExercise() {
     final exercise = _exercises[_current];
-    final encMsg = _encouragements[DateTime.now().second % _encouragements.length];
+    final encMsg =
+        _encouragements[DateTime.now().second % _encouragements.length];
 
     return Column(
       children: [
@@ -563,7 +580,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                         if (_streak > 0)
                           Container(
                             margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.amber,
                               borderRadius: BorderRadius.circular(12),
@@ -571,7 +589,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text('🔥', style: TextStyle(fontSize: 14)),
+                                const Text('🔥',
+                                    style: TextStyle(fontSize: 14)),
                                 Text(
                                   '$_streak',
                                   style: const TextStyle(
@@ -584,8 +603,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                             ),
                           ).animate().scale(),
                         Text(
-                          _selectedTable != null 
-                              ? 'Table × $_selectedTable' 
+                          _selectedTable != null
+                              ? 'Table × $_selectedTable'
                               : 'Mode Mixte ⚡',
                           style: const TextStyle(
                             color: Colors.white,
@@ -608,13 +627,15 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                     const SizedBox(height: 4),
                     Text(
                       '${_current + 1} / ${_exercises.length}',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: _remainingSeconds <= 10 ? Colors.red : Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -622,7 +643,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                 child: Text(
                   '$_remainingSeconds s',
                   style: TextStyle(
-                    color: _remainingSeconds <= 10 ? Colors.white : AppTheme.primaryBlue,
+                    color: _remainingSeconds <= 10
+                        ? Colors.white
+                        : AppTheme.primaryBlue,
                     fontWeight: FontWeight.w800,
                     fontSize: 18,
                   ),
@@ -655,7 +678,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                     mood: MascotMood.happy,
                     size: 80,
                     showSpeechBubble: true,
-                    speechText: _streak >= 3 ? 'Incroyable Emilie ! 🔥' : 'Bravo Emilie ! 🎉',
+                    speechText: _streak >= 3
+                        ? 'Incroyable Emilie ! 🔥'
+                        : 'Bravo Emilie ! 🎉',
                   ).animate().scale()
                 else
                   RiveMascotWidget(
@@ -663,7 +688,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                     mood: MascotMood.wrong,
                     size: 80,
                     showSpeechBubble: true,
-                    speechText: _wrongMessages[DateTime.now().second % _wrongMessages.length],
+                    speechText: _wrongMessages[
+                        DateTime.now().second % _wrongMessages.length],
                   ).animate().shake(),
 
                 const SizedBox(height: 24),
@@ -722,14 +748,17 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                           ),
                         ],
                       ).animate().fadeIn().scale(begin: const Offset(0.8, 0.8)),
-                      
+
                       // Feedback
                       if (_isCorrect != null) ...[
                         const SizedBox(height: 16),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                           decoration: BoxDecoration(
-                            color: _isCorrect! ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE),
+                            color: _isCorrect!
+                                ? const Color(0xFFE8F5E9)
+                                : const Color(0xFFFFEBEE),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
@@ -745,7 +774,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                                     ? 'Correct ! ${exercise.table} × ${exercise.multiplier} = ${exercise.correctAnswer}'
                                     : 'La réponse était ${exercise.correctAnswer}',
                                 style: TextStyle(
-                                  color: _isCorrect! ? Colors.green.shade700 : Colors.red.shade700,
+                                  color: _isCorrect!
+                                      ? Colors.green.shade700
+                                      : Colors.red.shade700,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -781,7 +812,9 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                             color: AppTheme.primaryBlue,
                           ),
                         ),
-                      ).animate(delay: Duration(milliseconds: 100 * entry.key))
+                      )
+                          .animate(
+                              delay: Duration(milliseconds: 100 * entry.key))
                           .fadeIn()
                           .slideX(begin: 0.1);
                     }).toList(),
@@ -799,7 +832,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
     final pct = _score / _exercises.length;
     final isPerfect = pct == 1.0;
     final isBossDefeated = pct >= 0.8;
-    
+
     String message;
     String emoji;
     if (isPerfect) {
@@ -825,7 +858,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
             // Animation boss final si réussi
             if (isBossDefeated)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Colors.amber, Colors.orange],
@@ -856,7 +890,10 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                 ),
               )
                   .animate()
-                  .scale(begin: const Offset(0, 0), curve: Curves.elasticOut, delay: 200.ms)
+                  .scale(
+                      begin: const Offset(0, 0),
+                      curve: Curves.elasticOut,
+                      delay: 200.ms)
                   .shake(duration: 800.ms, hz: 2),
 
             const SizedBox(height: 24),
@@ -885,7 +922,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                   i < stars ? Icons.star : Icons.star_border,
                   size: 48,
                   color: i < stars ? Colors.amber : Colors.white54,
-                ).animate(delay: Duration(milliseconds: 400 + i * 150))
+                )
+                    .animate(delay: Duration(milliseconds: 400 + i * 150))
                     .scale(curve: Curves.elasticOut);
               }),
             ),

@@ -47,8 +47,8 @@ class _BounceButtonState extends State<BounceButton>
       reverseDuration: const Duration(milliseconds: 200),
     );
     _scale = Tween<double>(begin: 1.0, end: 0.92).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeIn,
-          reverseCurve: Curves.elasticOut),
+      CurvedAnimation(
+          parent: _ctrl, curve: Curves.easeIn, reverseCurve: Curves.elasticOut),
     );
   }
 
@@ -79,7 +79,7 @@ class _BounceButtonState extends State<BounceButton>
   @override
   Widget build(BuildContext context) {
     final Color bg = widget.color ?? Theme.of(context).colorScheme.primary;
-    
+
     Widget content = Stack(
       clipBehavior: Clip.none,
       children: [
@@ -95,9 +95,9 @@ class _BounceButtonState extends State<BounceButton>
               constraints: BoxConstraints(minHeight: widget.minHeight),
               padding: widget.padding,
               decoration: BoxDecoration(
-                color: widget.onTap == null 
-                    ? bg.withOpacity(0.5) 
-                    : _isPressed 
+                color: widget.onTap == null
+                    ? bg.withOpacity(0.5)
+                    : _isPressed
                         ? bg.withOpacity(0.85)
                         : bg,
                 borderRadius: widget.borderRadius,
@@ -105,7 +105,8 @@ class _BounceButtonState extends State<BounceButton>
                     ? []
                     : [
                         BoxShadow(
-                          color: (widget.shadowColor ?? bg).withOpacity(_isPressed ? 0.3 : 0.45),
+                          color: (widget.shadowColor ?? bg)
+                              .withOpacity(_isPressed ? 0.3 : 0.45),
                           blurRadius: _isPressed ? 8 : 14,
                           offset: Offset(0, _isPressed ? 3 : 6),
                         ),
@@ -116,7 +117,7 @@ class _BounceButtonState extends State<BounceButton>
             ),
           ),
         ),
-        
+
         // Badge optionnel
         if (widget.badge != null)
           Positioned(
@@ -193,7 +194,7 @@ class _AnimatedCardButtonState extends State<AnimatedCardButton> {
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? const Color(0xFF4FC3F7);
-    
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -219,8 +220,6 @@ class _AnimatedCardButtonState extends State<AnimatedCardButton> {
         transform: Matrix4.identity()..scale(_isPressed ? 0.98 : 1.0),
         child: widget.child,
       ),
-    )
-        .animate(target: _isPressed ? 1 : 0)
-        .shake(duration: 200.ms, hz: 2);
+    ).animate(target: _isPressed ? 1 : 0).shake(duration: 200.ms, hz: 2);
   }
 }

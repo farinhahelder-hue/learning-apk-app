@@ -18,21 +18,18 @@ class MascotSelectorCarousel extends StatefulWidget {
   });
 
   @override
-  State<MascotSelectorCarousel> createState() =>
-      _MascotSelectorCarouselState();
+  State<MascotSelectorCarousel> createState() => _MascotSelectorCarouselState();
 }
 
-class _MascotSelectorCarouselState
-    extends State<MascotSelectorCarousel> {
+class _MascotSelectorCarouselState extends State<MascotSelectorCarousel> {
   late PageController _pageCtrl;
   int _selected = 0;
 
   @override
   void initState() {
     super.initState();
-    _selected = widget.initial != null
-        ? Mascots.all.indexOf(widget.initial!)
-        : 0;
+    _selected =
+        widget.initial != null ? Mascots.all.indexOf(widget.initial!) : 0;
     if (_selected < 0) _selected = 0;
     _pageCtrl = PageController(
       initialPage: _selected,
@@ -74,7 +71,7 @@ class _MascotSelectorCarouselState
               widget.onSelected?.call(mascots[i]);
             },
             itemBuilder: (ctx, i) {
-              final mascot  = mascots[i];
+              final mascot = mascots[i];
               final isActive = i == _selected;
               return AnimatedScale(
                 scale: isActive ? 1.0 : 0.82,
@@ -95,9 +92,7 @@ class _MascotSelectorCarouselState
                           : Colors.white,
                       borderRadius: BorderRadius.circular(28),
                       border: Border.all(
-                        color: isActive
-                            ? mascot.color
-                            : Colors.grey.shade200,
+                        color: isActive ? mascot.color : Colors.grey.shade200,
                         width: isActive ? 3 : 1.5,
                       ),
                       boxShadow: isActive
@@ -115,9 +110,7 @@ class _MascotSelectorCarouselState
                       children: [
                         RiveMascotWidget(
                           mascot: mascot,
-                          mood: isActive
-                              ? MascotMood.happy
-                              : MascotMood.idle,
+                          mood: isActive ? MascotMood.happy : MascotMood.idle,
                           size: 100,
                         ),
                         const SizedBox(height: 8),
@@ -151,7 +144,7 @@ class _MascotSelectorCarouselState
             (i) => AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 4),
-              width:  i == _selected ? 20 : 8,
+              width: i == _selected ? 20 : 8,
               height: 8,
               decoration: BoxDecoration(
                 color: i == _selected

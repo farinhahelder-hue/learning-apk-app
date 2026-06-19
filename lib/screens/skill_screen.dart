@@ -61,19 +61,25 @@ class SkillScreen extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: stars > 0 ? color.withOpacity(0.5) : Colors.grey.shade200,
+                    color: stars > 0
+                        ? color.withOpacity(0.5)
+                        : Colors.grey.shade200,
                     width: stars > 0 ? 2 : 1,
                   ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.05), blurRadius: 8),
                   ],
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 48, height: 48,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: unlocked ? color.withOpacity(0.15) : Colors.grey.shade100,
+                        color: unlocked
+                            ? color.withOpacity(0.15)
+                            : Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Center(
@@ -87,14 +93,17 @@ class SkillScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(skill['label'] as String,
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15)),
                           const SizedBox(height: 2),
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: levelTag == 'CE1' ? AppTheme.primaryBlue.withOpacity(0.15)
+                                  color: levelTag == 'CE1'
+                                      ? AppTheme.primaryBlue.withOpacity(0.15)
                                       : AppTheme.primaryPink.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -102,28 +111,41 @@ class SkillScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
-                                      color: levelTag == 'CE1' ? AppTheme.primaryBlue : AppTheme.primaryPink,
+                                      color: levelTag == 'CE1'
+                                          ? AppTheme.primaryBlue
+                                          : AppTheme.primaryPink,
                                     )),
                               ),
                               const SizedBox(width: 8),
                               Text(skill['period'] as String,
-                                  style: const TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+                                  style: const TextStyle(
+                                      fontSize: 11, color: AppTheme.textGrey)),
                             ],
                           ),
                         ],
                       ),
                     ),
                     // Étoiles
-                    Row(children: List.generate(3, (s) => Icon(
-                      s < stars ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: s < stars ? Colors.amber : Colors.grey.shade300,
-                      size: 20,
-                    ))),
+                    Row(
+                        children: List.generate(
+                            3,
+                            (s) => Icon(
+                                  s < stars
+                                      ? Icons.star_rounded
+                                      : Icons.star_outline_rounded,
+                                  color: s < stars
+                                      ? Colors.amber
+                                      : Colors.grey.shade300,
+                                  size: 20,
+                                ))),
                   ],
                 ),
               ),
             ),
-          ).animate(delay: Duration(milliseconds: 60 * i)).fadeIn().slideX(begin: 0.15);
+          )
+              .animate(delay: Duration(milliseconds: 60 * i))
+              .fadeIn()
+              .slideX(begin: 0.15);
         },
       ),
     );

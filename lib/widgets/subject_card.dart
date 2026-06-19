@@ -89,8 +89,7 @@ class _SubjectCardState extends State<SubjectCard>
                   borderRadius: BorderRadius.circular(18),
                 ),
                 alignment: Alignment.center,
-                child: Text(widget.emoji,
-                    style: const TextStyle(fontSize: 36)),
+                child: Text(widget.emoji, style: const TextStyle(fontSize: 36)),
               ),
               const SizedBox(width: 16),
               Expanded(

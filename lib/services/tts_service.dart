@@ -8,11 +8,11 @@ class TtsService extends ChangeNotifier {
   static const _channel = MethodChannel('com.emilieapp/tts');
   bool _enabled = true;
   bool _isSpeaking = false;
-  double _speechRate = 0.45;  // plus lent pour les enfants
-  double _pitch = 1.1;        // légèrement aigu, plus enfantin
+  double _speechRate = 0.45; // plus lent pour les enfants
+  double _pitch = 1.1; // légèrement aigu, plus enfantin
   String _language = 'fr-FR';
 
-  bool get enabled  => _enabled;
+  bool get enabled => _enabled;
   bool get isSpeaking => _isSpeaking;
   double get speechRate => _speechRate;
 
@@ -47,7 +47,8 @@ class TtsService extends ChangeNotifier {
   }
 
   /// Lire la question (préfixe adapté à l'exercice)
-  Future<void> readQuestion(String question, {String prefix = 'Question :'}) async {
+  Future<void> readQuestion(String question,
+      {String prefix = 'Question :'}) async {
     await speak('$prefix $question');
   }
 

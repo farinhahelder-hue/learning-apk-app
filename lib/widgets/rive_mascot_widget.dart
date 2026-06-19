@@ -32,11 +32,11 @@ class _RiveMascotWidgetState extends State<RiveMascotWidget> {
   StateMachineController? _controller;
 
   // Inputs exposés par la state machine Rive
-  SMITrigger? _triggerHappy;    // bonne réponse
-  SMITrigger? _triggerWrong;    // mauvaise réponse (Monika = pipipipi)
-  SMITrigger? _triggerCelebrate;// score parfait
-  SMIBool?    _inputThinking;   // timer en cours
-  SMIBool?    _inputSleepy;     // mode repos long
+  SMITrigger? _triggerHappy; // bonne réponse
+  SMITrigger? _triggerWrong; // mauvaise réponse (Monika = pipipipi)
+  SMITrigger? _triggerCelebrate; // score parfait
+  SMIBool? _inputThinking; // timer en cours
+  SMIBool? _inputSleepy; // mode repos long
   bool _riveLoaded = false;
 
   @override
@@ -61,17 +61,17 @@ class _RiveMascotWidgetState extends State<RiveMascotWidget> {
 
       if (ctrl != null) {
         artboard.addController(ctrl);
-        _controller    = ctrl;
-        _triggerHappy    = ctrl.findInput<bool>('success')    as SMITrigger?;
-        _triggerWrong    = ctrl.findInput<bool>('error')      as SMITrigger?;
-        _triggerCelebrate= ctrl.findInput<bool>('celebrate')  as SMITrigger?;
-        _inputThinking   = ctrl.findInput<bool>('thinking')   as SMIBool?;
-        _inputSleepy     = ctrl.findInput<bool>('sleepy')     as SMIBool?;
+        _controller = ctrl;
+        _triggerHappy = ctrl.findInput<bool>('success') as SMITrigger?;
+        _triggerWrong = ctrl.findInput<bool>('error') as SMITrigger?;
+        _triggerCelebrate = ctrl.findInput<bool>('celebrate') as SMITrigger?;
+        _inputThinking = ctrl.findInput<bool>('thinking') as SMIBool?;
+        _inputSleepy = ctrl.findInput<bool>('sleepy') as SMIBool?;
       }
 
       if (mounted) {
         setState(() {
-          _artboard   = artboard;
+          _artboard = artboard;
           _riveLoaded = true;
         });
       }
@@ -91,7 +91,7 @@ class _RiveMascotWidgetState extends State<RiveMascotWidget> {
     if (_controller == null) return;
     // Reset booleans
     _inputThinking?.value = false;
-    _inputSleepy?.value   = false;
+    _inputSleepy?.value = false;
 
     switch (mood) {
       case MascotMood.happy:
@@ -140,7 +140,8 @@ class _RiveMascotWidgetState extends State<RiveMascotWidget> {
           height: widget.size,
           child: _riveLoaded && _artboard != null
               ? Rive(artboard: _artboard!, fit: BoxFit.contain)
-              : _AnimatedEmojiMascot(mascot: widget.mascot, mood: widget.mood, size: widget.size),
+              : _AnimatedEmojiMascot(
+                  mascot: widget.mascot, mood: widget.mood, size: widget.size),
         ),
 
         const SizedBox(height: 4),
@@ -266,8 +267,10 @@ class _SpeechBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(18), topRight: Radius.circular(18),
-          bottomLeft: Radius.circular(4), bottomRight: Radius.circular(18),
+          topLeft: Radius.circular(18),
+          topRight: Radius.circular(18),
+          bottomLeft: Radius.circular(4),
+          bottomRight: Radius.circular(18),
         ),
         border: Border.all(color: color.withOpacity(0.4), width: 2),
       ),
@@ -275,9 +278,11 @@ class _SpeechBubble extends StatelessWidget {
         text,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontFamily: 'Nunito', fontSize: 15,
+          fontFamily: 'Nunito',
+          fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: color.withOpacity(0.85), height: 1.4,
+          color: color.withOpacity(0.85),
+          height: 1.4,
         ),
       ),
     );

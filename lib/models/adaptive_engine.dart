@@ -21,23 +21,28 @@ class AdaptiveEngine {
     final history = _history[skillId];
     if (history == null || history.isEmpty) return 1;
     final avg = history.reduce((a, b) => a + b) / history.length;
-    if (avg > _targetMax) return 3;  // trop facile -> monter
-    if (avg < _targetMin) return 1;  // trop dur -> baisser
-    return 2;                         // dans la ZPD -> maintenir
+    if (avg > _targetMax) return 3; // trop facile -> monter
+    if (avg < _targetMin) return 1; // trop dur -> baisser
+    return 2; // dans la ZPD -> maintenir
   }
 
   // Filtre les exercices selon la difficulté recommandée
   List<Exercise> filterExercises(String skillId, List<Exercise> exercises) {
     final diff = recommendedDifficulty(skillId);
-    final filtered = exercises.where((e) => e.difficulty <= diff + 1 && e.difficulty >= diff - 1).toList();
+    final filtered = exercises
+        .where((e) => e.difficulty <= diff + 1 && e.difficulty >= diff - 1)
+        .toList();
     return filtered.isEmpty ? exercises : filtered;
   }
 
   // Message coach adapté selon le taux de réussite
   String coachMessage(double successRate) {
-    if (successRate >= 0.9) return '🤩 Incroyable Emilie ! Tu es une vraie championne ! Je vais rendre les exercices un peu plus challengeants pour toi !';
-    if (successRate >= 0.75) return '🌟 Super ! Tu es exactement dans la bonne zone ! Continue comme ça !';
-    if (successRate >= 0.5) return '💪 Bien essayé ! On va reprendre depuis le début pour que tu te sentes plus à l’aise. Tu vas y arriver !';
+    if (successRate >= 0.9)
+      return '🤩 Incroyable Emilie ! Tu es une vraie championne ! Je vais rendre les exercices un peu plus challengeants pour toi !';
+    if (successRate >= 0.75)
+      return '🌟 Super ! Tu es exactement dans la bonne zone ! Continue comme ça !';
+    if (successRate >= 0.5)
+      return '💪 Bien essayé ! On va reprendre depuis le début pour que tu te sentes plus à l’aise. Tu vas y arriver !';
     return '🤗 Pas de souci ! Chaque erreur est une leçon. Je vais t’aider avec des exercices plus simples d’abord !';
   }
 

@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Gère musicEnabled et sfxEnabled via SharedPreferences
 class AudioSettingsService extends ChangeNotifier {
   final SharedPreferences _prefs;
-  
+
   bool _musicEnabled = true;
   bool _sfxEnabled = true;
   double _musicVolume = 0.35;

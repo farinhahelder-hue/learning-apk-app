@@ -11,7 +11,8 @@ class MiniMusicPlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     final audio = context.watch<AudioService>();
     return GestureDetector(
-      onTap: () => audio.musicEnabled ? audio.pauseMusic() : audio.resumeMusic(),
+      onTap: () =>
+          audio.musicEnabled ? audio.pauseMusic() : audio.resumeMusic(),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -22,24 +23,31 @@ class MiniMusicPlayer extends StatelessWidget {
               : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: audio.musicEnabled ? AppTheme.primaryPurple.withOpacity(0.3) : Colors.grey.shade300,
+            color: audio.musicEnabled
+                ? AppTheme.primaryPurple.withOpacity(0.3)
+                : Colors.grey.shade300,
           ),
         ),
         child: Row(
           children: [
             Icon(
-              audio.musicEnabled ? Icons.music_note_rounded : Icons.music_off_rounded,
+              audio.musicEnabled
+                  ? Icons.music_note_rounded
+                  : Icons.music_off_rounded,
               color: audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
               size: 20,
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                audio.musicEnabled ? '🎵 Musique activée' : '🔇 Musique désactivée',
+                audio.musicEnabled
+                    ? '🎵 Musique activée'
+                    : '🔇 Musique désactivée',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
+                  color:
+                      audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
                 ),
               ),
             ),
@@ -47,8 +55,11 @@ class MiniMusicPlayer extends StatelessWidget {
             GestureDetector(
               onTap: audio.toggleMusic,
               child: Icon(
-                audio.musicEnabled ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
-                color: audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
+                audio.musicEnabled
+                    ? Icons.pause_circle_filled_rounded
+                    : Icons.play_circle_filled_rounded,
+                color:
+                    audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
                 size: 30,
               ),
             ),
@@ -80,8 +91,11 @@ class AudioControlFAB extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Icon(
-                audio.musicEnabled ? Icons.music_note_rounded : Icons.music_off_rounded,
-                color: audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
+                audio.musicEnabled
+                    ? Icons.music_note_rounded
+                    : Icons.music_off_rounded,
+                color:
+                    audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
                 size: 22,
               ),
             ),
@@ -99,7 +113,9 @@ class AudioControlFAB extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Icon(
-                audio.soundEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                audio.soundEnabled
+                    ? Icons.volume_up_rounded
+                    : Icons.volume_off_rounded,
                 color: audio.soundEnabled ? AppTheme.primaryBlue : Colors.grey,
                 size: 22,
               ),

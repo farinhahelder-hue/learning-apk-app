@@ -2,29 +2,29 @@ import 'package:flutter/material.dart';
 
 /// État émotionnel d'une mascotte
 enum MascotMood {
-  idle,      // au repos, clignote des yeux
-  happy,     // bonne réponse → saute
-  wrong,     // mauvaise réponse → Monika fait "pipipipi"
-  thinking,  // pendant le temps de réflexion
+  idle, // au repos, clignote des yeux
+  happy, // bonne réponse → saute
+  wrong, // mauvaise réponse → Monika fait "pipipipi"
+  thinking, // pendant le temps de réflexion
   celebrate, // score parfait
   encourage, // message d'encouragement
-  sleepy,    // après longue session
+  sleepy, // après longue session
 }
 
 /// Modèle d'une mascotte
 class Mascot {
   final String id;
   final String name;
-  final String emoji;          // fallback si pas d'image
-  final String assetPath;      // assets/images/mascots/
-  final String personality;    // description courte
-  final String wrongSound;     // son quand mauvaise réponse
-  final String correctSound;   // son quand bonne réponse
-  final List<String> idlePhrases;    // phrases au repos
+  final String emoji; // fallback si pas d'image
+  final String assetPath; // assets/images/mascots/
+  final String personality; // description courte
+  final String wrongSound; // son quand mauvaise réponse
+  final String correctSound; // son quand bonne réponse
+  final List<String> idlePhrases; // phrases au repos
   final List<String> correctPhrases; // phrases bonne réponse
-  final List<String> wrongPhrases;   // phrases mauvaise réponse
-  final List<String> thinkPhrases;   // pendant réflexion
-  final Color color;           // couleur principale
+  final List<String> wrongPhrases; // phrases mauvaise réponse
+  final List<String> thinkPhrases; // pendant réflexion
+  final Color color; // couleur principale
 
   const Mascot({
     required this.id,
@@ -42,15 +42,15 @@ class Mascot {
   });
 
   // Membres statiques pour compatibilité avec les exercices existants
-  static const Mascot seal       = Mascots.papaSeal;
-  static const Mascot babySeal   = Mascots.babySeal;
-  static const Mascot jellyfish  = Mascots.monikaJellyfish;
-  static const Mascot squirrel   = Mascots.nightSquirrel;
-  static const Mascot crab       = Mascots.ainyCrab;
-  static const Mascot cat        = Mascots.barbeNoire;
-  static const Mascot dolphin    = Mascots.ninonDolphin;
-  static const Mascot bird       = Mascots.billyBird;
-  static const List<Mascot> all  = Mascots.all;
+  static const Mascot seal = Mascots.papaSeal;
+  static const Mascot babySeal = Mascots.babySeal;
+  static const Mascot jellyfish = Mascots.monikaJellyfish;
+  static const Mascot squirrel = Mascots.nightSquirrel;
+  static const Mascot crab = Mascots.ainyCrab;
+  static const Mascot cat = Mascots.barbeNoire;
+  static const Mascot dolphin = Mascots.ninonDolphin;
+  static const Mascot bird = Mascots.billyBird;
+  static const List<Mascot> all = Mascots.all;
 }
 
 /// Toutes les mascottes de l'app
@@ -121,7 +121,8 @@ class Mascots {
     name: 'Monika 🪼',
     emoji: '🪼',
     assetPath: 'assets/images/mascots/monika_jellyfish.png',
-    personality: 'Dramaturge ! Fait des reproches avec "pipipipi" quand c\'est faux',
+    personality:
+        'Dramaturge ! Fait des reproches avec "pipipipi" quand c\'est faux',
     wrongSound: 'sounds/wrong.wav',
     correctSound: 'sounds/star.wav',
     color: Color(0xFFCE93D8),
@@ -272,10 +273,11 @@ class Mascots {
     name: 'Billy 🐦',
     emoji: '🐦',
     assetPath: 'assets/images/mascots/billy_bird.png',
-    personality: 'Oiseau bavard et curieux, toujours prêt à chanter et poser des questions',
+    personality:
+        'Oiseau bavard et curieux, toujours prêt à chanter et poser des questions',
     wrongSound: 'sounds/wrong.wav',
     correctSound: 'sounds/correct.wav',
-    color: Color(0xFFFFB300),  // jaune canari vif
+    color: Color(0xFFFFB300), // jaune canari vif
     idlePhrases: [
       'Cui cui ! On apprend quoi aujourd\'hui ? 🐦',
       'Billy est là, Billy est prêt ! 🌟',
@@ -308,23 +310,34 @@ class Mascots {
     ainyCrab,
     barbeNoire,
     ninonDolphin,
-    billyBird,   // 🐦 nouveau !
+    billyBird, // 🐦 nouveau !
   ];
 
   /// Mascotte par défaut selon la matière
   static Mascot forSubject(String subject) {
     switch (subject) {
-      case 'math':    return barbeNoire;
-      case 'french':  return ninonDolphin;
-      case 'science': return nightSquirrel;
-      case 'geo':     return ainyCrab;
-      case 'animals': return billyBird;    // 🐦 Billy pour les animaux !
-      case 'emotions':return papaSeal;
-      case 'history': return barbeNoire;
-      case 'universe':return nightSquirrel;
-      case 'amazing': return monikaJellyfish;
-      case 'music':   return billyBird;    // 🐦 Billy pour la musique aussi
-      default:        return papaSeal;
+      case 'math':
+        return barbeNoire;
+      case 'french':
+        return ninonDolphin;
+      case 'science':
+        return nightSquirrel;
+      case 'geo':
+        return ainyCrab;
+      case 'animals':
+        return billyBird; // 🐦 Billy pour les animaux !
+      case 'emotions':
+        return papaSeal;
+      case 'history':
+        return barbeNoire;
+      case 'universe':
+        return nightSquirrel;
+      case 'amazing':
+        return monikaJellyfish;
+      case 'music':
+        return billyBird; // 🐦 Billy pour la musique aussi
+      default:
+        return papaSeal;
     }
   }
 }
