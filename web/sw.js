@@ -1,7 +1,7 @@
 // Emilie App CE1 - Service Worker
 // Cache les pages pour un fonctionnement hors ligne
 
-const CACHE_NAME = 'emilie-app-v2';
+const CACHE_NAME = 'emilie-app-v3';
 const ASSETS = [
   '/',
   '/index.html',

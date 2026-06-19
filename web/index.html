@@ -13,8 +13,8 @@
   <title>Emilie App 🌟</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2" async onerror="console.warn('Supabase CDN failed')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" async onerror="console.warn('Chart.js CDN failed')"></script>
   <style>
     :root {
       --rose: #FF6B9D;
@@ -1491,10 +1491,11 @@
   </style>
 </head>
 <body>
-  <div id="loadingSpinner">
+  <div id="loadingSpinner" class="active">
     <div class="spinner-ring"></div>
     <div style="font-weight:700;color:#6b7280;">Chargement...</div>
   </div>
+  <script>document.getElementById('loadingSpinner').classList.add('active');</script>
   <!-- ===================== PARTICULES ANIMAUX ===================== -->
   <div class="floating-animals" id="floatingAnimals"></div>
 
