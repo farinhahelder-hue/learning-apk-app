@@ -6148,6 +6148,22 @@ window.onerror = function(msg, url, line, col, err) {
 // Render immediately (DOM is ready since script is at bottom of <body>)
 try { render(); } catch(e) { console.error('Initial render error:', e); }
 
+// Safety: hide spinner after max 2s no matter what
+setTimeout(() => {
+  showLoading(false);
+}, 2000);
+
+// Safety: emergency render if DOMContentLoaded never fires
+setTimeout(() => {
+  const app = document.getElementById('app');
+  if (app && !app.innerHTML.trim()) {
+    screen = 'home';
+    app.innerHTML = homeHTML();
+    attachListeners();
+  }
+  showLoading(false);
+}, 3000);
+
 document.addEventListener('DOMContentLoaded', () => {
   try {
     createFloatingAnimals();
