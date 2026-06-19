@@ -3661,6 +3661,210 @@ function fractionsResultHTML() {
   </div>`;
 }
 
+// === GÉOGRAPHIE FRANCE ===
+let geoState = {
+  mode: null, // 'fleuves','pays','capitales'
+  questions: [],
+  index: 0, score: 0, total: 0, completed: false
+};
+
+function startGeo() { screen = 'geo'; geoState = { mode: null, questions: [], index: 0, score: 0, total: 0, completed: false }; render(); }
+
+async function startGeoGame(mode) {
+  geoState.mode = mode; geoState.index = 0; geoState.score = 0; geoState.completed = false;
+  let data = null;
+  if (supabase) {
+    data = await supabaseService._fetch('geo_france', { eq: { type: mode === 'fleuves' ? 'fleuve' : mode === 'pays' ? 'pays_voisin' : 'capitale' }, order: 'id' });
+  }
+  if (!data || data.length === 0) {
+    data = [
+      { nom: 'Loire', description: 'Plus long fleuve de France (1006 km)', emoji: '🌊', anecdote: 'La Loire traverse 12 départements !' },
+      { nom: 'Seine', description: 'Fleuve qui traverse Paris', emoji: '🏙️', anecdote: 'La Seine accueille les JO !' },
+      { nom: 'Rhône', description: 'Fleuve des Alpes à la Méditerranée', emoji: '⛰️', anecdote: 'Prend sa source dans un glacier !' },
+      { nom: 'Garonne', description: 'Fleuve du sud-ouest (647 km)', emoji: '🌿', anecdote: 'Donne son nom à la Haute-Garonne.' }
+    ].filter(() => mode === 'fleuves');
+  }
+  geoState.questions = shuffle(data).slice(0, 6);
+  geoState.total = geoState.questions.length;
+  render();
+  setTimeout(() => { showReplayBtn(true); const firstQ = document.querySelector('.question-card p'); if (firstQ) readAloud(firstQ.textContent, 0.85); }, 600);
+}
+
+function geoHTML() {
+  if (geoState.mode === null) {
+    return `<div class="module-header screen-transition"><button class="back-btn" onclick="screen='home';render()">⬅️</button><h2 class="module-title math">🗺️ La France</h2></div>
+    <div class="card" style="text-align:center;padding:30px 20px;">
+      <p style="font-size:2rem;margin-bottom:16px;">🗺️🌊🇪🇺</p>
+      <p style="font-size:1.1rem;color:#666;margin-bottom:20px;">Choisis un quiz géographie !</p>
+      <button class="primary-btn btn-blue" style="margin-bottom:10px;width:100%;font-size:1.1rem;" onclick="startGeoGame('fleuves')">🌊 Les fleuves de France</button>
+      <button class="primary-btn btn-green" style="margin-bottom:10px;width:100%;font-size:1.1rem;" onclick="startGeoGame('pays')">🌍 Les pays voisins</button>
+      <button class="primary-btn" style="background:var(--violet);width:100%;font-size:1.1rem;" onclick="startGeoGame('capitales')">🏛️ Les capitales</button>
+    </div>`;
+  }
+  if (geoState.completed) return geoResultHTML();
+  const q = geoState.questions[geoState.index];
+  if (!q) return geoResultHTML();
+  const choices = generateGeoChoices(q, geoState.questions);
+  return `<div class="module-header screen-transition"><button class="back-btn" onclick="screen='geo';render()">⬅️</button>
+    <h2 class="module-title math">${geoState.mode === 'fleuves' ? '🌊 Fleuves' : geoState.mode === 'pays' ? '🌍 Pays voisins' : '🏛️ Capitales'}</h2>
+    <span class="badge-count badge-math">${geoState.score}/${geoState.total}</span></div>
+  <div class="progress-bar"><div class="progress-fill progress-math" style="width:${(geoState.index/geoState.total)*100}%"></div></div>
+  <div class="question-card"><p>${geoState.mode === 'capitales' ? `🇪🇺 ${q.nom} est la capitale de quel pays ?` : `Que sais-tu sur ${q.nom} ?`}</p></div>
+  <div class="choices grid2">${choices.map(c => `<button class="choice-btn" onclick="handleGeoAnswer('${c}')">${c}</button>`).join('')}</div>
+  ${q.anecdote ? `<div class="mascot-tip"><em>💡 ${q.anecdote}</em></div>` : ''}`;
+}
+
+function generateGeoChoices(q, allQ) {
+  const correct = q.nom || q.capitale || q.description;
+  const others = allQ.filter(x => x.nom !== q.nom).map(x => x.nom || x.capitale || x.description);
+  const choices = new Set([correct]);
+  while (choices.size < 4 && others.length > 0) {
+    choices.add(others[Math.floor(Math.random() * others.length)]);
+  }
+  while (choices.size < 4) choices.add(['France','Espagne','Allemagne','Italie'][choices.size - 1]);
+  return [...choices].sort(() => Math.random() - 0.5);
+}
+
+function handleGeoAnswer(chosen) {
+  const q = geoState.questions[geoState.index];
+  const correct = q.nom || q.capitale || q.description;
+  const isCorrect = chosen === correct;
+  if (isCorrect) { geoState.score++; playCorrectSound(); spawnConfetti(5); showFeedback(true); xpEngine.addCorrectAnswer('science'); }
+  else { playWrongSound(); showFeedback(false); xpEngine.addWrongAnswer(); }
+  questionCount++;
+  setTimeout(() => {
+    geoState.index++;
+    if (geoState.index >= geoState.total) { geoState.completed = true; xpEngine.completeSession('geo', geoState.mode, geoState.score, geoState.total, 10); }
+    render();
+    if (questionCount % 5 === 0) triggerPauseEtoiles();
+  }, 1000);
+}
+
+function geoResultHTML() {
+  const pct = geoState.score / geoState.total;
+  showReplayBtn(false);
+  return `<div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+    <div style="font-size:2rem;margin-bottom:10px;">🗺️🌊</div>
+    <h2 class="result-title">${pct>=1?'Parfait !':pct>=0.7?'Bravo !':'Bien essayé !'}</h2>
+    <p class="result-score">${geoState.score}/${geoState.total} bonnes réponses</p>
+    <button class="primary-btn btn-blue" onclick="screen='geo';render()">🗺️ Rejouer</button>
+    <button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
+}
+
+// === HISTOIRE CE1 ===
+let histoireState = {
+  mode: null, // 'quissuisje','vraifaux'
+  questions: [], index: 0, score: 0, total: 0, completed: false, hintLevel: 0
+};
+
+function startHistoire() { screen = 'histoire'; histoireState = { mode: null, questions: [], index: 0, score: 0, total: 0, completed: false, hintLevel: 0 }; render(); }
+
+async function startHistoireGame(mode) {
+  histoireState.mode = mode; histoireState.index = 0; histoireState.score = 0; histoireState.completed = false; histoireState.hintLevel = 0;
+  let data = null;
+  if (supabase) {
+    data = await supabaseService._fetch('histoire_ce1', { eq: mode === 'quissuisje' ? { type_contenu: 'personnage' } : { type_contenu: 'vrai_faux' }, order: 'id' });
+  }
+  if (!data || data.length === 0) {
+    if (mode === 'quissuisje') {
+      data = [
+        { personnage: 'Jeanne d\'Arc', emoji: '⚜️', indices: ['Je suis née en 1412','J\'ai porté une armure','J\'ai libéré Orléans'], description_simple: 'Jeanne d\'Arc' },
+        { personnage: 'Marie Curie', emoji: '🔬', indices: ['Je suis scientifique','J\'ai découvert la radioactivité','J\'ai eu deux Prix Nobel'], description_simple: 'Marie Curie' }
+      ];
+    } else {
+      data = [
+        { affirmation: 'Les Romains ont construit des routes en France', affirmation_vrai: true, explication_courte: 'Les Romains ont construit plus de 100 000 km de routes !', emoji: '🏛️' },
+        { affirmation: 'Jeanne d\'Arc était un roi', affirmation_vrai: false, explication_courte: 'Jeanne d\'Arc était une jeune fille de 17 ans.', emoji: '⚔️' }
+      ];
+    }
+  }
+  histoireState.questions = shuffle(data).slice(0, 6);
+  histoireState.total = histoireState.questions.length;
+  screen = 'histoire';
+  render();
+  setTimeout(() => { showReplayBtn(true); const p = document.querySelector('.question-card p'); if (p) readAloud(p.textContent, 0.85); }, 600);
+}
+
+function histoireHTML() {
+  if (histoireState.mode === null) {
+    return `<div class="module-header screen-transition"><button class="back-btn" onclick="screen='home';render()">⬅️</button><h2 class="module-title math">🏰 Histoire</h2></div>
+    <div class="card" style="text-align:center;padding:30px 20px;">
+      <p style="font-size:2rem;margin-bottom:16px;">🏰⚜️🔬</p>
+      <p style="font-size:1.1rem;color:#666;margin-bottom:20px;">Choisis un quiz histoire !</p>
+      <button class="primary-btn btn-blue" style="margin-bottom:10px;width:100%;font-size:1.1rem;" onclick="startHistoireGame('quissuisje')">🎭 Qui suis-je ? (Personnages)</button>
+      <button class="primary-btn btn-green" style="width:100%;font-size:1.1rem;" onclick="startHistoireGame('vraifaux')">✅❌ Vrai ou Faux ?</button>
+    </div>`;
+  }
+  if (histoireState.completed) return histoireResultHTML();
+  const q = histoireState.questions[histoireState.index];
+  if (!q) return histoireResultHTML();
+
+  if (histoireState.mode === 'quissuisje') {
+    const maxHints = (q.indices && q.indices.length) || 3;
+    const showHints = q.indices ? q.indices.slice(0, histoireState.hintLevel + 1) : [`Indice ${histoireState.hintLevel + 1}`];
+    const points = 3 - histoireState.hintLevel;
+    return `<div class="module-header screen-transition"><button class="back-btn" onclick="screen='histoire';render()">⬅️</button>
+      <h2 class="module-title math">🎭 Qui suis-je ?</h2>
+      <span class="badge-count badge-math">${histoireState.score}/${histoireState.total}</span></div>
+    <div class="progress-bar"><div class="progress-fill progress-math" style="width:${(histoireState.index/histoireState.total)*100}%"></div></div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:4rem;margin-bottom:10px;">${q.emoji || '🎭'}</div>
+      <p style="font-size:1rem;font-weight:bold;color:var(--rose);margin-bottom:12px;">Devine qui je suis ! (${points} pts si bonne réponse)</p>
+      ${showHints.map((h,i) => `<div class="hint-bubble">📌 ${h}</div>`).join('')}
+      ${histoireState.hintLevel < maxHints - 1 ? `<button class="btn-reward" style="background:var(--orange);margin:8px;" onclick="nextHint()">🔍 Plus d'indices (${points-1} pts)</button>` : ''}
+      <div class="choices grid2" style="margin-top:12px;">
+        ${['Jeanne d\'Arc','Marie Curie','Napoléon','Louis XIV','Vercingétorix','De Gaulle']
+          .sort(() => Math.random() - 0.5).slice(0,4)
+          .map(n => `<button class="choice-btn" onclick="handleHistoireAnswer('${n}')">${n}</button>`).join('')}
+      </div>
+    </div>`;
+  } else {
+    return `<div class="module-header screen-transition"><button class="back-btn" onclick="screen='histoire';render()">⬅️</button>
+      <h2 class="module-title math">✅❌ Vrai ou Faux ?</h2>
+      <span class="badge-count badge-math">${histoireState.score}/${histoireState.total}</span></div>
+    <div class="progress-bar"><div class="progress-fill progress-math" style="width:${(histoireState.index/histoireState.total)*100}%"></div></div>
+    <div class="card question-card"><p>${q.affirmation || q.evenement}</p></div>
+    <div class="choices" style="justify-content:center;gap:16px;">
+      <button class="choice-btn" style="font-size:1.5rem;padding:20px 40px;background:#16a34a;color:white;" onclick="handleVFAnswer(true)">✅ VRAI</button>
+      <button class="choice-btn" style="font-size:1.5rem;padding:20px 40px;background:#dc2626;color:white;" onclick="handleVFAnswer(false)">❌ FAUX</button>
+    </div>
+    ${q.emoji ? `<div class="mascot-tip"><em>${q.emoji}</em></div>` : ''}`;
+  }
+}
+
+function nextHint() { histoireState.hintLevel++; render(); }
+
+function handleHistoireAnswer(chosen) {
+  const q = histoireState.questions[histoireState.index];
+  const correct = q.personnage || q.description_simple || '';
+  const isCorrect = chosen === correct || chosen === q.personnage;
+  if (isCorrect) { histoireState.score++; playCorrectSound(); spawnConfetti(8); showFeedback(true); xpEngine.addCorrectAnswer('science'); }
+  else { playWrongSound(); showFeedback(false); xpEngine.addWrongAnswer(); }
+  questionCount++;
+  setTimeout(() => { histoireState.index++; histoireState.hintLevel = 0; if (histoireState.index >= histoireState.total) { histoireState.completed = true; xpEngine.completeSession('histoire', histoireState.mode, histoireState.score, histoireState.total, 10); } render(); if (questionCount % 5 === 0) triggerPauseEtoiles(); }, 1200);
+}
+
+function handleVFAnswer(chosen) {
+  const q = histoireState.questions[histoireState.index];
+  const correct = q.affirmation_vrai === true;
+  const isCorrect = chosen === correct;
+  if (isCorrect) { histoireState.score++; playCorrectSound(); spawnConfetti(5); showFeedback(true); readAloud(q.explication_courte || 'Bravo !', 0.85); }
+  else { playWrongSound(); showFeedback(false); setTimeout(() => { if (q.explication_courte) showFeedback(true, q.explication_courte, '💡'); }, 300); }
+  questionCount++;
+  setTimeout(() => { histoireState.index++; if (histoireState.index >= histoireState.total) { histoireState.completed = true; xpEngine.completeSession('histoire', 'vraifaux', histoireState.score, histoireState.total, 10); } render(); if (questionCount % 5 === 0) triggerPauseEtoiles(); }, 2000);
+}
+
+function histoireResultHTML() {
+  const pct = histoireState.score / histoireState.total;
+  showReplayBtn(false);
+  return `<div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+    <div style="font-size:2rem;margin-bottom:10px;">🏰⚜️</div>
+    <h2 class="result-title">${pct>=1?'Parfait !':pct>=0.7?'Bravo !':'Bien essayé !'}</h2>
+    <p class="result-score">${histoireState.score}/${histoireState.total} bonnes réponses</p>
+    <button class="primary-btn btn-blue" onclick="screen='histoire';render()">🏰 Rejouer</button>
+    <button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
+}
+
 // === RENDER ===
 function render() {
   const app = document.getElementById('app');
@@ -3681,6 +3885,8 @@ function render() {
   else if (screen === 'visualMath') app.innerHTML = visualMathHTML();
   else if (screen === 'chenille') app.innerHTML = chenilleHTML();
   else if (screen === 'fractions') app.innerHTML = fractionsHTML();
+  else if (screen === 'geo') app.innerHTML = geoHTML();
+  else if (screen === 'histoire') app.innerHTML = histoireHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
   attachListeners();
@@ -3852,6 +4058,14 @@ function homeHTML() {
       <button class="mini-game-btn rocket" onclick="startFractions()" style="background: linear-gradient(135deg, #FF6B9D, #e85a8a);">
         <span class="emoji">🍕</span>
         <span>Fractions</span>
+      </button>
+      <button class="mini-game-btn word-hunt" onclick="startGeo()" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+        <span class="emoji">🗺️</span>
+        <span>Géographie</span>
+      </button>
+      <button class="mini-game-btn rocket" onclick="startHistoire()" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
+        <span class="emoji">🏰</span>
+        <span>Histoire</span>
       </button>
     </div>
   </div>
