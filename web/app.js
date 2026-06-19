@@ -3816,6 +3816,86 @@ function geoResultHTML() {
     <button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
 }
 
+// === CONJUGAISON MINI-JEU ===
+let conjugState = { questions: [], index: 0, score: 0, total: 0, completed: false };
+
+async function startConjugaison() {
+  screen = 'conjugaison';
+  conjugState = { questions: [], index: 0, score: 0, total: 0, completed: false };
+  let data = null;
+  if (supabase) {
+    const { data: db, error } = await supabase.from('conjugaison_exercices').select('*').order('id');
+    if (!error) data = db;
+  }
+  if (!data || data.length === 0) {
+    // Fallback
+    data = [
+      { verbe: 'être', pronom: 'je', bonne_reponse: 'suis', mauvaise1: 'es', mauvaise2: 'est' },
+      { verbe: 'être', pronom: 'tu', bonne_reponse: 'es', mauvaise1: 'suis', mauvaise2: 'est' },
+      { verbe: 'être', pronom: 'il/elle', bonne_reponse: 'est', mauvaise1: 'es', mauvaise2: 'suis' },
+      { verbe: 'avoir', pronom: 'j\'', bonne_reponse: 'ai', mauvaise1: 'as', mauvaise2: 'a' },
+      { verbe: 'avoir', pronom: 'tu', bonne_reponse: 'as', mauvaise1: 'ai', mauvaise2: 'a' },
+    ];
+  }
+  conjugState.questions = data.map(d => {
+    const ops = [d.bonne_reponse, d.mauvaise1, d.mauvaise2].sort(() => Math.random() - 0.5);
+    return { verbe: d.verbe, pronom: d.pronom, correct: d.bonne_reponse, choices: ops };
+  });
+  conjugState.total = conjugState.questions.length;
+  render();
+  readAloud(`Conjugaison ! Choisis la bonne forme du verbe.`);
+}
+
+function answerConjugaison(chosen, correct) {
+  if (conjugState.completed) return;
+  const isCorrect = chosen === correct;
+  if (isCorrect) { conjugState.score++; playCorrectSound(); spawnConfetti(5); showFeedback(true); xpEngine.addCorrectAnswer('french'); }
+  else { playWrongSound(); showFeedback(false); xpEngine.addWrongAnswer(); }
+  questionCount++;
+  setTimeout(() => {
+    conjugState.index++;
+    if (conjugState.index >= conjugState.total) { conjugState.completed = true; xpEngine.completeSession('french', 'conjugaison', conjugState.score, conjugState.total, 10); }
+    render();
+    if (questionCount % 5 === 0) triggerPauseEtoiles();
+  }, 1000);
+}
+
+function conjugaisonMenuHTML() {
+  if (conjugState.completed) return conjugaisonResultHTML();
+  const q = conjugState.questions[conjugState.index];
+  if (!q) return `<div class="card"><p class="empty-msg">Aucune question</p></div>`;
+  const prog = conjugState.total > 0 ? (conjugState.index / conjugState.total * 100) : 0;
+  setTimeout(() => {
+    readAloud(`${q.pronom} ${q.verbe} au présent.`);
+    document.querySelectorAll('.choice-btn').forEach((b,i) => { if (i===0) b.focus(); });
+  }, 300);
+  return `<div class="card quiz-card">
+    <div class="progress-bar" style="margin-bottom:10px;"><div class="progress-fill" style="width:${prog}%;background:linear-gradient(90deg,#f472b6,#8b5cf6);"></div></div>
+    <div style="text-align:center;">
+      <div style="font-size:3rem;">🔄</div>
+      <h2 style="font-size:1.3rem;margin:8px 0;">Conjugue le verbe "${q.verbe}"</h2>
+      <p style="font-size:2rem;font-weight:900;margin:12px 0;color:#6366f1;">${q.pronom} ___</p>
+    </div>
+    <div class="choices-container">
+      ${q.choices.map(c => `<button class="choice-btn" onclick="answerConjugaison('${c.replace(/'/g,"\\'")}','${q.correct.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:0.85rem;color:#999;">
+      Question ${conjugState.index+1}/${conjugState.total}
+    </div>
+  </div>`;
+}
+
+function conjugaisonResultHTML() {
+  showReplayBtn(false);
+  const pct = conjugState.score / conjugState.total;
+  return `<div class="card result-screen"><span class="result-emoji">${pct>=1?'🏆':pct>=0.7?'🌟':'💪'}</span>
+    <div style="font-size:2rem;margin-bottom:10px;">🔄📚</div>
+    <h2 class="result-title">${pct>=1?'Parfait !':pct>=0.7?'Bravo !':'Bien essayé !'}</h2>
+    <p class="result-score">${conjugState.score}/${conjugState.total} bonnes réponses</p>
+    <button class="primary-btn btn-blue" onclick="startConjugaison()">🔄 Rejouer</button>
+    <button class="primary-btn btn-green" style="margin-top:8px;" onclick="screen='home';render()">🏠 Accueil</button></div>`;
+}
+
 // === HISTOIRE CE1 ===
 let histoireState = {
   mode: null, // 'quissuisje','vraifaux'
@@ -3952,6 +4032,7 @@ function render() {
   else if (screen === 'fractions') app.innerHTML = fractionsHTML();
   else if (screen === 'geo') app.innerHTML = geoHTML();
   else if (screen === 'histoire') app.innerHTML = histoireHTML();
+  else if (screen === 'conjugaison') app.innerHTML = conjugaisonMenuHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
   else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
   attachListeners();
@@ -4140,6 +4221,10 @@ function homeHTML() {
       <button class="mini-game-btn rocket" onclick="startHistoire()" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
         <span class="emoji">🏰</span>
         <span>Histoire</span>
+      </button>
+      <button class="mini-game-btn word-hunt" onclick="startConjugaison()" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+        <span class="emoji">🔄</span>
+        <span>Conjugaison</span>
       </button>
     </div>
   </div>
