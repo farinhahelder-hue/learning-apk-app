@@ -1454,9 +1454,47 @@
     .night-mode .pause-etoiles-overlay { background: rgba(10, 10, 30, 0.97) !important; }
     .night-mode .pause-message { color: #c4b5fd !important; }
     .night-mode .pause-countdown { color: #667eea !important; }
+
+    /* ===================== LOADING SPINNER ===================== */
+    #loadingSpinner {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(255,255,255,0.85);
+      justify-content: center; align-items: center; flex-direction: column; gap: 16px;
+    }
+    #loadingSpinner.active { display: flex; }
+    .spinner-ring {
+      width: 48px; height: 48px;
+      border: 5px solid #e5e7eb; border-top-color: #FF6B9D;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===================== SLIDE TRANSITIONS ===================== */
+    .slide-in { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+    .slide-out { animation: slideOut 0.2s ease-in; }
+    @keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-24px); } }
+
+    /* ===================== ACCORDION HOME ===================== */
+    .accordion-section { border-radius: 16px; overflow: hidden; margin: 8px 0; }
+    .accordion-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; cursor: pointer; font-weight: 800; font-size: 1rem;
+      background: #f8f9fa; border-radius: 16px; user-select: none;
+      transition: background 0.2s;
+    }
+    .accordion-header:hover { background: #f0f1f3; }
+    .accordion-header .arrow { transition: transform 0.3s; font-size: 1rem; }
+    .accordion-header.collapsed .arrow { transform: rotate(-90deg); }
+    .accordion-body { overflow: hidden; transition: max-height 0.3s ease; }
+    .accordion-body.collapsed { max-height: 0 !important; }
   </style>
 </head>
 <body>
+  <div id="loadingSpinner">
+    <div class="spinner-ring"></div>
+    <div style="font-weight:700;color:#6b7280;">Chargement...</div>
+  </div>
   <!-- ===================== PARTICULES ANIMAUX ===================== -->
   <div class="floating-animals" id="floatingAnimals"></div>
 

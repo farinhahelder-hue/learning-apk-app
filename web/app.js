@@ -1510,6 +1510,38 @@ function playBeep(freq=440, duration=0.15, type='sine', volume=0.3) {
   } catch(e) {}
 }
 
+// === LOADING SPINNER ===
+function showLoading(show = true) {
+  const el = document.getElementById('loadingSpinner');
+  if (el) el.classList.toggle('active', show);
+}
+
+// === ACCORDION ===
+function toggleAccordion(id) {
+  const header = document.getElementById(id);
+  if (!header) return;
+  const body = header.nextElementSibling;
+  if (!body) return;
+  header.classList.toggle('collapsed');
+  body.classList.toggle('collapsed');
+  // If opening, set max-height for animation
+  if (!body.classList.contains('collapsed')) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+// === SLIDE-IN HELPER ===
+function slideTransition(newHTML) {
+  const app = document.getElementById('app');
+  app.classList.add('slide-out');
+  setTimeout(() => {
+    app.innerHTML = newHTML;
+    app.classList.remove('slide-out');
+    app.classList.add('slide-in');
+    setTimeout(() => app.classList.remove('slide-in'), 300);
+  }, 200);
+}
+
 function playCorrectSound() {
   playBeep(523, 0.12, 'sine');
   setTimeout(() => playBeep(659, 0.12, 'sine'), 120);
@@ -4013,7 +4045,7 @@ function histoireResultHTML() {
 // === RENDER ===
 function render() {
   const app = document.getElementById('app');
-  if (screen === 'home') app.innerHTML = homeHTML();
+  if (screen === 'home') slideTransition(homeHTML());
   else if (screen === 'rocketRace') app.innerHTML = rocketRaceHTML();
   else if (screen === 'wordHunt') app.innerHTML = wordHuntHTML();
   else if (screen === 'stickers') app.innerHTML = stickerAlbumHTML();
@@ -4149,30 +4181,12 @@ function homeHTML() {
     <div class="challenge-animals-large">🐿️🪼🦭</div>
   </div>
   
-  <button class="homework-main-btn screen-transition" onclick="screen='homework';render()">
-    <div class="homework-btn-content">
-      <span style="font-size: 2rem;">📚</span>
-      <div class="homework-btn-text">
-        <span class="homework-btn-title">Devoirs du Jour</span>
-        <span class="homework-btn-subtitle">Clique pour commencer !</span>
-      </div>
+  <div class="accordion-section">
+    <div class="accordion-header collapsed" id="accordion-jeux" onclick="toggleAccordion('accordion-jeux')">
+      <span>🎮 Mini-Jeux Ludiques</span>
+      <span class="arrow">▼</span>
     </div>
-    <span class="homework-btn-arrow">→</span>
-  </button>
-  
-  <button class="lessons-main-btn screen-transition" onclick="screen='lessons';render()">
-    <div class="lessons-btn-content">
-      <span style="font-size: 2rem;">📖</span>
-      <div class="lessons-btn-text">
-        <span class="lessons-btn-title">Leçons CE1 & CE2</span>
-        <span class="lessons-btn-subtitle">Apprends avec Noisette !</span>
-      </div>
-    </div>
-    <span class="lessons-btn-arrow">→</span>
-  </button>
-  
-  <div class="mini-games-section screen-transition">
-    <div class="mini-games-title">🎮 Mini-Jeux Ludiques</div>
+    <div class="accordion-body slide-in" style="max-height:0;">
     <div class="mini-games-grid">
       <button class="mini-game-btn rocket" onclick="startRocketRace()">
         <span class="emoji">🚀</span>
@@ -4226,6 +4240,36 @@ function homeHTML() {
         <span class="emoji">🔄</span>
         <span>Conjugaison</span>
       </button>
+    </div>
+    </div>
+  </div>
+  
+  <div class="accordion-section">
+    <div class="accordion-header collapsed" id="accordion-apprendre" onclick="toggleAccordion('accordion-apprendre')">
+      <span>📚 Apprentissage</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="accordion-body slide-in" style="max-height:0;">
+    <button class="homework-main-btn screen-transition" onclick="screen='homework';render()">
+      <div class="homework-btn-content">
+        <span style="font-size: 2rem;">📚</span>
+        <div class="homework-btn-text">
+          <span class="homework-btn-title">Devoirs du Jour</span>
+          <span class="homework-btn-subtitle">Clique pour commencer !</span>
+        </div>
+      </div>
+      <span class="homework-btn-arrow">→</span>
+    </button>
+    <button class="lessons-main-btn screen-transition" onclick="screen='lessons';render()">
+      <div class="lessons-btn-content">
+        <span style="font-size: 2rem;">📖</span>
+        <div class="lessons-btn-text">
+          <span class="lessons-btn-title">Leçons CE1 & CE2</span>
+          <span class="lessons-btn-subtitle">Apprends avec Noisette !</span>
+        </div>
+      </div>
+      <span class="lessons-btn-arrow">→</span>
+    </button>
     </div>
   </div>
   
