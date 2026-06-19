@@ -11,6 +11,11 @@ class ScienceExercises {
         question: 'Quel animal est le roi de la jungle ?',
         options: ['Léopard', 'Lion', 'Tigre', 'Éléphant'],
         correctAnswer: 'Lion', difficulty: 1, points: 10),
+    // Question Noisette (mascotte)
+    Exercise(id: 'animaux_squirrel', subject: 'science', type: 'qcm',
+        question: '🐿️ Noisette est un écureuil. Que mange-t-il principalement ?',
+        options: ['De la viande', 'Des noisettes', 'Du poisson', 'Des insectes'],
+        correctAnswer: 'Des noisettes', difficulty: 1, points: 10),
     Exercise(id: 'animaux_2', subject: 'science', type: 'qcm',
         question: 'Quel animal peut voler ?',
         options: ['Chien', 'Chat', 'Aigle', 'Lapin'],

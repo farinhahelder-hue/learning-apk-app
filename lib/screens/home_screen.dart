@@ -113,6 +113,12 @@ class HomeScreen extends StatelessWidget {
                 // --- Bannière progression ---
                 ProgressBanner(progress: progress)
                     .animate(delay: 200.ms).fadeIn(duration: 500.ms).slideX(begin: -0.2),
+                
+                // --- Devoirs du Jour ---
+                const SizedBox(height: 24),
+                _buildDailyChallengeCard(context, progress)
+                    .animate(delay: 300.ms).fadeIn(duration: 500.ms).slideY(begin: 0.1),
+                
                 const SizedBox(height: 28),
                 const Text(
                   'Que veux-tu apprendre ?',
@@ -120,7 +126,7 @@ class HomeScreen extends StatelessWidget {
                     fontSize: 20, fontWeight: FontWeight.w700,
                     color: AppTheme.textDark,
                   ),
-                ).animate(delay: 300.ms).fadeIn(),
+                ).animate(delay: 400.ms).fadeIn(),
                 const SizedBox(height: 16),
                 // --- Cartes matières ---
                 SubjectCard(
@@ -128,32 +134,54 @@ class HomeScreen extends StatelessWidget {
                   subtitle: 'Additions • Multiplications • Géométrie',
                   gradient: AppTheme.mathGradient, points: progress.mathPoints,
                   onTap: () => Navigator.pushNamed(context, '/math'),
-                ).animate(delay: 400.ms).fadeIn(duration: 500.ms).slideX(begin: 0.2),
+                ).animate(delay: 500.ms).fadeIn(duration: 500.ms).slideX(begin: 0.2),
                 const SizedBox(height: 16),
                 SubjectCard(
                   title: 'Français', emoji: '📚',
                   subtitle: 'Lecture • Orthographe • Conjugaison',
                   gradient: AppTheme.frenchGradient, points: progress.frenchPoints,
                   onTap: () => Navigator.pushNamed(context, '/french'),
-                ).animate(delay: 500.ms).fadeIn(duration: 500.ms).slideX(begin: -0.2),
+                ).animate(delay: 600.ms).fadeIn(duration: 500.ms).slideX(begin: -0.2),
                 const SizedBox(height: 16),
                 SubjectCard(
                   title: 'Sciences', emoji: '🔬',
                   subtitle: 'Nature • Corps humain • Météo',
                   gradient: AppTheme.scienceGradient, points: progress.sciencePoints,
                   onTap: () => Navigator.pushNamed(context, '/science'),
-                ).animate(delay: 600.ms).fadeIn(duration: 500.ms).slideX(begin: 0.2),
+                ).animate(delay: 700.ms).fadeIn(duration: 500.ms).slideX(begin: 0.2),
                 const SizedBox(height: 24),
                 // --- Badges ---
-                if (progress.earnedBadges.isNotEmpty) ...[
-                  const Text(
-                    'Mes badges 🏅',
-                    style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w700,
-                      color: AppTheme.textDark,
+                const Text(
+                  'Mes badges 🏅',
+                  style: TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.w700,
+                    color: AppTheme.textDark,
+                  ),
+                ).animate(delay: 800.ms).fadeIn(),
+                const SizedBox(height: 12),
+                if (progress.earnedBadges.isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ).animate(delay: 700.ms).fadeIn(),
-                  const SizedBox(height: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('🎯', style: TextStyle(fontSize: 24)),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Fais des exercices pour gagner des badges !',
+                          style: TextStyle(
+                            fontSize: 14, color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ).animate().fadeIn()
+                else
                   Wrap(
                     spacing: 10, runSpacing: 10,
                     children: progress.earnedBadges.map((badgeId) {
@@ -178,11 +206,91 @@ class HomeScreen extends StatelessWidget {
                         ),
                       );
                     }).toList(),
-                  ).animate(delay: 800.ms).fadeIn(),
-                ],
+                  ).animate(delay: 900.ms).fadeIn(),
+                const SizedBox(height: 20),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDailyChallengeCard(BuildContext context, progress) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/daily-challenge'),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF6B6B), Color(0xFFFFE66D)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Text('⚡', style: TextStyle(fontSize: 32)),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'DÉFI DU JOUR',
+                    style: TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w800,
+                      color: Colors.white, letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Gagne des étoiles et des stickers !',
+                    style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('🎁', style: TextStyle(fontSize: 12)),
+                        SizedBox(width: 4),
+                        Text(
+                          '+ Sticker à gagner !',
+                          style: TextStyle(fontSize: 11, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 20),
+          ],
         ),
       ),
     );
