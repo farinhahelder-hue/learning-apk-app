@@ -245,6 +245,36 @@
 
     .btn-reward:hover { transform: scale(1.05); }
 
+    /* ===================== PARENTAL DASHBOARD TABLE ===================== */
+    .parent-info {
+      background: #faf5ff;
+      border-radius: 16px;
+      padding: 15px;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      text-align: left;
+    }
+    .parental-lock .pin-input {
+      width: 120px;
+      text-align: center;
+      font-size: 1.8rem;
+      letter-spacing: 8px;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 16px;
+      margin-bottom: 15px;
+    }
+    .parental-lock .pin-input.error {
+      border-color: #ef4444;
+      animation: shake 0.3s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%  { transform: translateX(-8px); }
+      75%  { transform: translateX(8px); }
+    }
+
     /* ===================== CONFETTI BURST ===================== */
     .confetti-burst {
       position: absolute;
@@ -1124,6 +1154,72 @@
     }
 
     .star-display .emoji { font-size: 1.2rem; }
+
+    /* ===================== MODE NUIT ===================== */
+    .night-mode {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e) !important;
+      color: #e0e0e0 !important;
+    }
+    .night-mode #app > * {
+      background: rgba(30, 27, 75, 0.95) !important;
+      color: #e0e0e0 !important;
+      border-color: rgba(255,255,255,0.1) !important;
+    }
+    .night-mode .card { background: rgba(40, 35, 90, 0.95) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important; }
+    .night-mode .module-header { background: transparent !important; }
+    .night-mode .progress-bar { background: rgba(255,255,255,0.15) !important; }
+    .night-mode .progress-fill { background: linear-gradient(90deg, #667eea, #764ba2) !important; }
+    .night-mode .header h1 { color: #c4b5fd !important; }
+    .night-mode .header p { color: #a5b4fc !important; }
+    .night-mode .stats-bar { background: rgba(40, 35, 90, 0.95) !important; }
+    .night-mode .level-section { background: rgba(40, 35, 90, 0.95) !important; }
+    .night-mode .streak-banner { background: linear-gradient(135deg, #1e1b4b, #312e81) !important; }
+    .night-mode .subject-progress-section { background: rgba(40, 35, 90, 0.95) !important; }
+    .night-mode .daily-challenge-detail { background: linear-gradient(135deg, #1e1b4b, #3730a3) !important; }
+    .night-mode .homework-main-btn { background: rgba(40, 35, 90, 0.95) !important; color: #e0e0e0 !important; }
+    .night-mode .lessons-main-btn { background: rgba(40, 35, 90, 0.95) !important; color: #e0e0e0 !important; }
+    .night-mode .mini-game-btn { box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; }
+    .night-mode .subject-btn { box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; }
+    .night-mode .parental-link { color: #a5b4fc !important; }
+    .night-mode .choice-btn { background: rgba(60, 50, 120, 0.9) !important; color: #e0e0e0 !important; border-color: rgba(255,255,255,0.15) !important; }
+    .night-mode .feedback-overlay.correct-fb { background: rgba(16, 185, 129, 0.9) !important; }
+    .night-mode .feedback-overlay.wrong-fb { background: rgba(239, 68, 68, 0.85) !important; }
+    .night-mode .reward-box { background: rgba(40, 35, 90, 0.98) !important; }
+    .night-mode .reward-title { color: #c4b5fd !important; }
+    .night-mode .reward-desc { color: #a5b4fc !important; }
+    .night-mode .trophy-card { background: rgba(60, 50, 120, 0.9) !important; color: #e0e0e0 !important; }
+    .night-mode .trophy-label { color: #a5b4fc !important; }
+    .night-mode .badge-item { background: rgba(60, 50, 120, 0.9) !important; border-color: rgba(255,255,255,0.15) !important; color: #e0e0e0 !important; }
+    .night-mode .category-tab { background: rgba(40, 35, 90, 0.95) !important; color: #a5b4fc !important; border-color: rgba(255,255,255,0.15) !important; }
+    .night-mode .category-tab.active, .night-mode .category-tab:hover { background: #667eea !important; color: white !important; }
+    .night-mode .lesson-card { background: rgba(40, 35, 90, 0.95) !important; }
+    .night-mode .lesson-title { color: #c4b5fd !important; }
+    .night-mode .skill-header { color: #a5b4fc !important; }
+    .night-mode .question-card { background: rgba(40, 35, 90, 0.95) !important; color: #e0e0e0 !important; }
+    .night-mode .mascot-tip em { color: #818cf8 !important; }
+    .night-mode .result-screen { background: rgba(40, 35, 90, 0.95) !important; }
+    .night-mode .result-title { color: #c4b5fd !important; }
+    .night-mode .result-score { color: #a5b4fc !important; }
+    .night-mode .result-stars { color: #fbbf24 !important; }
+    .night-mode .parental-lock .pin-input { background: rgba(40, 35, 90, 0.95) !important; color: #e0e0e0 !important; border-color: rgba(255,255,255,0.2) !important; }
+    .night-mode .parent-info { background: rgba(60, 50, 120, 0.9) !important; color: #e0e0e0 !important; }
+    .night-mode .victory-box { background: rgba(40, 35, 90, 0.98) !important; }
+    .night-mode .victory-title { color: #c4b5fd !important; }
+    .night-mode .victory-score { color: #a5b4fc !important; }
+    .night-mode .victory-xp { color: #fbbf24 !important; }
+    .night-mode table { color: #e0e0e0 !important; }
+    .night-mode table th { color: #a5b4fc !important; border-color: rgba(255,255,255,0.15) !important; }
+    .night-mode table td { border-color: rgba(255,255,255,0.08) !important; }
+    .night-mode .timer-ring-text { color: #a5b4fc !important; }
+    .night-mode .word-hunt-cell { background: rgba(40, 35, 90, 0.9) !important; color: #e0e0e0 !important; border-color: rgba(255,255,255,0.1) !important; }
+    .night-mode .word-hunt-cell.selected { background: #667eea !important; }
+    .night-mode .word-to-find { color: #a5b4fc !important; }
+    .night-mode .sticker-detail-box { background: rgba(40, 35, 90, 0.98) !important; }
+    .night-mode .sticker-detail-name { color: #c4b5fd !important; }
+    .night-mode .sticker-detail-desc { color: #a5b4fc !important; }
+    .night-mode .rocket-result-box { background: rgba(40, 35, 90, 0.98) !important; }
+    .night-mode .rocket-result-title { color: #c4b5fd !important; }
+    .night-mode .rocket-result-stats { color: #a5b4fc !important; }
   </style>
 </head>
 <body>

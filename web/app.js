@@ -7,6 +7,14 @@ let level = 1;
 let streak = 1;
 let combo = 0;
 let muted = false;
+let nightMode = localStorage.getItem('emilie_night_mode') === 'true';
+// Timer state
+let quizTimer = null;
+let quizTimeLeft = 0;
+let quizTimeTotal = 30;
+// Challenge mode state
+let challengeMode = null; // null, 'defi', 'rapide'
+let challengeState = {};
 
 // === SUPABASE SERVICE ===
 const SUPABASE_URL = 'https://wgkcowgnzysuzclhzxxk.supabase.co';
@@ -2663,7 +2671,7 @@ function lectureHTML(items) {
 
 function dicteesHTML(items) {
   return items.map(i => `
-    <div class="lesson-card" onclick="showDecouverteItem('${i.titre.replace(/'/g, "\\'")}', '<div style=\"white-space:pre-wrap;text-align:left;background:#f9fafb;padding:12px;border-radius:12px;\">${i.texte.replace(/'/g, "\\'")}</div><br><strong>🤫 Mots pièges :</strong> ${(Array.isArray(i.mots_pieges) ? i.mots_pieges : JSON.parse(i.mots_pieges || '[]')).join(', ')}')">
+    <div class="lesson-card" onclick="startInteractiveDictee(${i.id}, '${i.titre.replace(/'/g, "\\'")}', '${i.texte.replace(/'/g, "\\'")}')">
       <div class="lesson-icon">🎙️</div>
       <div class="lesson-info">
         <h3 class="lesson-title">${i.titre}</h3>
@@ -2672,6 +2680,104 @@ function dicteesHTML(items) {
       <div class="lesson-arrow">→</div>
     </div>
   `).join('');
+}
+
+// Interactive dictation state
+let dictationState = null;
+
+function startInteractiveDictee(id, title, text) {
+  const words = text.split(/\s+/).filter(w => w.length > 0);
+  dictationState = { id, title, text, words, index: 0, userWords: [], correct: 0 };
+  showDicteeScreen();
+}
+
+function showDicteeScreen() {
+  const d = dictationState;
+  if (!d) return;
+  const soFar = d.userWords.join(' ');
+  const remaining = d.words.slice(d.index).join(' ');
+  const progress = d.words.length > 0 ? Math.round((d.index / d.words.length) * 100) : 0;
+  
+  // Build feedback showing correct/incorrect words
+  const feedbackHtml = d.userWords.map((w, i) => {
+    const isCorrect = w.toLowerCase() === (d.words[i] || '').toLowerCase();
+    return `<span style="color:${isCorrect ? '#16a34a' : '#dc2626'};font-weight:bold;">${w}</span>`;
+  }).join(' ');
+
+  document.getElementById('decouverteDetailOverlay').classList.add('show');
+  document.getElementById('decouverteDetailBox').innerHTML = `
+    <div style="font-size:2rem;margin-bottom:8px;">🎙️</div>
+    <div style="font-size:1.2rem;font-weight:bold;color:#9333ea;margin-bottom:8px;">${d.title}</div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:#666;">
+        <span>Mot ${d.index + 1}/${d.words.length}</span>
+        <span>${d.correct} ✓</span>
+      </div>
+      <div class="progress-bar" style="margin-bottom:8px;"><div class="progress-fill" style="width:${progress}%;background:var(--rose);"></div></div>
+    </div>
+    <div style="background:#f9fafb;padding:12px;border-radius:12px;margin-bottom:12px;min-height:40px;line-height:1.8;">
+      ${d.userWords.length > 0 ? feedbackHtml : '<span style="color:#999;">Écris les mots que tu entends...</span>'}
+      ${remaining ? `<span style="color:#ccc;"> ${remaining}</span>` : ''}
+    </div>
+    ${d.index < d.words.length ? `
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input type="text" id="dicteeInput" style="flex:1;padding:10px;border:2px solid #e5e7eb;border-radius:12px;font-size:1rem;font-family:inherit;" placeholder="Tape le mot..." autocomplete="off" onkeydown="if(event.key==='Enter')checkDicteeWord()">
+      <button class="btn-reward" style="padding:10px 16px;font-size:0.9rem;" onclick="readDicteeWord()" title="Écouter">🔊</button>
+    </div>
+    <button class="btn-reward" onclick="checkDicteeWord()">✓ Vérifier</button>
+    ` : `
+    <div style="background:#f0fdf4;padding:12px;border-radius:12px;margin-bottom:12px;">
+      <strong style="color:#16a34a;">🎉 Dictée terminée !</strong><br>
+      <span style="color:#666;">${d.correct}/${d.words.length} mots corrects</span>
+    </div>
+    <button class="btn-reward" style="background:var(--violet);" onclick="closeDecouverteDetail();dictationState=null;">Fermer</button>
+    `}
+    ${d.index > 0 && d.index < d.words.length ? `<button class="parental-link" onclick="skipDicteeWord()">Passer ce mot →</button>` : ''}
+  `;
+  
+  if (d.index < d.words.length) {
+    setTimeout(() => {
+      const input = document.getElementById('dicteeInput');
+      if (input) input.focus();
+    }, 300);
+  }
+}
+
+function readDicteeWord() {
+  const d = dictationState;
+  if (!d || d.index >= d.words.length) return;
+  const word = d.words[d.index];
+  // Read the word twice
+  sayMessage(word, 0.7);
+  setTimeout(() => sayMessage(word, 0.7), 1200);
+}
+
+function checkDicteeWord() {
+  const d = dictationState;
+  if (!d || d.index >= d.words.length) return;
+  const input = document.getElementById('dicteeInput');
+  const word = (input ? input.value : '').trim();
+  if (!word) return;
+  
+  const expected = d.words[d.index];
+  d.userWords.push(word);
+  if (word.toLowerCase() === expected.toLowerCase()) {
+    d.correct++;
+    playCorrectSound();
+  } else {
+    playWrongSound();
+  }
+  d.index++;
+  if (input) input.value = '';
+  showDicteeScreen();
+}
+
+function skipDicteeWord() {
+  const d = dictationState;
+  if (!d || d.index >= d.words.length) return;
+  d.userWords.push('');
+  d.index++;
+  showDicteeScreen();
 }
 
 function poesiesHTML(items) {
@@ -2931,9 +3037,13 @@ function render() {
     if (done) app.innerHTML = resultHTML();
     else app.innerHTML = quizHTML();
   } else if (screen === 'trophy') app.innerHTML = trophyHTML();
+  else if (screen === 'challenge') app.innerHTML = challengeHTML();
   else if (screen === 'parental') app.innerHTML = parentalHTML();
+  else if (screen === 'parentalDashboard') app.innerHTML = parentalDashboardHTML();
   attachListeners();
   initStickerAlbum();
+  // Draw weekly chart after dashboard renders
+  if (screen === 'parentalDashboard') drawWeeklyChart();
 }
 
 function homeHTML() {
@@ -3064,6 +3174,10 @@ function homeHTML() {
         <span class="emoji">${stickerAlbum.unlockedCount}/20</span>
         <span>Album</span>
       </button>
+      <button class="mini-game-btn rocket" onclick="startChallenge('defi')" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+        <span class="emoji">⚡</span>
+        <span>Défi Maths</span>
+      </button>
     </div>
   </div>
   
@@ -3093,7 +3207,10 @@ function homeHTML() {
     </button>
   </div>
   
-  <button class="parental-link" data-action="parental">👨‍👩‍👧 Espace parents</button>`;
+  <div style="text-align:center;padding:12px;display:flex;justify-content:center;gap:16px;">
+    <button class="parental-link" data-action="parental">👨‍👩‍👧 Espace parents</button>
+    <button class="parental-link" onclick="toggleNightMode()">${nightMode ? '☀️' : '🌙'} ${nightMode ? 'Jour' : 'Nuit'}</button>
+  </div>`;
 }
 
 function quizHTML() {
@@ -3119,6 +3236,9 @@ function quizHTML() {
   const mascotEmoji = module === 'math' ? '🪼' : module === 'french' ? '🦭' : '🐿️';
   const gridClass = typeof ex.a === 'number' && ex.c.length === 4 ? 'grid2' : '';
   
+  // Start timer for this question
+  setTimeout(() => startQuizTimer(30, handleTimeout), 100);
+  
   return `<div class="module-header screen-transition">
     <button class="back-btn" data-action="back">⬅️</button>
     <h2 class="module-title ${cls}">${module === 'math' ? '🔢 Maths avec 🪼 Bulle' : module === 'french' ? '📖 Français avec 🦭 Câlin' : '🔬 Sciences avec 🐿️ Noisette'}</h2>
@@ -3130,6 +3250,7 @@ function quizHTML() {
   <div class="question-card" style="position: relative;">
     <span class="quiz-mascot ${mascotClass}">${mascotEmoji}</span>
     <span class="exercise-mascot ${mascotClass}" style="margin-bottom: 15px;">${mascotEmoji}</span>
+    <div id="quizTimerDisplay" style="position:absolute;top:5px;left:10px;">${timerSVG(30, 30, 50)}</div>
     <p>${ex.q}</p>
   </div>
   
@@ -3144,6 +3265,7 @@ function resultHTML() {
   const emoji = score >= 8 ? '🏆' : score >= 5 ? '😊' : '💪';
   const cls = module === 'math' ? 'blue' : module === 'french' ? 'pink' : 'green';
   const mascots = score >= 8 ? '🐿️🪼🦭' : '🐿️🦭';
+  clearQuizTimer();
   // Show victory overlay for perfect score
   if (score === exercises.length && exercises.length >= 5) {
     setTimeout(() => {
@@ -3343,21 +3465,116 @@ function handleDailyChallenge() {
 }
 
 function parentalHTML() {
+  // Show PIN lock screen first, dashboard after unlock
   return `<div class="card parental-lock screen-transition">
     <div style="font-size:40px;margin-bottom:16px">👨‍👩‍👧</div>
     <h2 style="font-size:22px;font-weight:900;margin-bottom:8px">Espace Parents</h2>
-    <input type="password" maxlength="4" class="pin-input" id="pin" placeholder="••••">
+    <p style="color: #666; margin-bottom:16px;">Entre le code PIN pour accéder au tableau de bord</p>
+    <input type="password" maxlength="4" class="pin-input" id="pin" placeholder="••••" autocomplete="off">
     <p class="error-msg" id="error" style="display:none">Code incorrect !</p>
-    <button class="primary-btn btn-purple" data-action="unlock">Entrer</button>
-    <button class="parental-link" data-action="back">Retour</button>
-    ${badges.length ? `<div class="parent-info">
-      <strong>📊 Statistiques d'Emilie</strong><br>
-      ⭐ ${stars} étoiles | 🏅 ${badges.length} badges<br>
-      🎯 Niveau ${level} | 🔥 ${streak} jours de suite<br><br>
-      <strong>🐿️🪼🦭 Les mascottes</strong><br>
-      Noisette, Bulle et Câlin accompagnent Emilie dans son apprentissage !<br><br>
-      <strong>Badges:</strong> ${badges.join(', ')}
-    </div>` : ''}
+    <button class="primary-btn btn-purple" onclick="unlockParental()">🔓 Déverrouiller</button>
+    <button class="parental-link" onclick="screen='home';render();">Retour</button>
+  </div>`;
+}
+
+function parentalDashboardHTML() {
+  const p = xpEngine.progress || {};
+  const sessions = window._parentalSessions || [];
+  const totalXp = p.total_xp || 0;
+  const lvl = p.level || 1;
+  const starCount = p.stars || 0;
+  const badgeCount = xpEngine.badges ? xpEngine.badges.length : 0;
+  const streakDays = p.streak_days || 1;
+  const totalEx = p.total_exercises || 0;
+  const mathSc = p.math_score || 0;
+  const frenchSc = p.french_score || 0;
+  const scienceSc = p.science_score || 0;
+
+  // Build weekly chart data
+  const weeklyLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const dayTotals = [0,0,0,0,0,0,0];
+  sessions.forEach(s => {
+    const d = new Date(s.created_at);
+    const dayIdx = (d.getDay() + 6) % 7; // Monday=0
+    dayTotals[dayIdx] += s.xp_earned || 0;
+  });
+
+  const sessionRows = sessions.slice(0, 10).map(s => {
+    const date = new Date(s.created_at);
+    return `<tr>
+      <td>${date.toLocaleDateString('fr-FR', {day:'numeric',month:'short'})}</td>
+      <td>${s.subject}</td>
+      <td>${s.score}/${s.total_questions}</td>
+      <td>+${s.xp_earned || 0} XP</td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="screen='home';render();" style="font-size:1rem;">⬅️</button>
+    <h2 class="module-title" style="color:#7c3aed;">📊 Tableau de Bord</h2>
+    <span style="font-size:1.2rem;">👨‍👩‍👧</span>
+  </div>
+
+  <div class="card">
+    <h3 style="font-weight:900;margin-bottom:15px;">👧 Résumé d'Émilie</h3>
+    <div class="trophies-grid" style="grid-template-columns: repeat(4,1fr);">
+      <div class="trophy-card"><div class="trophy-value">${totalXp}</div><div class="trophy-label">XP Total</div></div>
+      <div class="trophy-card"><div class="trophy-value">Niv.${lvl}</div><div class="trophy-label">Niveau</div></div>
+      <div class="trophy-card"><div class="trophy-value">${starCount}</div><div class="trophy-label">⭐ Étoiles</div></div>
+      <div class="trophy-card"><div class="trophy-value">${badgeCount}</div><div class="trophy-label">🏅 Badges</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-around;margin-top:12px;font-size:0.9rem;">
+      <span>🔥 ${streakDays} jours de suite</span>
+      <span>📝 ${totalEx} exercices</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-weight:900;margin-bottom:12px;">📈 Progression par matière</h3>
+    <div class="subject-progress-section" style="box-shadow:none;padding:0;margin:0;">
+      <div class="subject-progress-row">
+        <span class="subj-icon">🔢</span>
+        <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill math-fill" style="width:${Math.min(mathSc/2,100)}%"></div></div></div>
+        <span class="subj-score">${mathSc} pts</span>
+      </div>
+      <div class="subject-progress-row">
+        <span class="subj-icon">📖</span>
+        <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill french-fill" style="width:${Math.min(frenchSc/2,100)}%"></div></div></div>
+        <span class="subj-score">${frenchSc} pts</span>
+      </div>
+      <div class="subject-progress-row">
+        <span class="subj-icon">🔬</span>
+        <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill science-fill" style="width:${Math.min(scienceSc/2,100)}%"></div></div></div>
+        <span class="subj-score">${scienceSc} pts</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-weight:900;margin-bottom:12px;">📊 Activité hebdomadaire</h3>
+    <canvas id="weeklyChart" width="400" height="200"></canvas>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.7rem;color:#999;">
+      ${weeklyLabels.map((l,i) => `<span>${l}<br><strong style="color:#7c3aed;">${dayTotals[i]}XP</strong></span>`).join('')}
+    </div>
+  </div>
+
+  <div class="card" style="overflow-x:auto;">
+    <h3 style="font-weight:900;margin-bottom:12px;">🕐 Dernières sessions</h3>
+    ${sessions.length ? `<table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+      <thead><tr style="border-bottom:2px solid #eee;"><th style="text-align:left;padding:6px;">Date</th><th style="text-align:left;">Matière</th><th style="text-align:left;">Score</th><th style="text-align:left;">XP</th></tr></thead>
+      <tbody>${sessionRows}</tbody>
+    </table>` : `<p class="empty-msg">Aucune session pour l'instant. Lancez des exercices ! 🚀</p>`}
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <button class="btn-reward" style="background:#7c3aed;" onclick="resetProgress()">
+      🔄 Réinitialiser la progression
+    </button>
+    <p style="font-size:0.75rem;color:#999;margin-top:8px;">Cette action est irréversible.</p>
+  </div>
+
+  <div style="text-align:center;padding:16px;color:#999;">
+    🐿️🪼🦭 Émilie CE1 • Données synchronisées avec Supabase
   </div>`;
 }
 
@@ -3491,12 +3708,18 @@ function handleChoice(choice) {
   }, correct ? 1200 : 1500);
 }
 
-function unlockParental() {
+async function unlockParental() {
   const pin = document.getElementById('pin').value;
   const err = document.getElementById('error');
   if (pin === '1234') { 
     playBeep(600, 0.1, 'sine');
-        screen = 'parental';
+    // Load session data for dashboard
+    try {
+      window._parentalSessions = await supabaseService.getRecentSessions(50);
+    } catch(e) {
+      window._parentalSessions = [];
+    }
+    screen = 'parentalDashboard';
     render(); 
   }
   else { 
@@ -3510,8 +3733,97 @@ function unlockParental() {
   }
 }
 
+function drawWeeklyChart() {
+  const canvas = document.getElementById('weeklyChart');
+  if (!canvas) return;
+  const p = xpEngine.progress || {};
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const pad = { top: 20, bottom: 30, left: 30, right: 15 };
+  const chartW = w - pad.left - pad.right;
+  const chartH = h - pad.top - pad.bottom;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const sessions = window._parentalSessions || [];
+  const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const dayTotals = [0,0,0,0,0,0,0];
+  sessions.forEach(s => {
+    const d = new Date(s.created_at);
+    const dayIdx = (d.getDay() + 6) % 7;
+    dayTotals[dayIdx] += s.xp_earned || 0;
+  });
+
+  const maxVal = Math.max(...dayTotals, 1);
+  const barW = Math.min(chartW / 7 - 8, 40);
+
+  // Background grid
+  ctx.strokeStyle = '#f0f0f0';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (chartH / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(w - pad.right, y);
+    ctx.stroke();
+  }
+
+  // Bars
+  dayTotals.forEach((v, i) => {
+    const barH = (v / maxVal) * chartH;
+    const x = pad.left + (chartW / 7) * i + (chartW / 7 - barW) / 2;
+    const y = pad.top + chartH - barH;
+
+    const gradient = ctx.createLinearGradient(x, y, x, pad.top + chartH);
+    gradient.addColorStop(0, '#C3A6FF');
+    gradient.addColorStop(1, '#7c3aed');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.roundRect(x, y, barW, barH, [4, 4, 0, 0]);
+    ctx.fill();
+
+    // Label
+    ctx.fillStyle = '#999';
+    ctx.font = '10px Nunito';
+    ctx.textAlign = 'center';
+    ctx.fillText(dayNames[i] + ' ' + v + 'XP', pad.left + (chartW / 7) * i + (chartW / 7) / 2, h - 5);
+  });
+}
+
+async function resetProgress() {
+  if (!confirm('⚠️ Es-tu sûr de vouloir réinitialiser toute la progression d\'Émilie ? Cette action est irréversible.')) return;
+  if (!confirm('⚠️ Confirme : toutes les étoiles, badges et XP seront perdus.')) return;
+  playBeep(400, 0.3, 'sawtooth');
+  try {
+    await supabaseService.upsertProgress({
+      total_xp: 0, level: 1, stars: 0, streak_days: 0,
+      math_score: 0, french_score: 0, science_score: 0, discovery_score: 0,
+      total_exercises: 0, correct_answers: 0
+    });
+    xpEngine.progress = null;
+    xpEngine.badges = [];
+    await xpEngine.init();
+    updateProgressUI();
+    showReward('🔄', 'Progression réinitialisée', 'Les données d\'Émilie ont été effacées.');
+  } catch(e) {
+    alert('Erreur lors de la réinitialisation. Vérifie la connexion Supabase.');
+  }
+}
+
 function shuffle(arr) {
   return arr.sort(() => Math.random() - 0.5);
+}
+
+// === MODE NUIT ===
+function toggleNightMode() {
+  nightMode = !nightMode;
+  localStorage.setItem('emilie_night_mode', nightMode ? 'true' : 'false');
+  document.body.classList.toggle('night-mode', nightMode);
+  playBeep(nightMode ? 400 : 600, 0.1, 'sine');
+}
+
+function initNightMode() {
+  if (nightMode) document.body.classList.add('night-mode');
 }
 
 // === TIMER SVG GÉNÉRATEUR ===
@@ -3530,6 +3842,131 @@ function timerSVG(remaining, total, size = 56, stroke = 4) {
   </div>`;
 }
 
+// === QUIZ TIMER ===
+function startQuizTimer(timeoutSeconds, onTimeout) {
+  clearQuizTimer();
+  quizTimeTotal = timeoutSeconds;
+  quizTimeLeft = timeoutSeconds;
+  const timerEl = document.getElementById('quizTimerDisplay');
+  if (timerEl) updateTimerDisplay();
+  quizTimer = setInterval(() => {
+    quizTimeLeft--;
+    if (timerEl) updateTimerDisplay();
+    if (quizTimeLeft <= 0) {
+      clearQuizTimer();
+      if (onTimeout) onTimeout();
+    }
+  }, 1000);
+}
+
+function clearQuizTimer() {
+  if (quizTimer) { clearInterval(quizTimer); quizTimer = null; }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('quizTimerDisplay');
+  if (el) {
+    el.innerHTML = timerSVG(quizTimeLeft, quizTimeTotal);
+  }
+}
+
+function handleTimeout() {
+  playWrongSound();
+  showFeedback(false, 'Temps écoulé !', '⏰');
+  // Auto-advance to next question
+  if (screen === 'math' || screen === 'french' || screen === 'science') {
+    if (qIdx + 1 >= exercises.length) {
+      done = true;
+      render();
+    } else {
+      qIdx++;
+      sel = null;
+      render();
+    }
+  } else if (challengeMode) {
+    challengeState.answers.push({ correct: false, time: challengeState.timeTotal - quizTimeLeft });
+    advanceChallenge();
+  }
+}
+
+// === MODE DÉFI (rapide 20 calculs) ===
+function startChallenge(mode = 'defi') {
+  challengeMode = mode;
+  module = 'math';
+  const data = mathData.addition.concat(mathData.soustraction).concat(mathData.tables_ce1);
+  const qs = shuffle(data).slice(0, 20);
+  challengeState = {
+    questions: qs,
+    index: 0,
+    answers: [],
+    timeTotal: mode === 'rapide' ? 5 : 10,
+    score: 0
+  };
+  screen = 'challenge';
+  render();
+}
+
+function challengeHTML() {
+  const c = challengeState;
+  const q = c.questions[c.index];
+  if (!q) return '';
+  const timerHtml = timerSVG(c.timeTotal, c.timeTotal);
+  const cls = module === 'math' ? 'math' : 'french';
+  return `<div class="module-header screen-transition">
+    <button class="back-btn" onclick="endChallenge()">✕</button>
+    <h2 class="module-title math">⚡ Défi ${c.index+1}/${c.questions.length}</h2>
+    <span class="badge-count badge-math">${c.score}/${c.index}</span>
+  </div>
+  <div class="card" style="text-align:center;padding:15px;">
+    <div class="question-card" style="position:relative;">
+      <span class="quiz-mascot swim">🪼</span>
+      <span class="exercise-mascot swim" style="margin-bottom:15px;">🪼</span>
+      <div id="quizTimerDisplay">${timerHtml}</div>
+      <p style="font-size:1.5rem;margin:15px 0;">${q.q}</p>
+    </div>
+    <div class="choices grid2">
+      ${q.c.map(c => `<button class="choice-btn" onclick="handleChallengeAnswer(this, '${c}', '${q.a}')">${c}</button>`).join('')}
+    </div>
+    <div class="mascot-tip"><em>🪼 Bulle : "Vite, réponds avant la fin du chrono !"</em></div>
+  </div>`;
+}
+
+function handleChallengeAnswer(btn, chosen, answer) {
+  const correct = String(chosen) === String(answer);
+  if (correct) challengeState.score++;
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  if (correct) { playCorrectSound(); xpEngine.addCorrectAnswer('math'); }
+  else { playWrongSound(); xpEngine.addWrongAnswer(); }
+  challengeState.answers.push({ correct, time: challengeState.timeTotal - quizTimeLeft });
+  setTimeout(advanceChallenge, correct ? 400 : 600);
+}
+
+function advanceChallenge() {
+  challengeState.index++;
+  clearQuizTimer();
+  if (challengeState.index >= challengeState.questions.length) {
+    endChallenge();
+  } else {
+    render();
+    startQuizTimer(challengeState.timeTotal, handleTimeout);
+  }
+}
+
+function endChallenge() {
+  clearQuizTimer();
+  const c = challengeState;
+  const score = c.score;
+  const total = c.questions.length;
+  challengeMode = null;
+  screen = 'trophy';
+  const pct = score / total;
+  if (pct >= 1) showVictory('🌟', 'Défi Réussi !', `${score}/${total} bonnes réponses`, `+${score * 10} XP`);
+  else if (pct >= 0.7) showReward('🪼', `Score: ${score}/${total}`, 'Continue à t\'entraîner, tu progresses !');
+  xpEngine.completeSession('math', 'challenge', score, total, c.timeTotal * total);
+  render();
+}
+
 // === INIT ===
 document.addEventListener('DOMContentLoaded', async () => {
   createFloatingAnimals();
@@ -3537,6 +3974,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Init XP Engine
   await xpEngine.init();
   updateProgressUI();
+  
+  // Init night mode
+  initNightMode();
   
   // Preload speech synthesis voices
   if (window.speechSynthesis) window.speechSynthesis.getVoices();
