@@ -1666,17 +1666,25 @@ function readAloud(text, rate = 0.85, pitch = 1.1) {
 
   function speakWithFrench() {
     const voices = window.speechSynthesis.getVoices();
-    const frVoice = voices.find(v => v.name && v.name.includes('Google') && v.lang.startsWith('fr'))
+    // Priorité : Google FR > voix locale FR > toute voix FR
+    const frVoice = voices.find(v => v.name && v.name.includes('Google') && v.lang === 'fr-FR')
+      || voices.find(v => v.lang === 'fr-FR' && v.localService)
       || voices.find(v => v.lang === 'fr-FR')
       || voices.find(v => v.lang.startsWith('fr'));
-    if (frVoice) utterance.voice = frVoice;
+    if (frVoice) {
+      utterance.voice = frVoice;
+      utterance.lang = 'fr-FR';
+    }
     window.speechSynthesis.speak(utterance);
   }
 
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) {
-    window.speechSynthesis.onvoiceschanged = speakWithFrench;
-    setTimeout(speakWithFrench, 1000);
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      speakWithFrench();
+    };
+    setTimeout(speakWithFrench, 800);
     return;
   }
   speakWithFrench();
