@@ -2768,13 +2768,142 @@ async function loadDecouverteSubject(subjectId) {
       case 'emc': data = await supabaseService.getEmc(); break;
       case 'arts': data = await supabaseService.getArts(); break;
     }
+    // Fallback data if Supabase unavailable
+    if (!data || data.length === 0) {
+      data = getFallbackData(subjectId);
+    }
     decouverteData = data || [];
   } catch (e) {
-    decouverteData = [];
+    decouverteData = getFallbackData(subjectId);
   }
   
   screen = 'decouverteDetail';
   render();
+}
+
+function getFallbackData(subjectId) {
+  const fs = [
+    { regle:'Le son [t]', explication:'Le son [t] peut s\'écrire "t", "tt" ou "th".', mots_exemples:'la tête, une table, la terre, un train, un manteau', niveau:1 },
+    { regle:'Le son [d]', explication:'Le son [d] s\'écrit toujours "d".', mots_exemples:'une dent, le dos, lundi, vendredi, danser', niveau:1 },
+    { regle:'Le son [p]', explication:'Le son [p] s\'écrit "p" ou "pp".', mots_exemples:'un pied, la pluie, un chapeau, une poupée', niveau:1 },
+    { regle:'Le son [f]', explication:'Le son [f] s\'écrit "f", "ff" ou "ph".', mots_exemples:'la fête, une feuille, un fils, du fromage', niveau:1 },
+    { regle:'Le son [ɔ̃] (on/om)', explication:'"on" devant consonne, "om" devant p ou b.', mots_exemples:'bonjour, le monde, un ballon, une chanson', niveau:1 },
+    { regle:'Le son [wa] (oi/oy)', explication:'"oi" la plupart du temps, "oy" devant voyelle.', mots_exemples:'un oiseau, une voiture, une étoile, le soir', niveau:1 },
+    { regle:'Le son [ɛ] (è/ê/ai/ei)', explication:'Plusieurs orthographes pour le même son.', mots_exemples:'la tête, la fête, une maison, la neige', niveau:1 },
+    { regle:'Le son [z] (s/z/x)', explication:'"s" entre voyelles, "z" en début, "x" dans six/dix.', mots_exemples:'la maison, un oiseau, zéro, onze', niveau:1 },
+    { regle:'Le son [s] (s/ss/c/ç/x/sc/t)', explication:'Nombreuses orthographes pour le son [s].', mots_exemples:'la classe, cinq, un garçon, la piscine', niveau:1 },
+    { regle:'Le son [k] (c/qu/ch/cc/k/q)', explication:'"c" devant a/o/u, "qu" devant e/i/y.', mots_exemples:'quatre, qui, un coq, un canard', niveau:1 },
+    { regle:'Le son [i] (i/y)', explication:'"i" la plupart du temps, "y" dans certains mots.', mots_exemples:'lundi, six, dix, un pyjama', niveau:1 },
+    { regle:'Le son [ʒ] (j/ge/gi/gy)', explication:'"j" devant toutes voyelles, "g" devant e et i.', mots_exemples:'jouer, rouge, une cage, la gymnastique', niveau:1 }
+  ];
+  const gr = [
+    { categorie:'types_de_phrases', notion:'La phrase', explication:'Une phrase commence par une majuscule et se termine par un point (. / ? / !).', exemple:'Bonjour ! Comment vas-tu ?', niveau:1 },
+    { categorie:'types_de_phrases', notion:'Phrase déclarative', explication:'Dit une information, se termine par un point.', exemple:'Le chat dort.', niveau:1 },
+    { categorie:'types_de_phrases', notion:'Phrase interrogative', explication:'Pose une question, se termine par ?.', exemple:'Où vas-tu ?', niveau:1 },
+    { categorie:'types_de_phrases', notion:'Phrase exclamative', explication:'Exprime une émotion, se termine par !.', exemple:'Quel beau château !', niveau:1 },
+    { categorie:'classes_de_mots', notion:'Le nom', explication:'Désigne une personne, un animal, un objet ou un lieu.', exemple:'chat, maison, Marie', niveau:1 },
+    { categorie:'classes_de_mots', notion:'Le déterminant', explication:'Mot placé devant le nom (le, un, mon, ce).', exemple:'le chat, une fleur', niveau:1 },
+    { categorie:'classes_de_mots', notion:'L\'adjectif', explication:'Donne une qualité au nom. S\'accorde avec lui.', exemple:'un grand arbre, une jolie fleur', niveau:1 },
+    { categorie:'classes_de_mots', notion:'Le verbe et le sujet', explication:'Le verbe exprime l\'action. Le sujet fait l\'action.', exemple:'Le chat (sujet) mange (verbe).', niveau:1 },
+    { categorie:'classes_de_mots', notion:'Le pronom personnel', explication:'Remplace un nom : je, tu, il, nous, vous, ils.', exemple:'Je mange. Il court.', niveau:1 },
+    { categorie:'accords', notion:'L\'accord sujet-verbe', explication:'Le verbe s\'accorde avec son sujet en nombre.', exemple:'Le chat mange → Les chats mangent.', niveau:1 },
+    { categorie:'negation', notion:'La phrase négative', explication:'On utilise "ne...pas" pour dire le contraire.', exemple:'Je ne mange pas.', niveau:1 }
+  ];
+  const lr = [
+    { titre:'Le Petit Chat Perdu', texte:'Un petit chat noir et blanc s\'est perdu. Une petite fille nommée Lola l\'entend et le ramène chez elle.', type:'narratif', niveau:1 },
+    { titre:'La Petite Poule Rousse', texte:'La petite poule rousse cherche de l\'aide pour planter du blé, mais personne ne veut l\'aider. Elle fait tout toute seule et mange son pain toute seule !', type:'narratif', niveau:1 },
+    { titre:'Pilotin le petit poisson', texte:'Pilotin est un petit poisson rouge qui voudrait être grand. Mais être petit lui sauve la vie quand un gros poisson veut le manger !', type:'narratif', niveau:1 },
+    { titre:'Les Saisons', texte:'Il y a 4 saisons : le printemps, l\'été, l\'automne et l\'hiver. Chaque saison a ses particularités.', type:'documentaire', niveau:1 },
+    { titre:'Le Cycle de l\'Eau', texte:'L\'eau s\'évapore, forme des nuages, puis retombe en pluie. C\'est le cycle de l\'eau !', type:'documentaire', niveau:1 },
+    { titre:'Le Paresseux', texte:'Le paresseux dort 20h par jour, suspendu par ses griffes. Il est végétarien et se déplace très lentement.', type:'documentaire', niveau:1 },
+    { titre:'Le Zèbre', texte:'Le zèbre vit dans les plaines d\'Afrique. Ses rayures sont uniques et lui servent à se camoufler.', type:'documentaire', niveau:1 }
+  ];
+  const dict = [
+    { titre:'Dictée facile - Le jardin', texte:'Mon jardin est plein de belles fleurs. Les roses sont rouges et les tulipes sont jaunes.', nb_mots:12, niveau:1 },
+    { titre:'Liste 1 - Les chiffres', texte:'zéro un deux trois quatre cinq six sept huit neuf', nb_mots:10, niveau:1 },
+    { titre:'Liste 2 - Nombres 10-19', texte:'dix onze douze treize quatorze quinze seize dix-sept dix-huit dix-neuf', nb_mots:10, niveau:1 },
+    { titre:'Liste 4 - Mots courants', texte:'la tête un train la terre un manteau des manteaux toujours une histoire très attraper le travail', nb_mots:12, niveau:1 },
+    { titre:'Dictée moyenne - La plage', texte:'Cet été, nous sommes allés à la plage. Le sable était chaud. J\'ai construit un grand château.', nb_mots:16, niveau:2 }
+  ];
+  const poe = [
+    { titre:'Le Printemps', auteur:'Maurice Carême', texte:'Printemps, printemps, me voici !\nLes arbres sont en fleurs.\nLes oiseaux sont de retour\nEt chantent dans mon cœur.', niveau:1 },
+    { titre:'Où es-tu ?', auteur:'Maurice Carême', texte:'Petite abeille,\nOù es-tu cachée ?\nDans les fleurs, dans le pré,\nOu sur le rosier ?', niveau:1 },
+    { titre:'La lune', auteur:'Victor Hugo', texte:'La lune est un petit jardin\nTout en haut du ciel.\nElle éclaire les chemins\nD\'une lumière si belle.', niveau:1 },
+    { titre:'Trois escargots', auteur:'Jacques Charpentreau', texte:'Moi, j\'ai trois escargots,\nUn devant, deux derrière.\nIls habitent un pot\nDe la cuisine, par terre.', niveau:1 },
+    { titre:'Anniversaire', auteur:'Jacques Prévert', texte:'Un gâteau tout rond,\nDes bougies qui brillent,\nUne chanson, des ballons,\nEt des amis qui babillent.', niveau:1 }
+  ];
+  const prb = [
+    { enonce:'Léo a 8 billes. Il en gagne 5. Combien de billes a-t-il ?', operation:'addition', reponse:'13', etapes:1, niveau:1 },
+    { enonce:'Dans la classe, 15 élèves. 6 garçons. Combien de filles ?', operation:'soustraction', reponse:'9', etapes:1, niveau:1 },
+    { enonce:'3 paquets de 4 gâteaux. Combien de gâteaux ?', operation:'multiplication', reponse:'12', etapes:1, niveau:1 },
+    { enonce:'Émilie a 45€. Elle dépense 13€. Combien reste-t-il ?', operation:'soustraction', reponse:'32', etapes:1, niveau:1 },
+    { enonce:'Une ferme a 147 vaches et 48 veaux. Combien d\'animaux ?', operation:'addition', reponse:'195', etapes:1, niveau:2 },
+    { enonce:'4 paquets de 8 bonbons. Combien de bonbons ?', operation:'multiplication', reponse:'32', etapes:1, niveau:2 }
+  ];
+  const geo = [
+    { notion:'Le carré', description:'Un carré a 4 côtés de la même longueur et 4 angles droits.', niveau:1 },
+    { notion:'Le rectangle', description:'Un rectangle a 4 côtés : 2 grands et 2 petits. 4 angles droits.', niveau:1 },
+    { notion:'Le triangle', description:'Un triangle a 3 côtés et 3 sommets.', niveau:1 },
+    { notion:'Le cercle', description:'Un cercle est une forme ronde. Tous les points sont à égale distance du centre.', niveau:1 },
+    { notion:'Les polygones', description:'Un polygone est une figure fermée tracée à la règle, avec des côtés et des sommets.', niveau:1 },
+    { notion:'L\'angle droit', description:'Un angle droit mesure 90 degrés. On le trouve dans les carrés et les rectangles.', niveau:1 },
+    { notion:'L\'axe de symétrie', description:'Une figure a un axe de symétrie quand on peut la plier en deux pour que les deux parties se superposent.', niveau:1 }
+  ];
+  const mes = [
+    { unite:'Mètre', symbole:'m', conversion:'1 m = 100 cm', explication:'Le mètre est l\'unité principale pour mesurer les longueurs.', niveau:1 },
+    { unite:'Centimètre', symbole:'cm', conversion:'1 cm = 10 mm', explication:'Le centimètre sert à mesurer des petites longueurs.', niveau:1 },
+    { unite:'Kilomètre', symbole:'km', conversion:'1 km = 1000 m', explication:'Le kilomètre sert à mesurer de grandes distances.', niveau:1 },
+    { unite:'Gramme', symbole:'g', conversion:'1 g = 1000 mg', explication:'Le gramme est l\'unité pour mesurer la masse.', niveau:1 },
+    { unite:'Kilogramme', symbole:'kg', conversion:'1 kg = 1000 g', explication:'Le kilogramme sert à peser des objets lourds.', niveau:1 },
+    { unite:'Litre', symbole:'L', conversion:'1 L = 100 cL', explication:'Le litre sert à mesurer les liquides.', niveau:1 }
+  ];
+  const ang = [
+    { mot_fr:'bonjour', mot_en:'hello', phonetique:'/hə.ˈloʊ/', categorie:'salutations' },
+    { mot_fr:'merci', mot_en:'thank you', phonetique:'/ˈθæŋk juː/', categorie:'salutations' },
+    { mot_fr:'oui', mot_en:'yes', phonetique:'/jɛs/', categorie:'salutations' },
+    { mot_fr:'non', mot_en:'no', phonetique:'/noʊ/', categorie:'salutations' },
+    { mot_fr:'maman', mot_en:'mom', phonetique:'/mɑm/', categorie:'famille' },
+    { mot_fr:'papa', mot_en:'dad', phonetique:'/dæd/', categorie:'famille' },
+    { mot_fr:'rouge', mot_en:'red', phonetique:'/rɛd/', categorie:'couleurs' },
+    { mot_fr:'bleu', mot_en:'blue', phonetique:'/bluː/', categorie:'couleurs' },
+    { mot_fr:'un', mot_en:'one', phonetique:'/wʌn/', categorie:'chiffres' },
+    { mot_fr:'deux', mot_en:'two', phonetique:'/tuː/', categorie:'chiffres' },
+    { mot_fr:'le chat', mot_en:'cat', phonetique:'/kæt/', categorie:'animaux' },
+    { mot_fr:'le chien', mot_en:'dog', phonetique:'/dɑːɡ/', categorie:'animaux' }
+  ];
+  const qm = [
+    { titre:'Les Gaulois', contenu:'Les Gaulois étaient les habitants de la France avant les Romains.', domaine:'histoire', niveau:1 },
+    { titre:'La France et ses frontières', contenu:'La France a des frontières avec l\'Espagne, l\'Italie, la Suisse, l\'Allemagne, la Belgique et le Luxembourg.', domaine:'geographie', niveau:1 },
+    { titre:'Les 5 sens', contenu:'Nous avons 5 sens : la vue, l\'ouïe, l\'odorat, le goût et le toucher.', domaine:'sciences', niveau:1 },
+    { titre:'Le corps humain', contenu:'Le corps a plusieurs parties : tête, tronc, bras, jambes. À l\'intérieur : cœur, poumons, estomac, cerveau.', domaine:'sciences', niveau:1 }
+  ];
+  const emcData = [
+    { valeur:'Le respect', explication:'Le respect, c\'est traiter les autres comme on aimerait être traité.', question_reflexion:'Comment montres-tu du respect ?' },
+    { valeur:'La liberté', explication:'La liberté, c\'est le droit de penser et d\'agir sans faire de mal aux autres.', question_reflexion:'Qu\'est-ce que la liberté pour toi ?' },
+    { valeur:'L\'égalité', explication:'L\'égalité, c\'est quand tout le monde a les mêmes droits.', question_reflexion:'Pourquoi l\'égalité est importante ?' },
+    { valeur:'La solidarité', explication:'La solidarité, c\'est aider les autres quand ils en ont besoin.', question_reflexion:'Comment peux-tu aider quelqu\'un ?' },
+    { valeur:'L\'honnêteté', explication:'L\'honnêteté, c\'est dire la vérité.', question_reflexion:'Pourquoi dire la vérité ?' }
+  ];
+  const artsData = [
+    { activite:'Les couleurs primaires', description:'Rouge, bleu, jaune. Leurs mélanges donnent d\'autres couleurs.', domaine:'arts', niveau:1 },
+    { activite:'Les notes de musique', description:'Do, Ré, Mi, Fa, Sol, La, Si. 7 notes pour faire des mélodies.', domaine:'musique', niveau:1 },
+    { activite:'La gymnastique', description:'Roulades, chandelle, roue. Cela développe souplesse et équilibre.', domaine:'eps', niveau:1 }
+  ];
+  switch (subjectId) {
+    case 'orthographe': return fs;
+    case 'grammaire': return gr;
+    case 'lecture': return lr;
+    case 'dictees': return dict;
+    case 'poesies': return poe;
+    case 'problemes': return prb;
+    case 'geometrie': return geo;
+    case 'mesures': return mes;
+    case 'anglais': return ang;
+    case 'questionner_monde': return qm;
+    case 'emc': return emcData;
+    case 'arts': return artsData;
+    default: return [];
+  }
 }
 
 function decouverteDetailHTML() {
