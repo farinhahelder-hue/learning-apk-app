@@ -18,7 +18,7 @@ class FrenchExerciseScreen extends StatefulWidget {
 
 class _FrenchExerciseScreenState extends State<FrenchExerciseScreen> {
   late List<Exercise> _exercises;
-  int _current = 0, _score = 0, _wrong = 0;
+  int _current = 0, _score = 0;
   bool _finished = false;
   late ConfettiController _confetti;
 
@@ -42,7 +42,7 @@ class _FrenchExerciseScreenState extends State<FrenchExerciseScreen> {
   }
 
   void _onWrong() {
-    setState(() => _wrong++);
+
     if (_current < _exercises.length - 1)
       Future.delayed(const Duration(milliseconds: 1500), () => setState(() => _current++));
     else _finish();
@@ -126,7 +126,7 @@ class _FrenchExerciseScreenState extends State<FrenchExerciseScreen> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () => setState(() {
-                _current = 0; _score = 0; _wrong = 0; _finished = false; _exercises.shuffle();
+                _current = 0; _score = 0; _finished = false; _exercises.shuffle();
               }),
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.frenchColor),
               child: const Text('Rejouer ! 🔄', style: TextStyle(color: Colors.white)),
