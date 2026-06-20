@@ -109,13 +109,13 @@ class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           textStyle: buttonStyle,
           elevation: 4,
-          shadowColor: primaryBlue.withOpacity(0.4),
+          shadowColor: primaryBlue.withValues(alpha: 0.4),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withValues(alpha: 0.1),
       ),
     );
   }
