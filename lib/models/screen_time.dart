@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ScreenTimeService extends ChangeNotifier {
+  final SharedPreferences prefs;
+
+  ScreenTimeService(this.prefs);
   static const int sessionLimitMinutes = 15;   // pause oblig. après 15 min
   static const int dailyLimitMinutes   = 45;   // max par jour
 
@@ -47,7 +50,7 @@ class ScreenTimeService extends ChangeNotifier {
   bool get dailyLimitReached => _dailySeconds >= dailyLimitMinutes * 60;
 
   Future<void> loadToday() async {
-    final p = await SharedPreferences.getInstance();
+    final p = prefs;
     final today = DateTime.now().toIso8601String().substring(0, 10);
     final saved = p.getString('screentime_date');
     if (saved == today) {
@@ -59,7 +62,7 @@ class ScreenTimeService extends ChangeNotifier {
   }
 
   Future<void> saveToday() async {
-    final p = await SharedPreferences.getInstance();
+    final p = prefs;
     final today = DateTime.now().toIso8601String().substring(0, 10);
     await p.setString('screentime_date', today);
     await p.setInt('screentime_daily', _dailySeconds);
