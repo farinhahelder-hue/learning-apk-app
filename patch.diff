@@ -1,0 +1,30 @@
+<<<<<<< SEARCH
+  void _showCurrentQuestion() {
+    if (_currentIndex >= _questions.length) return;
+    final q = _questions[_currentIndex];
+    setState(() {
+      _mood         = MascotMood.thinking;
+      _speechText   = _mascot.thinkPhrases[_currentIndex % _mascot.thinkPhrases.length];
+      _selectedAnswer = null;
+      _answered       = false;
+      _showFunFact    = false;
+    });
+    _timerKey.currentState?.reset();
+    // Optionnel : lire la question via TTS
+    // context.read<TtsService>().readQuestion(q['question']);
+  }
+=======
+  void _showCurrentQuestion() {
+    if (_currentIndex >= _questions.length) return;
+    setState(() {
+      _mood         = MascotMood.thinking;
+      _speechText   = _mascot.thinkPhrases[_currentIndex % _mascot.thinkPhrases.length];
+      _selectedAnswer = null;
+      _answered       = false;
+      _showFunFact    = false;
+    });
+    _timerKey.currentState?.reset();
+    // Optionnel : lire la question via TTS
+    // context.read<TtsService>().readQuestion(_questions[_currentIndex]['question']);
+  }
+>>>>>>> REPLACE
