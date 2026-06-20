@@ -3,25 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ScreenTimeService extends ChangeNotifier {
-  static const int sessionLimitMinutes = 15;   // pause oblig. après 15 min
-  static const int dailyLimitMinutes   = 45;   // max par jour
+  static const int sessionLimitMinutes = 15; // pause oblig. après 15 min
+  static const int dailyLimitMinutes = 45; // max par jour
 
   int _sessionSeconds = 0;
-  int _dailySeconds   = 0;
+  int _dailySeconds = 0;
   bool _pauseRequested = false;
   DateTime? _sessionStart;
 
-  int get sessionSeconds  => _sessionSeconds;
-  int get dailySeconds    => _dailySeconds;
+  int get sessionSeconds => _sessionSeconds;
+  int get dailySeconds => _dailySeconds;
   bool get pauseRequested => _pauseRequested;
 
   double get sessionProgress => _sessionSeconds / (sessionLimitMinutes * 60);
-  double get dailyProgress   => _dailySeconds   / (dailyLimitMinutes   * 60);
+  double get dailyProgress => _dailySeconds / (dailyLimitMinutes * 60);
 
   String get sessionTimeLabel {
     final m = _sessionSeconds ~/ 60;
     final s = _sessionSeconds % 60;
-    return '${m.toString().padLeft(2,'0')}:${s.toString().padLeft(2,'0')}';
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
   void startSession() {
@@ -47,7 +47,8 @@ class ScreenTimeService extends ChangeNotifier {
   bool get dailyLimitReached => _dailySeconds >= dailyLimitMinutes * 60;
 
   Future<void> loadToday() async {
-    final p = await SharedPreferences.getInstance();
+    _prefs ??= await SharedPreferences.getInstance();
+    final p = _prefs!;
     final today = DateTime.now().toIso8601String().substring(0, 10);
     final saved = p.getString('screentime_date');
     if (saved == today) {
@@ -58,8 +59,11 @@ class ScreenTimeService extends ChangeNotifier {
     }
   }
 
+  SharedPreferences? _prefs;
+
   Future<void> saveToday() async {
-    final p = await SharedPreferences.getInstance();
+    _prefs ??= await SharedPreferences.getInstance();
+    final p = _prefs!;
     final today = DateTime.now().toIso8601String().substring(0, 10);
     await p.setString('screentime_date', today);
     await p.setInt('screentime_daily', _dailySeconds);
