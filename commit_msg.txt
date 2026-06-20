@@ -1,0 +1,6 @@
+🧹 [code health improvement] Remove unused fields in StoryScreen
+
+🎯 **What:** Removed unused `_currentChapterIndex` and `_showingReward` fields from `_StoryScreenState`.
+💡 **Why:** Analyzer flagged them. Removing unused state improves maintainability and readability.
+✅ **Verification:** Compiled the code and verified the fix with `flutter analyze lib/screens/story_screen.dart` to make sure there are no remaining issues. There is no test suite in this project.
+✨ **Result:** Clean state with no unused variables in `StoryScreen`.
