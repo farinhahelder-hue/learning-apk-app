@@ -221,8 +221,8 @@ class StreakIndicator extends StatelessWidget {
     )
         .animate(target: achieved ? 1 : 0)
         .shake(duration: 500.ms, hz: 2)
-        .scale(begin: 1.0, end: 1.1, duration: 200.ms)
+        .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1), duration: 200.ms)
         .then()
-        .scale(begin: 1.1, end: 1.0, duration: 200.ms);
+        .scale(begin: const Offset(1.1, 1.1), end: const Offset(1.0, 1.0), duration: 200.ms);
   }
 }
