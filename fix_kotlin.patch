@@ -1,0 +1,9 @@
+--- android/app/src/main/kotlin/com/emilieapp/education/MainActivity.kt
++++ android/app/src/main/kotlin/com/emilieapp/education/MainActivity.kt
+@@ -1,5 +1,5 @@
+ package com.emilieapp.education
+
+-import io.flutter.embedding.android.FlutterActivity
++import io.flutter.embedding.android.FlutterActivity
+
+ class MainActivity: FlutterActivity()
