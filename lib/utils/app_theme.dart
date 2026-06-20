@@ -112,7 +112,7 @@ class AppTheme {
           shadowColor: primaryBlue.withOpacity(0.4),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         shadowColor: Colors.black.withOpacity(0.1),
