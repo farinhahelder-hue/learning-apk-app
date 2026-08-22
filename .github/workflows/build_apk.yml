@@ -49,7 +49,15 @@ jobs:
 
       - name: 🩺 List build outputs (always, for diagnosis)
         if: always()
-        run: find build -iname "*.apk" -o -iname "output-metadata.json" 2>/dev/null || true
+        run: |
+          echo "--- top-level build/ exists? ---"
+          ls -la build 2>&1 || true
+          echo "--- android/app/build exists? ---"
+          ls -la android/app/build 2>&1 || true
+          echo "--- searching whole repo for .apk files ---"
+          find . -iname "*.apk" 2>/dev/null || true
+          echo "--- searching whole repo for output-metadata.json ---"
+          find . -iname "output-metadata.json" 2>/dev/null || true
 
       - name: 📤 Upload APK
         uses: actions/upload-artifact@v4
