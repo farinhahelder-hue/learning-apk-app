@@ -19,13 +19,9 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(':app')
-}
 
-// Fix for speech_to_text plugin compatibility
-subprojects {
+    // Fix for speech_to_text plugin compatibility
     afterEvaluate { project ->
         if (project.hasProperty('android')) {
             project.android {
