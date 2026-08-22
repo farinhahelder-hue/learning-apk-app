@@ -14,6 +14,16 @@ allprojects {
     }
 }
 
+// Redirige les sorties de build de chaque module Android vers <racine>/build/<module>
+// (c'est ce que flutter_tools attend, ex: build/app/outputs/flutter-apk/app-release.apk)
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
 // Fix for speech_to_text plugin compatibility
 subprojects {
     afterEvaluate { project ->
