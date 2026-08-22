@@ -82,7 +82,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   }
 
   void _startMixedMode() {
-    final random = Random();
+    final random = Random.secure();
     final exercises = <MultiplicationExercise>[];
     final tables = [2, 3, 4, 5];
     
@@ -140,7 +140,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   }
 
   List<MultiplicationExercise> _generateExercises(int table) {
-    final random = Random();
+    final random = Random.secure();
     final exercises = <MultiplicationExercise>[];
     
     for (int i = 1; i <= 10; i++) {

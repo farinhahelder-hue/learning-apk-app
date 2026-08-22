@@ -1,0 +1,1 @@
+ /app/build/web/app.js /app/build/web/style.css:  /app/web/app.js /app/web/index.html /app/web/style.css
