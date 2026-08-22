@@ -12,7 +12,7 @@ import '../utils/constants.dart';
 import '../data/math_exercises.dart';
 import '../data/french_exercises.dart';
 import '../data/science_exercises.dart';
-import '../data/ce2_exercises.dart';
+import '../data/skill_exercises.dart';
 import '../models/adaptive_engine.dart';
 import 'coach_screen.dart';
 
@@ -35,7 +35,7 @@ class ArcadeGameScreen extends StatefulWidget {
   @override
   State<ArcadeGameScreen> createState() => _ArcadeGameScreenState();
 
-  // Mapping skillId -> catégorie d'exercices génériques (fallback si CE2Exercises
+  // Mapping skillId -> catégorie d'exercices génériques (fallback si SkillExercises
   // n'a rien de spécifique pour ce skillId)
   static const Map<String, String> _categoryMap = {
     'sk_add20': 'addition',      'sk_add100': 'addition',
@@ -53,10 +53,10 @@ class ArcadeGameScreen extends StatefulWidget {
     'sk_vocab_animals': 'vocabulaire', 'sk_read_poetry': 'vocabulaire',
   };
 
-  /// Une compétence a du contenu jouable si CE2Exercises en a, ou si elle
+  /// Une compétence a du contenu jouable si SkillExercises en a, ou si elle
   /// est mappée vers une catégorie d'exercices génériques.
   static bool hasContent(String skillId) =>
-      CE2Exercises.getBySkill(skillId).isNotEmpty ||
+      SkillExercises.getBySkill(skillId).isNotEmpty ||
       _categoryMap.containsKey(skillId);
 }
 
@@ -84,8 +84,8 @@ class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
   }
 
   void _loadExercises() {
-    // 1. Exercices spécifiques à cette compétence en priorité (CE2Exercises)
-    List<Exercise> all = CE2Exercises.getBySkill(widget.skillId);
+    // 1. Exercices spécifiques à cette compétence en priorité (SkillExercises)
+    List<Exercise> all = SkillExercises.getBySkill(widget.skillId);
 
     // 2. Sinon, catégorie générique correspondant à la compétence
     if (all.isEmpty) {
