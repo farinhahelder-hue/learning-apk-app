@@ -54,20 +54,25 @@ class WorldMapScreen extends StatelessWidget {
               ),
             ),
             // Sélecteur de niveau : CE1 et CE2 sont bien séparés partout
+            // (bleu = CE1, violet = CE2, même code couleur dans toute l'app)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
                     child: _LevelChip(
-                      label: 'CE1', selected: gs.gradeLevel == 'CE1',
+                      label: 'Je joue en CE1',
+                      color: AppTheme.primaryBlue,
+                      selected: gs.gradeLevel == 'CE1',
                       onTap: () => gs.setGradeLevel('CE1'),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _LevelChip(
-                      label: 'CE2', selected: gs.gradeLevel == 'CE2',
+                      label: 'Je joue en CE2',
+                      color: AppTheme.primaryPurple,
+                      selected: gs.gradeLevel == 'CE2',
                       onTap: () => gs.setGradeLevel('CE2'),
                     ),
                   ),
@@ -151,10 +156,16 @@ class WorldMapScreen extends StatelessWidget {
 
 class _LevelChip extends StatelessWidget {
   final String label;
+  final Color color;
   final bool selected;
   final VoidCallback onTap;
 
-  const _LevelChip({required this.label, required this.selected, required this.onTap});
+  const _LevelChip({
+    required this.label,
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -162,21 +173,25 @@ class _LevelChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.primaryBlue : Colors.white,
+          color: selected ? color : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? AppTheme.primaryBlue : Colors.grey.shade300,
-            width: 2,
+            color: selected ? color : Colors.grey.shade300,
+            width: 2.5,
           ),
+          boxShadow: selected
+              ? [BoxShadow(color: color.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))]
+              : [],
         ),
         alignment: Alignment.center,
         child: Text(
           label,
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w800,
-            fontSize: 15,
+            fontSize: 14,
             color: selected ? Colors.white : AppTheme.textGrey,
           ),
         ),
