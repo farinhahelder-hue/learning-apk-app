@@ -9,10 +9,7 @@ import '../services/game_service.dart';
 import '../services/progress_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/constants.dart';
-import '../data/math_exercises.dart';
-import '../data/french_exercises.dart';
-import '../data/science_exercises.dart';
-import '../data/skill_exercises.dart';
+import '../utils/curriculum.dart';
 import '../models/adaptive_engine.dart';
 import 'coach_screen.dart';
 
@@ -35,29 +32,9 @@ class ArcadeGameScreen extends StatefulWidget {
   @override
   State<ArcadeGameScreen> createState() => _ArcadeGameScreenState();
 
-  // Mapping skillId -> catégorie d'exercices génériques (fallback si SkillExercises
-  // n'a rien de spécifique pour ce skillId)
-  static const Map<String, String> _categoryMap = {
-    'sk_add20': 'addition',      'sk_add100': 'addition',
-    'sk_sub20': 'subtraction',   'sk_sub100': 'subtraction',
-    'sk_mult2_5': 'multiplication', 'sk_mult6_9': 'multiplication',
-    'sk_shapes2d': 'geometry',   'sk_shapes3d': 'geometry',
-    'sk_angles': 'geometry',     'sk_count100': 'logic',
-    'sk_count1000': 'logic',     'sk_fractions': 'logic',
-    'sk_length': 'logic',        'sk_mass': 'logic',
-    'sk_time': 'logic',          'sk_money': 'logic',
-    'sk_read_simple': 'lecture', 'sk_read_text': 'lecture',
-    'sk_spell_basic': 'orthographe', 'sk_spell_homophones': 'orthographe',
-    'sk_conj_present': 'conjugaison', 'sk_conj_etre_avoir': 'conjugaison',
-    'sk_gram_phrase': 'grammaire', 'sk_gram_nature': 'grammaire',
-    'sk_vocab_animals': 'vocabulaire', 'sk_read_poetry': 'vocabulaire',
-  };
-
   /// Une compétence a du contenu jouable si SkillExercises en a, ou si elle
   /// est mappée vers une catégorie d'exercices génériques.
-  static bool hasContent(String skillId) =>
-      SkillExercises.getBySkill(skillId).isNotEmpty ||
-      _categoryMap.containsKey(skillId);
+  static bool hasContent(String skillId) => Curriculum.skillHasContent(skillId);
 }
 
 class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
@@ -84,21 +61,7 @@ class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
   }
 
   void _loadExercises() {
-    // 1. Exercices spécifiques à cette compétence en priorité (SkillExercises)
-    List<Exercise> all = SkillExercises.getBySkill(widget.skillId);
-
-    // 2. Sinon, catégorie générique correspondant à la compétence
-    if (all.isEmpty) {
-      final cat = ArcadeGameScreen._categoryMap[widget.skillId];
-      if (cat != null) {
-        switch (widget.subject) {
-          case 'math':    all = MathExercises.getByCategory(cat); break;
-          case 'french':  all = FrenchExercises.getByCategory(cat); break;
-          case 'science': all = ScienceExercises.getByCategory(cat); break;
-        }
-      }
-    }
-
+    List<Exercise> all = Curriculum.exercisesForSkill(widget.subject, widget.skillId);
     all = List.from(all)..shuffle();
     _exercises = all.length > 8 ? all.sublist(0, 8) : all;
 

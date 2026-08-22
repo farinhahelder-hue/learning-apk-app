@@ -1,5 +1,75 @@
 // Mapping officiel programme CE1 + début CE2 (Eduscol / Cycle 2)
+import '../models/exercise.dart';
+import '../data/math_exercises.dart';
+import '../data/french_exercises.dart';
+import '../data/science_exercises.dart';
+import '../data/skill_exercises.dart';
+
 class Curriculum {
+  // Mapping skillId -> catégorie d'exercices génériques (fallback si
+  // SkillExercises n'a rien de spécifique pour ce skillId).
+  static const Map<String, String> categoryMap = {
+    'sk_add20': 'addition',      'sk_add100': 'addition',
+    'sk_sub20': 'subtraction',   'sk_sub100': 'subtraction',
+    'sk_mult2_5': 'multiplication', 'sk_mult6_9': 'multiplication',
+    'sk_shapes2d': 'geometry',   'sk_shapes3d': 'geometry',
+    'sk_angles': 'geometry',     'sk_count100': 'logic',
+    'sk_count1000': 'logic',     'sk_fractions': 'logic',
+    'sk_length': 'logic',        'sk_mass': 'logic',
+    'sk_time': 'logic',          'sk_money': 'logic',
+    'sk_read_simple': 'lecture', 'sk_read_text': 'lecture',
+    'sk_spell_basic': 'orthographe', 'sk_spell_homophones': 'orthographe',
+    'sk_conj_present': 'conjugaison', 'sk_conj_etre_avoir': 'conjugaison',
+    'sk_gram_phrase': 'grammaire', 'sk_gram_nature': 'grammaire',
+    'sk_vocab_animals': 'vocabulaire', 'sk_read_poetry': 'vocabulaire',
+  };
+
+  /// Une compétence a du contenu jouable si SkillExercises en a, ou si elle
+  /// est mappée vers une catégorie d'exercices génériques.
+  static bool skillHasContent(String skillId) =>
+      SkillExercises.getBySkill(skillId).isNotEmpty ||
+      categoryMap.containsKey(skillId);
+
+  /// Résout les exercices d'une compétence : priorité à SkillExercises
+  /// (contenu spécifique), sinon la catégorie générique de la matière.
+  static List<Exercise> exercisesForSkill(String subject, String skillId) {
+    final specific = SkillExercises.getBySkill(skillId);
+    if (specific.isNotEmpty) return specific;
+
+    final cat = categoryMap[skillId];
+    if (cat == null) return const [];
+    switch (subject) {
+      case 'math':    return MathExercises.getByCategory(cat);
+      case 'french':  return FrenchExercises.getByCategory(cat);
+      case 'science': return ScienceExercises.getByCategory(cat);
+      default:        return const [];
+    }
+  }
+
+  /// Toutes les compétences (de tous les mondes) d'un niveau donné
+  /// ('CE1' ou 'CE2'), chacune enrichie de son 'subject' et 'worldId'.
+  static List<Map<String, dynamic>> skillsForLevel(String level) {
+    final result = <Map<String, dynamic>>[];
+    for (final world in worlds) {
+      final subject = world['subject'] as String;
+      final worldId = world['id'] as String;
+      for (final skill in (world['skills'] as List<Map<String, dynamic>>)) {
+        if (skill['level'] == level) {
+          result.add({...skill, 'subject': subject, 'worldId': worldId});
+        }
+      }
+    }
+    return result;
+  }
+
+  /// Tous les exercices jouables d'un niveau donné, tous mondes confondus.
+  static List<Exercise> exercisesForLevel(String level) {
+    final result = <Exercise>[];
+    for (final skill in skillsForLevel(level)) {
+      result.addAll(exercisesForSkill(skill['subject'] as String, skill['id'] as String));
+    }
+    return result;
+  }
   static const List<Map<String, dynamic>> periods = [
     {
       'id': 'P1', 'label': 'Période 1', 'emoji': '🍂',

@@ -12,13 +12,16 @@ class SkillScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gs = context.watch<GameService>();
-    final skills = world['skills'] as List<Map<String, dynamic>>;
+    final allSkills = world['skills'] as List<Map<String, dynamic>>;
+    // Ne montre que les compétences du niveau choisi : CE1 et CE2 sont
+    // deux progressions bien séparées, jamais mélangées.
+    final skills = allSkills.where((s) => s['level'] == gs.gradeLevel).toList();
     final worldId = world['id'] as String;
     final color = Color(world['color'] as int);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${world['emoji']} ${world['title']}'),
+        title: Text('${world['emoji']} ${world['title']} · ${gs.gradeLevel}'),
         backgroundColor: color.withOpacity(0.15),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),

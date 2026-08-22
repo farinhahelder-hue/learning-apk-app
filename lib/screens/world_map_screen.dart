@@ -53,6 +53,28 @@ class WorldMapScreen extends StatelessWidget {
                 ],
               ),
             ),
+            // Sélecteur de niveau : CE1 et CE2 sont bien séparés partout
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _LevelChip(
+                      label: 'CE1', selected: gs.gradeLevel == 'CE1',
+                      onTap: () => gs.setGradeLevel('CE1'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _LevelChip(
+                      label: 'CE2', selected: gs.gradeLevel == 'CE2',
+                      onTap: () => gs.setGradeLevel('CE2'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.all(16),
@@ -65,10 +87,12 @@ class WorldMapScreen extends StatelessWidget {
                 itemCount: Curriculum.worlds.length,
                 itemBuilder: (context, i) {
                   final world = Curriculum.worlds[i];
-                  final wp = gs.getWorldProgress(world['id'] as String);
                   final color = Color(world['color'] as int);
-                  final skills = world['skills'] as List<Map<String, dynamic>>;
+                  final allSkills = world['skills'] as List<Map<String, dynamic>>;
+                  final skills = allSkills.where((s) => s['level'] == gs.gradeLevel).toList();
                   final totalStars = skills.length * 3;
+                  final earnedStars = skills.fold<int>(
+                      0, (sum, s) => sum + gs.getSkillStars(world['id'] as String, s['id'] as String));
 
                   return GestureDetector(
                     onTap: () => Navigator.push(
@@ -102,14 +126,14 @@ class WorldMapScreen extends StatelessWidget {
                           const SizedBox(height: 6),
                           Row(
                             children: List.generate(3, (s) => Icon(
-                              s < (wp.totalStars * 3 / totalStars).round()
+                              s < (totalStars == 0 ? 0 : earnedStars * 3 / totalStars).round()
                                   ? Icons.star_rounded
                                   : Icons.star_outline_rounded,
                               color: Colors.yellow.shade200,
                               size: 18,
                             )),
                           ),
-                          Text('${wp.totalStars}/$totalStars ⭐',
+                          Text('$earnedStars/$totalStars ⭐',
                               style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
                         ],
                       ),
@@ -119,6 +143,42 @@ class WorldMapScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LevelChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LevelChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? AppTheme.primaryBlue : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? AppTheme.primaryBlue : Colors.grey.shade300,
+            width: 2,
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            color: selected ? Colors.white : AppTheme.textGrey,
+          ),
         ),
       ),
     );

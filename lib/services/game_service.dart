@@ -12,6 +12,7 @@ class GameService extends ChangeNotifier {
   int _level = 1;
   List<String> _unlockedAvatars = ['avatar_star'];
   String _currentAvatar = 'avatar_star';
+  String _gradeLevel = 'CE1';
 
   GameService(this._prefs) { _load(); }
 
@@ -21,6 +22,17 @@ class GameService extends ChangeNotifier {
   List<String> get unlockedAvatars => _unlockedAvatars;
   Map<String, WorldProgress> get worldsProgress => _worldsProgress;
 
+  /// Niveau scolaire actuellement choisi ('CE1' ou 'CE2'), pour bien
+  /// séparer les deux programmes dans la Carte du monde et les mini-jeux.
+  String get gradeLevel => _gradeLevel;
+
+  Future<void> setGradeLevel(String level) async {
+    if (level != 'CE1' && level != 'CE2') return;
+    _gradeLevel = level;
+    await _prefs.setString('grade_level', level);
+    notifyListeners();
+  }
+
   int get xpForNextLevel  => _level * 200;
   double get xpProgress   => (_xp % xpForNextLevel) / xpForNextLevel;
 
@@ -28,6 +40,7 @@ class GameService extends ChangeNotifier {
     _xp    = _prefs.getInt('game_xp')    ?? 0;
     _level = _prefs.getInt('game_level') ?? 1;
     _currentAvatar = _prefs.getString('avatar') ?? 'avatar_star';
+    _gradeLevel = _prefs.getString('grade_level') ?? 'CE1';
     _unlockedAvatars = _prefs.getStringList('unlocked_avatars') ?? ['avatar_star'];
     _completedDailyChallenges = _prefs.getStringList('daily_done') ?? [];
 
