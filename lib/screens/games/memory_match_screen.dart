@@ -1,4 +1,6 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/mascot.dart';
@@ -55,6 +57,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
   void _onTapCard(int index) {
     if (_busy || _cards[index].flipped || _cards[index].matched || _finished) return;
 
+    HapticFeedback.lightImpact();
     setState(() => _cards[index].flipped = true);
 
     if (_firstIndex == null) {
@@ -71,6 +74,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
     final audio = context.read<AudioService>();
 
     if (isMatch) {
+      HapticFeedback.mediumImpact();
       setState(() {
         _cards[first].matched = true;
         _cards[index].matched = true;
@@ -148,24 +152,28 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
           final showFace = card.flipped || card.matched;
           return GestureDetector(
             onTap: () => _onTapCard(i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              decoration: BoxDecoration(
-                color: showFace
-                    ? card.mascot.color.withOpacity(card.matched ? 0.25 : 0.2)
-                    : AppTheme.primaryPurple.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: card.matched
-                      ? const Color(0xFF81C784)
-                      : AppTheme.primaryPurple.withOpacity(0.3),
-                  width: card.matched ? 3 : 1.5,
+            child: _FlipCard(
+              faceUp: showFace,
+              back: Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryPurple.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppTheme.primaryPurple.withOpacity(0.3), width: 1.5),
                 ),
+                alignment: Alignment.center,
+                child: const Text('❔', style: TextStyle(fontSize: 34)),
               ),
-              alignment: Alignment.center,
-              child: Text(
-                showFace ? card.mascot.emoji : '❔',
-                style: const TextStyle(fontSize: 34),
+              front: Container(
+                decoration: BoxDecoration(
+                  color: card.mascot.color.withOpacity(card.matched ? 0.25 : 0.2),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: card.matched ? const Color(0xFF81C784) : card.mascot.color.withOpacity(0.5),
+                    width: card.matched ? 3 : 1.5,
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(card.mascot.emoji, style: const TextStyle(fontSize: 34)),
               ),
             ),
           ).animate(target: card.matched ? 1 : 0).scale(
@@ -214,6 +222,74 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Petite carte qui se retourne (effet 3D) entre un dos et une face.
+class _FlipCard extends StatefulWidget {
+  final bool faceUp;
+  final Widget front;
+  final Widget back;
+
+  const _FlipCard({required this.faceUp, required this.front, required this.back});
+
+  @override
+  State<_FlipCard> createState() => _FlipCardState();
+}
+
+class _FlipCardState extends State<_FlipCard> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+      value: widget.faceUp ? 1 : 0,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _FlipCard old) {
+    super.didUpdateWidget(old);
+    if (old.faceUp != widget.faceUp) {
+      if (widget.faceUp) {
+        _ctrl.forward();
+      } else {
+        _ctrl.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        final angle = _ctrl.value * math.pi;
+        final showFront = _ctrl.value > 0.5;
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0012)
+            ..rotateY(angle),
+          child: showFront
+              ? Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..rotateY(math.pi),
+                  child: widget.front,
+                )
+              : widget.back,
+        );
+      },
     );
   }
 }

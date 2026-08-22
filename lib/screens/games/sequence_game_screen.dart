@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../services/audio_service.dart';
@@ -34,11 +35,11 @@ class _SequenceGameScreenState extends State<SequenceGameScreen> {
   int _activeButton = -1;
   bool _accepting = false;
   bool _isPlaying = false;
+  bool _started = false;
   String _message = 'Regarde bien la séquence...';
 
-  @override
-  void initState() {
-    super.initState();
+  void _beginGame() {
+    setState(() => _started = true);
     _startRound(fresh: true);
   }
 
@@ -46,23 +47,25 @@ class _SequenceGameScreenState extends State<SequenceGameScreen> {
     if (fresh) {
       _sequence = List.generate(_startLength, (_) => _rand.nextInt(4));
     }
-    _playerStep = 0;
-    _accepting = false;
-    setState(() => _message = 'Regarde bien la séquence...');
+    setState(() {
+      _playerStep = 0;
+      _accepting = false;
+      _message = 'Regarde bien la séquence...';
+    });
     _playSequence();
   }
 
   Future<void> _playSequence() async {
     setState(() => _isPlaying = true);
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 500));
     for (final i in _sequence) {
       if (!mounted) return;
       setState(() => _activeButton = i);
       context.read<AudioService>().onButtonTap();
-      await Future.delayed(const Duration(milliseconds: 450));
+      await Future.delayed(const Duration(milliseconds: 500));
       if (!mounted) return;
       setState(() => _activeButton = -1);
-      await Future.delayed(const Duration(milliseconds: 200));
+      await Future.delayed(const Duration(milliseconds: 250));
     }
     if (!mounted) return;
     setState(() {
@@ -75,8 +78,9 @@ class _SequenceGameScreenState extends State<SequenceGameScreen> {
   void _onTapButton(int i) {
     if (!_accepting || _isPlaying) return;
 
+    HapticFeedback.lightImpact();
     setState(() => _activeButton = i);
-    Future.delayed(const Duration(milliseconds: 150), () {
+    Future.delayed(const Duration(milliseconds: 180), () {
       if (mounted) setState(() => _activeButton = -1);
     });
 
@@ -85,20 +89,23 @@ class _SequenceGameScreenState extends State<SequenceGameScreen> {
       _playerStep++;
       if (_playerStep == _sequence.length) {
         _accepting = false;
-        if (_sequence.length > _bestLength) _bestLength = _sequence.length;
+        HapticFeedback.mediumImpact();
+        if (_sequence.length > _bestLength) {
+          setState(() => _bestLength = _sequence.length);
+        }
         context.read<AudioService>().onStarEarned();
         context.read<ProgressService>().addPoints('game', 10);
         setState(() => _message = 'Bravo ! Séquence suivante...');
         Future.delayed(const Duration(milliseconds: 900), () {
           if (!mounted) return;
-          setState(() => _sequence = [..._sequence, _rand.nextInt(4)]);
+          _sequence = [..._sequence, _rand.nextInt(4)];
           _startRound(fresh: false);
         });
       }
     } else {
       _accepting = false;
       setState(() => _message = 'On recommence en douceur ! 🌈');
-      Future.delayed(const Duration(milliseconds: 1200), () {
+      Future.delayed(const Duration(milliseconds: 1300), () {
         if (!mounted) return;
         _startRound(fresh: true);
       });
@@ -116,46 +123,85 @@ class _SequenceGameScreenState extends State<SequenceGameScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      body: _started ? _buildGame() : _buildIntro(),
+    );
+  }
+
+  Widget _buildIntro() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const Text('🎵', style: TextStyle(fontSize: 80))
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 900.ms),
+            const SizedBox(height: 20),
+            const Text('Regarde la séquence de couleurs,\npuis reproduis-la !',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                textAlign: TextAlign.center),
             const SizedBox(height: 8),
-            Text('Meilleure séquence : $_bestLength',
-                style: const TextStyle(fontSize: 16, color: AppTheme.textGrey, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            Text(_message,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                textAlign: TextAlign.center)
-                .animate(key: ValueKey(_message)).fadeIn(duration: 300.ms),
+            const Text('Pas de chrono, tu peux prendre ton temps 💙',
+                style: TextStyle(fontSize: 14, color: AppTheme.textGrey),
+                textAlign: TextAlign.center),
             const SizedBox(height: 32),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 20,
-                children: List.generate(4, (i) {
-                  final active = _activeButton == i;
-                  return GestureDetector(
-                    onTap: () => _onTapButton(i),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      decoration: BoxDecoration(
-                        color: active ? _colors[i] : _colors[i].withOpacity(0.35),
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: active
-                            ? [BoxShadow(color: _colors[i].withOpacity(0.6), blurRadius: 20, spreadRadius: 2)]
-                            : [],
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(_emojis[i], style: const TextStyle(fontSize: 48)),
-                    ),
-                  );
-                }),
+            ElevatedButton(
+              onPressed: _beginGame,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                minimumSize: const Size(220, 60),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
+              child: const Text('🎮 Commencer !',
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildGame() {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          Text('Meilleure séquence : $_bestLength',
+              style: const TextStyle(fontSize: 16, color: AppTheme.textGrey, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          Text(_message,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+              textAlign: TextAlign.center)
+              .animate(key: ValueKey(_message)).fadeIn(duration: 300.ms),
+          const SizedBox(height: 32),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+              children: List.generate(4, (i) {
+                final active = _activeButton == i;
+                return GestureDetector(
+                  onTap: () => _onTapButton(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    decoration: BoxDecoration(
+                      color: active ? _colors[i] : _colors[i].withOpacity(0.35),
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: active
+                          ? [BoxShadow(color: _colors[i].withOpacity(0.6), blurRadius: 20, spreadRadius: 2)]
+                          : [],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(_emojis[i], style: const TextStyle(fontSize: 48)),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
       ),
     );
   }
