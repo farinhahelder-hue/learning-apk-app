@@ -12,6 +12,9 @@ import '../utils/constants.dart';
 import '../data/math_exercises.dart';
 import '../data/french_exercises.dart';
 import '../data/science_exercises.dart';
+import '../data/ce2_exercises.dart';
+import '../models/adaptive_engine.dart';
+import 'coach_screen.dart';
 
 class ArcadeGameScreen extends StatefulWidget {
   final String worldId;
@@ -31,6 +34,30 @@ class ArcadeGameScreen extends StatefulWidget {
 
   @override
   State<ArcadeGameScreen> createState() => _ArcadeGameScreenState();
+
+  // Mapping skillId -> catégorie d'exercices génériques (fallback si CE2Exercises
+  // n'a rien de spécifique pour ce skillId)
+  static const Map<String, String> _categoryMap = {
+    'sk_add20': 'addition',      'sk_add100': 'addition',
+    'sk_sub20': 'subtraction',   'sk_sub100': 'subtraction',
+    'sk_mult2_5': 'multiplication', 'sk_mult6_9': 'multiplication',
+    'sk_shapes2d': 'geometry',   'sk_shapes3d': 'geometry',
+    'sk_angles': 'geometry',     'sk_count100': 'logic',
+    'sk_count1000': 'logic',     'sk_fractions': 'logic',
+    'sk_length': 'logic',        'sk_mass': 'logic',
+    'sk_time': 'logic',          'sk_money': 'logic',
+    'sk_read_simple': 'lecture', 'sk_read_text': 'lecture',
+    'sk_spell_basic': 'orthographe', 'sk_spell_homophones': 'orthographe',
+    'sk_conj_present': 'conjugaison', 'sk_conj_etre_avoir': 'conjugaison',
+    'sk_gram_phrase': 'grammaire', 'sk_gram_nature': 'grammaire',
+    'sk_vocab_animals': 'vocabulaire', 'sk_read_poetry': 'vocabulaire',
+  };
+
+  /// Une compétence a du contenu jouable si CE2Exercises en a, ou si elle
+  /// est mappée vers une catégorie d'exercices génériques.
+  static bool hasContent(String skillId) =>
+      CE2Exercises.getBySkill(skillId).isNotEmpty ||
+      _categoryMap.containsKey(skillId);
 }
 
 class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
@@ -46,44 +73,32 @@ class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
   Timer? _timer;
   late ConfettiController _confetti;
   late GameSession _session;
+  final AdaptiveEngine _engine = AdaptiveEngine();
 
   @override
   void initState() {
     super.initState();
     _confetti = ConfettiController(duration: const Duration(seconds: 4));
     _loadExercises();
-    _startTimer();
+    if (_exercises.isNotEmpty) _startTimer();
   }
 
   void _loadExercises() {
-    List<Exercise> all = [];
-    // Mapper skillId -> catégorie d'exercices
-    final categoryMap = {
-      'sk_add20': 'addition',      'sk_add100': 'addition',
-      'sk_sub20': 'subtraction',   'sk_sub100': 'subtraction',
-      'sk_mult2_5': 'multiplication', 'sk_mult6_9': 'multiplication',
-      'sk_shapes2d': 'geometry',   'sk_shapes3d': 'geometry',
-      'sk_angles': 'geometry',     'sk_count100': 'logic',
-      'sk_count1000': 'logic',     'sk_fractions': 'logic',
-      'sk_length': 'logic',        'sk_mass': 'logic',
-      'sk_time': 'logic',          'sk_money': 'logic',
-      'sk_read_simple': 'lecture', 'sk_read_text': 'lecture',
-      'sk_spell_basic': 'orthographe', 'sk_spell_homophones': 'orthographe',
-      'sk_conj_present': 'conjugaison', 'sk_conj_etre_avoir': 'conjugaison',
-      'sk_gram_phrase': 'grammaire', 'sk_gram_nature': 'grammaire',
-      'sk_vocab_animals': 'vocabulaire', 'sk_read_poetry': 'vocabulaire',
-    };
+    // 1. Exercices spécifiques à cette compétence en priorité (CE2Exercises)
+    List<Exercise> all = CE2Exercises.getBySkill(widget.skillId);
 
-    final cat = categoryMap[widget.skillId];
-    if (cat != null) {
-      switch (widget.subject) {
-        case 'math':    all = MathExercises.getByCategory(cat); break;
-        case 'french':  all = FrenchExercises.getByCategory(cat); break;
-        case 'science': all = ScienceExercises.getByCategory(cat); break;
+    // 2. Sinon, catégorie générique correspondant à la compétence
+    if (all.isEmpty) {
+      final cat = ArcadeGameScreen._categoryMap[widget.skillId];
+      if (cat != null) {
+        switch (widget.subject) {
+          case 'math':    all = MathExercises.getByCategory(cat); break;
+          case 'french':  all = FrenchExercises.getByCategory(cat); break;
+          case 'science': all = ScienceExercises.getByCategory(cat); break;
+        }
       }
     }
 
-    if (all.isEmpty) all = MathExercises.getByCategory('addition'); // fallback
     all = List.from(all)..shuffle();
     _exercises = all.length > 8 ? all.sublist(0, 8) : all;
 
@@ -145,11 +160,28 @@ class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
     _session.completed = true;
     _session.timeSeconds = 60 - _timeLeft;
 
+    final successRate = _session.percentScore.clamp(0.0, 1.0);
+    _engine.recordSession(widget.skillId, successRate);
+
     context.read<GameService>().completeSession(_session);
     context.read<ProgressService>().addPoints(widget.subject, _score);
 
     if (_session.stars >= 2) _confetti.play();
     setState(() => _finished = true);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CoachScreen(
+            message: _engine.coachMessage(successRate),
+            successRate: successRate,
+            onContinue: () => Navigator.pop(context),
+          ),
+        ),
+      );
+    });
   }
 
   @override
@@ -204,7 +236,16 @@ class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
   }
 
   Widget _buildGame() {
-    if (_exercises.isEmpty) return const Center(child: Text('Pas d’exercice disponible.'));
+    if (_exercises.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text('🚧 Bientôt disponible pour cette compétence !',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        ),
+      );
+    }
     final ex = _exercises[_current];
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),

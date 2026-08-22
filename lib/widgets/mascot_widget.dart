@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/mascot.dart';
+import 'mascot_illustrations.dart';
 
 /// Widget mascotte animé façon Duolingo
 /// Réagit selon MascotMood avec animations différentes
@@ -141,7 +142,7 @@ class _MascotWidgetState extends State<MascotWidget>
   }
 
   Widget _buildMascotBody() {
-    Widget mascot = Container(
+    Widget circle = Container(
       width: widget.size,
       height: widget.size,
       decoration: BoxDecoration(
@@ -157,6 +158,18 @@ class _MascotWidgetState extends State<MascotWidget>
         widget.mascot.emoji,
         style: TextStyle(fontSize: widget.size * 0.52),
       ),
+    );
+
+    Widget mascot = Stack(
+      alignment: Alignment.center,
+      children: [
+        MascotAccessories(
+          mascotId: widget.mascot.id,
+          size: widget.size,
+          color: widget.mascot.color,
+        ),
+        circle,
+      ],
     );
 
     // Applique l'animation selon le mood
@@ -182,11 +195,21 @@ class _MascotWidgetState extends State<MascotWidget>
                    duration: 200.ms);
 
       case MascotMood.wrong:
-        // Pipipipi de Monika : secousse rapide + rouge
+        // Animation douce, jamais agressive : léger tassement + teinte neutre
         return mascot
-            .animate(onPlay: (c) => c.repeat(count: 4))
-            .shake(hz: 8, offset: const Offset(6, 0), duration: 500.ms)
-            .tint(color: Colors.red.withOpacity(0.3), duration: 200.ms);
+            .animate()
+            .scale(
+                begin: const Offset(1, 1),
+                end: const Offset(0.94, 0.94),
+                duration: 250.ms,
+                curve: Curves.easeOut)
+            .then()
+            .scale(
+                begin: const Offset(0.94, 0.94),
+                end: const Offset(1, 1),
+                duration: 250.ms,
+                curve: Curves.easeOut)
+            .tint(color: Colors.blueGrey.withOpacity(0.15), duration: 300.ms);
 
       case MascotMood.thinking:
         return AnimatedBuilder(

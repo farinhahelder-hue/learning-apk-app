@@ -58,13 +58,13 @@ class CE2Exercises {
         options: ['8 cm', '15 cm', '16 cm', '10 cm'], correctAnswer: '16 cm', difficulty: 3, points: 20),
 
     // --- IMPARFAIT ---
-    Exercise(id: 'sk_imparfait_1', subject: 'french', type: 'qcm',
+    Exercise(id: 'sk_conj_imparfait_1', subject: 'french', type: 'qcm',
         question: 'Conjugue à l’imparfait : Je ___ (jouer) au parc.',
         options: ['joue', 'jouais', 'jouera', 'jouons'], correctAnswer: 'jouais', difficulty: 2, points: 15),
-    Exercise(id: 'sk_imparfait_2', subject: 'french', type: 'qcm',
+    Exercise(id: 'sk_conj_imparfait_2', subject: 'french', type: 'qcm',
         question: 'Conjugue à l’imparfait : Il ___ (être) content.',
         options: ['était', 'est', 'sera', 'étant'], correctAnswer: 'était', difficulty: 2, points: 15),
-    Exercise(id: 'sk_imparfait_3', subject: 'french', type: 'qcm',
+    Exercise(id: 'sk_conj_imparfait_3', subject: 'french', type: 'qcm',
         question: 'Conjugue à l’imparfait : Nous ___ (manger) une pizza.',
         options: ['mangeons', 'mangions', 'mangerons', 'mangeais'], correctAnswer: 'mangions', difficulty: 3, points: 20),
 

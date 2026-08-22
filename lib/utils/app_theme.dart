@@ -32,6 +32,24 @@ class AppTheme {
     begin: Alignment.topCenter, end: Alignment.bottomCenter,
   );
 
+  // ── Dégradés "mode calme" : plus doux, moins saturés ──
+  static const LinearGradient calmMathGradient = LinearGradient(
+    colors: [Color(0xFFDCEEFB), Color(0xFFC5E3F7)],
+    begin: Alignment.topLeft, end: Alignment.bottomRight,
+  );
+  static const LinearGradient calmFrenchGradient = LinearGradient(
+    colors: [Color(0xFFFBE4EC), Color(0xFFF6D6E3)],
+    begin: Alignment.topLeft, end: Alignment.bottomRight,
+  );
+  static const LinearGradient calmScienceGradient = LinearGradient(
+    colors: [Color(0xFFE1F0E2), Color(0xFFD1E8D3)],
+    begin: Alignment.topLeft, end: Alignment.bottomRight,
+  );
+  static const LinearGradient calmHomeGradient = LinearGradient(
+    colors: [Color(0xFFFCF8F2), Color(0xFFEFF3F8)],
+    begin: Alignment.topCenter, end: Alignment.bottomCenter,
+  );
+
   // ── Styles de texte accessibles (dyslexie / neurodivergences) ──
   static const TextStyle headingStyle = TextStyle(
     fontFamily: 'Nunito',

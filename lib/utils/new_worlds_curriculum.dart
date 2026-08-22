@@ -218,7 +218,7 @@ class NewWorldsCurriculum {
     },
     {
       'id': 'f3', 'question': 'Combien d\'os a un bébé à la naissance ?',
-      'choices': ['206', '300', '100', '206'],
+      'choices': ['206', '300', '100', '250'],
       'answer': '300', 'emoji': '👶',
       'funFact': 'Les bébés ont 300 os ! Certains fusionnent en grandissant — les adultes n\'en ont que 206.',
     },

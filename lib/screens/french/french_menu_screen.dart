@@ -16,6 +16,7 @@ class FrenchMenuScreen extends StatelessWidget {
     {'title': 'Phonetique',     'emoji': '🎤', 'category': 'phonetique',   'color': Color(0xFFB966D9), 'mascot': Mascot.jellyfish},
     {'title': 'Vocabulaire',    'emoji': '💬', 'category': 'vocabulaire',  'color': Color(0xFFC2185B), 'mascot': Mascot.jellyfish},
     {'title': 'Grammaire',      'emoji': '📝', 'category': 'grammaire',    'color': Color(0xFF880E4F), 'mascot': Mascot.seal},
+    {'title': 'Dictée',         'emoji': '🖊️', 'category': 'dictee',       'color': Color(0xFF5C6BC0), 'mascot': Mascot.seal},
   ];
 
   @override

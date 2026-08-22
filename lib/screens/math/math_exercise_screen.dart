@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:confetti/confetti.dart';
 import '../../data/math_exercises.dart';
 import '../../models/exercise.dart';
 import '../../services/progress_service.dart';
+import '../../services/audio_service.dart';
+import '../../services/accessibility_settings_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/exercise_card.dart';
+import '../../widgets/confetti_overlay.dart';
+import '../../widgets/correct_answer_feedback.dart';
 
 class MathExerciseScreen extends StatefulWidget {
   final String category;
@@ -22,37 +25,37 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
   int _score = 0;
   int _wrong = 0;
   bool _finished = false;
-  late ConfettiController _confetti;
+  final _confettiKey = GlobalKey<ConfettiOverlayState>();
 
   @override
   void initState() {
     super.initState();
-    _confetti = ConfettiController(duration: const Duration(seconds: 3));
     _exercises = MathExercises.getByCategory(widget.category);
     _exercises.shuffle();
     if (_exercises.length > 10) _exercises = _exercises.sublist(0, 10);
   }
 
-  @override
-  void dispose() {
-    _confetti.dispose();
-    super.dispose();
-  }
-
   void _onCorrect() {
     setState(() { _score++; });
+    final calm = context.read<AccessibilitySettingsService>().calmModeEnabled;
+    final audio = context.read<AudioService>();
+    audio.onCorrectAnswer();
+    if (!calm) {
+      CorrectAnswerFeedback.trigger(confettiKey: _confettiKey, context: context);
+    }
     if (_current < _exercises.length - 1) {
       Future.delayed(const Duration(milliseconds: 300), () {
-        setState(() { _current++; });
+        if (mounted) setState(() { _current++; });
       });
     } else _finish();
   }
 
   void _onWrong() {
     setState(() { _wrong++; });
+    context.read<AudioService>().onWrongAnswer();
     if (_current < _exercises.length - 1) {
       Future.delayed(const Duration(milliseconds: 1500), () {
-        setState(() { _current++; });
+        if (mounted) setState(() { _current++; });
       });
     } else _finish();
   }
@@ -60,12 +63,16 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
   void _finish() {
     final pts = _score * 10;
     context.read<ProgressService>().addPoints('math', pts);
-    if (_score == _exercises.length) _confetti.play();
+    if (_score == _exercises.length) {
+      context.read<AudioService>().onPerfect();
+      _confettiKey.currentState?.burst(ConfettiType.celebrate);
+    }
     setState(() { _finished = true; });
   }
 
   @override
   Widget build(BuildContext context) {
+    final calm = context.watch<AccessibilitySettingsService>().calmModeEnabled;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -84,19 +91,14 @@ class _MathExerciseScreenState extends State<MathExerciseScreen> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          if (_finished) _buildResults()
-          else _buildExercise(),
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confetti,
-              blastDirectionality: BlastDirectionality.explosive,
-              colors: const [Colors.red, Colors.blue, Colors.yellow, Colors.green, Colors.pink],
-            ),
-          ),
-        ],
+      body: Container(
+        decoration: calm ? const BoxDecoration(gradient: AppTheme.calmMathGradient) : null,
+        child: Stack(
+          children: [
+            if (_finished) _buildResults() else _buildExercise(),
+            ConfettiOverlay(key: _confettiKey),
+          ],
+        ),
       ),
     );
   }

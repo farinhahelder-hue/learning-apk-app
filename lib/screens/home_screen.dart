@@ -5,6 +5,7 @@ import '../utils/app_theme.dart';
 import '../utils/constants.dart';
 import '../services/progress_service.dart';
 import '../services/audio_service.dart';
+import '../services/accessibility_settings_service.dart';
 import '../widgets/subject_card.dart';
 import '../widgets/progress_banner.dart';
 
@@ -15,9 +16,12 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = context.watch<ProgressService>().progress;
     final audio = context.watch<AudioService>();
+    final calm = context.watch<AccessibilitySettingsService>().calmModeEnabled;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.homeGradient),
+        decoration: BoxDecoration(
+          gradient: calm ? AppTheme.calmHomeGradient : AppTheme.homeGradient,
+        ),
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
@@ -86,6 +90,25 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                         ).animate().fadeIn().scale(begin: const Offset(0.8, 0.8)),
+                        const SizedBox(width: 8),
+                        // Bouton réglages sons / mode calme
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamed(context, '/audio-settings'),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10, offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Text('🎵', style: TextStyle(fontSize: 20)),
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         // Bouton code parental
                         GestureDetector(
@@ -207,6 +230,43 @@ class HomeScreen extends StatelessWidget {
                       );
                     }).toList(),
                   ).animate(delay: 900.ms).fadeIn(),
+                const SizedBox(height: 24),
+                const Text(
+                  'Plus à explorer 🚀',
+                  style: TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.w700,
+                    color: AppTheme.textDark,
+                  ),
+                ).animate(delay: 1000.ms).fadeIn(),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 92,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _ExploreCard(
+                        emoji: '🗺️', label: 'Carte du monde',
+                        color: AppTheme.primaryBlue,
+                        onTap: () => Navigator.pushNamed(context, '/world-map'),
+                      ),
+                      _ExploreCard(
+                        emoji: '🎞️', label: 'Mes avatars',
+                        color: AppTheme.primaryPurple,
+                        onTap: () => Navigator.pushNamed(context, '/avatar'),
+                      ),
+                      _ExploreCard(
+                        emoji: '📜', label: 'Mon aventure',
+                        color: AppTheme.primaryOrange,
+                        onTap: () => Navigator.pushNamed(context, '/story'),
+                      ),
+                      _ExploreCard(
+                        emoji: '🌍', label: 'Découvertes',
+                        color: AppTheme.primaryGreen,
+                        onTap: () => Navigator.pushNamed(context, '/discovery-world'),
+                      ),
+                    ],
+                  ),
+                ).animate(delay: 1100.ms).fadeIn().slideX(begin: 0.1),
                 const SizedBox(height: 20),
               ],
             ),
@@ -339,6 +399,50 @@ class HomeScreen extends StatelessWidget {
             child: const Text('Entrer'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ExploreCard extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ExploreCard({
+    required this.emoji,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 100,
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 30)),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
+              maxLines: 2,
+            ),
+          ],
+        ),
       ),
     );
   }

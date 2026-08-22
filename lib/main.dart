@@ -9,11 +9,22 @@ import 'screens/math/math_menu_screen.dart';
 import 'screens/french/french_menu_screen.dart';
 import 'screens/science/science_menu_screen.dart';
 import 'screens/parental/parental_dashboard_screen.dart';
+import 'screens/world_map_screen.dart';
+import 'screens/daily_challenge_screen.dart';
+import 'screens/avatar_screen.dart';
+import 'screens/story_screen.dart';
+import 'screens/audio_settings_screen.dart';
+import 'screens/discovery/discovery_world_menu_screen.dart';
 import 'services/progress_service.dart';
 import 'services/audio_service.dart';
-import 'services/audio_settings_service.dart';
+import 'services/accessibility_settings_service.dart';
 import 'services/tts_service.dart';
+import 'services/game_service.dart';
+import 'models/screen_time.dart';
+import 'widgets/screen_time_gate.dart';
 import 'utils/app_theme.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,14 +51,21 @@ class EmilieApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProgressService(prefs)),
-        ChangeNotifierProvider(create: (_) => AudioSettingsService(prefs)),
+        ChangeNotifierProvider(create: (_) => AccessibilitySettingsService(prefs)),
         ChangeNotifierProvider(create: (_) => AudioService()),
         ChangeNotifierProvider(create: (_) => TtsService()),
+        ChangeNotifierProvider(create: (_) => GameService(prefs)),
+        ChangeNotifierProvider(create: (_) => ScreenTimeService()),
       ],
       child: MaterialApp(
-        title: 'Emilie App',
+        navigatorKey: navigatorKey,
+        title: 'Appli Émilie',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
+        builder: (context, child) => ScreenTimeGate(
+          navigatorKey: navigatorKey,
+          child: child!,
+        ),
         initialRoute: '/',
         routes: {
           '/': (context) => const SplashScreen(),
@@ -56,6 +74,12 @@ class EmilieApp extends StatelessWidget {
           '/french': (context) => const FrenchMenuScreen(),
           '/science': (context) => const ScienceMenuScreen(),
           '/parental': (context) => const ParentalDashboardScreen(),
+          '/world-map': (context) => const WorldMapScreen(),
+          '/daily-challenge': (context) => const DailyChallengeScreen(),
+          '/avatar': (context) => const AvatarScreen(),
+          '/story': (context) => const StoryScreen(),
+          '/audio-settings': (context) => const AudioSettingsScreen(),
+          '/discovery-world': (context) => const DiscoveryWorldMenuScreen(),
         },
       ),
     );

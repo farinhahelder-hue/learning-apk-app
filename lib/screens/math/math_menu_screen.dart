@@ -12,6 +12,7 @@ class MathMenuScreen extends StatelessWidget {
     {'title': 'Multiplications',  'emoji': '✖️', 'category': 'multiplication', 'color': Color(0xFF0288D1)},
     {'title': 'Géométrie',        'emoji': '🔺', 'category': 'geometry',      'color': Color(0xFF0277BD)},
     {'title': 'Logique & Mesures','emoji': '🧩', 'category': 'logic',         'color': Color(0xFF01579B)},
+    {'title': 'Numération',       'emoji': '🔢', 'category': 'numeration',    'color': Color(0xFF3949AB)},
   ];
 
   @override

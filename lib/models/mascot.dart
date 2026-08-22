@@ -121,7 +121,7 @@ class Mascots {
     name: 'Monika 🪼',
     emoji: '🪼',
     assetPath: 'assets/images/mascots/monika_jellyfish.png',
-    personality: 'Dramaturge ! Fait des reproches avec "pipipipi" quand c\'est faux',
+    personality: 'Dramaturge attachante, dit toujours "pipipipi" avec le sourire',
     wrongSound: 'sounds/wrong.wav',
     correctSound: 'sounds/star.wav',
     color: Color(0xFFCE93D8),
@@ -136,13 +136,13 @@ class Mascots {
       'Pas mal du tout pour une fois ! 🪼💜',
     ],
     wrongPhrases: [
-      'Pipipi ! 😤 C\'était pas ça du tout !',
-      'Pipi pi pi pi ! 🪼 Recommence !',
-      'Pipipipi ! Monika est déçue... 😔',
+      'Pipipi... pas tout à fait ! On réessaie ? 🪼',
+      'Pipipipi ! Presque, retente ta chance ! 💜',
+      'Pipipi ! Même les méduses se trompent parfois 🌊',
     ],
     thinkPhrases: [
-      'Pipipi... je t\'observe 👀',
-      'Réfléchis ou je fais pipipipi ! 🪼',
+      'Pipipi... prends ton temps 👀',
+      'Pipipi... je réfléchis avec toi 🪼',
     ],
   );
 

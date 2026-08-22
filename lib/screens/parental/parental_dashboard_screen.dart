@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/progress_service.dart';
+import '../../services/accessibility_settings_service.dart';
+import '../../models/screen_time.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/constants.dart';
 
@@ -11,6 +13,8 @@ class ParentalDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final svc = context.watch<ProgressService>();
     final p   = svc.progress;
+    final access = context.watch<AccessibilitySettingsService>();
+    final screenTime = context.watch<ScreenTimeService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -95,6 +99,57 @@ class ParentalDashboardScreen extends StatelessWidget {
                 }).toList(),
               ),
             const SizedBox(height: 24),
+            _SectionTitle(title: 'Confort et temps d\u2019\u00e9cran \ud83c\udf19'),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)],
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Text('\ud83c\udf19', style: TextStyle(fontSize: 22)),
+                      const SizedBox(width: 10),
+                      const Expanded(child: Text('Mode calme (moins de stimulation)',
+                          style: TextStyle(fontWeight: FontWeight.w700))),
+                      Switch(
+                        value: access.calmModeEnabled,
+                        onChanged: (_) => access.toggleCalmMode(),
+                        activeColor: AppTheme.primaryPurple,
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Temps d\u2019\u00e9cran aujourd\u2019hui',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('${screenTime.dailySeconds ~/ 60} / ${ScreenTimeService.dailyLimitMinutes} min',
+                          style: const TextStyle(color: AppTheme.textGrey)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: screenTime.dailyProgress.clamp(0.0, 1.0),
+                      minHeight: 8,
+                      backgroundColor: Colors.grey.shade200,
+                      valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryPurple),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('Simple indication pour vous \u2014 jamais bloquant pour Emilie.',
+                      style: TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
             _SectionTitle(title: 'Conseils pour les parents \ud83d\udca1'),
             const SizedBox(height: 12),
             ..._tips.map((tip) => Padding(
@@ -117,7 +172,7 @@ class ParentalDashboardScreen extends StatelessWidget {
     'Sessions recommand\u00e9es\u00a0: 10\u201315 minutes par jour pour maintenir l\u2019attention.',
     'C\u00e9l\u00e9brez chaque badge obtenu \u2014 la motivation positive est cl\u00e9 \u00e0 cet \u00e2ge.',
     'Alterner les mati\u00e8res \u00e9vite la monotonie et stimule l\u2019apprentissage.',
-    'Le code parental par d\u00e9faut est 1234 \u2014 changez-le dans le fichier constants.dart.',
+    'Le code parental par d\u00e9faut est 0000 \u2014 changez-le dans le fichier constants.dart.',
     'En cas de difficult\u00e9 persistante, r\u00e9p\u00e9tez les exercices de niveau 1 (difficult\u00e9 facile).',
   ];
 

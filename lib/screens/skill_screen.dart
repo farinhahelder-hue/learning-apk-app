@@ -36,9 +36,10 @@ class SkillScreen extends StatelessWidget {
           final wp = gs.getWorldProgress(worldId);
           final unlocked = wp.isSkillUnlocked(skillId, skills);
           final levelTag = skill['level'] as String;
+          final hasContent = ArcadeGameScreen.hasContent(skillId);
 
           return GestureDetector(
-            onTap: unlocked
+            onTap: (unlocked && hasContent)
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -53,7 +54,7 @@ class SkillScreen extends StatelessWidget {
                     )
                 : null,
             child: AnimatedOpacity(
-              opacity: unlocked ? 1.0 : 0.45,
+              opacity: unlocked ? (hasContent ? 1.0 : 0.7) : 0.45,
               duration: const Duration(milliseconds: 300),
               child: Container(
                 padding: const EdgeInsets.all(18),
@@ -108,17 +109,30 @@ class SkillScreen extends StatelessWidget {
                               const SizedBox(width: 8),
                               Text(skill['period'] as String,
                                   style: const TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+                              if (!hasContent) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text('🚧 Bientôt',
+                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textGrey)),
+                                ),
+                              ],
                             ],
                           ),
                         ],
                       ),
                     ),
                     // Étoiles
-                    Row(children: List.generate(3, (s) => Icon(
-                      s < stars ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: s < stars ? Colors.amber : Colors.grey.shade300,
-                      size: 20,
-                    ))),
+                    if (hasContent)
+                      Row(children: List.generate(3, (s) => Icon(
+                        s < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+                        color: s < stars ? Colors.amber : Colors.grey.shade300,
+                        size: 20,
+                      ))),
                   ],
                 ),
               ),

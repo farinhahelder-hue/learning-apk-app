@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/audio_service.dart';
+import '../services/accessibility_settings_service.dart';
 import '../utils/app_theme.dart';
 
 class AudioSettingsScreen extends StatelessWidget {
@@ -9,6 +10,7 @@ class AudioSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final audio = context.watch<AudioService>();
+    final access = context.watch<AccessibilitySettingsService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -24,6 +26,37 @@ class AudioSettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Carte Mode calme
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 12)],
+              ),
+              child: Row(
+                children: [
+                  const Text('🌙', style: TextStyle(fontSize: 30)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Mode calme', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                        Text('Moins de confettis, d\'animations et de couleurs vives',
+                            style: const TextStyle(color: AppTheme.textGrey, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: access.calmModeEnabled,
+                    onChanged: (_) => access.toggleCalmMode(),
+                    activeColor: AppTheme.primaryPurple,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
             // Carte Musique
             _SectionCard(
               icon: '🎶',
@@ -93,8 +126,6 @@ class AudioSettingsScreen extends StatelessWidget {
     {'emoji': '🔢', 'name': 'Maths', 'desc': 'Rythmée et dynamique – exercices de calcul'},
     {'emoji': '📚', 'name': 'Français', 'desc': 'Calme et mélodique – lecture & orthographe'},
     {'emoji': '🔬', 'name': 'Sciences', 'desc': 'Curieuse et aventureuse – découvertes'},
-    {'emoji': '🏆', 'name': 'Résultats', 'desc': 'Festive – quand tu gagnes des étoiles'},
-    {'emoji': '⚡', 'name': 'Défi du Jour', 'desc': 'Épique – pour les défis quotidiens'},
   ];
 
   static const _sfxList = [

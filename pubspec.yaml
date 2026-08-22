@@ -15,12 +15,13 @@ dependencies:
 
   # Audio
   audioplayers: ^6.0.0
-  just_audio: ^0.9.40  # Audio léger pour sons et musique
+
+  # Synthèse vocale (offline via moteur TTS système Android)
+  flutter_tts: ^4.2.0
 
   # Animations
   flutter_animate: ^4.5.0
   confetti: ^0.7.0
-  lottie: ^3.1.0
   rive: ^0.13.0
 
   # Storage
@@ -31,7 +32,6 @@ dependencies:
 
   # UI
   cupertino_icons: ^1.0.6
-  flutter_svg: ^2.0.9
 
 dev_dependencies:
   flutter_test:
@@ -43,8 +43,6 @@ flutter:
   assets:
     - assets/sounds/
     - assets/sounds/music/
-    - assets/audio/sounds/
-    - assets/audio/music/
     - assets/images/
     - assets/animations/
     - assets/rive/

@@ -5,7 +5,7 @@ import '../models/daily_challenge.dart';
 import '../services/game_service.dart';
 import '../utils/app_theme.dart';
 import 'arcade_game_screen.dart';
-import '../utils/curriculum.dart';
+import 'science/science_exercise_screen.dart';
 
 class DailyChallengeScreen extends StatelessWidget {
   const DailyChallengeScreen({super.key});
@@ -85,16 +85,39 @@ class DailyChallengeScreen extends StatelessWidget {
             else
               ElevatedButton(
                 onPressed: () {
-                  // Déterminer le bon world pour le challenge
-                  final worldId = challenge.subject == 'math' ? 'math_numbers'
-                      : challenge.subject == 'french' ? 'french_spelling'
-                      : 'math_measures';
+                  if (challenge.subject == 'science') {
+                    // Les sciences ne passent pas par le système de mondes/compétences
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ScienceExerciseScreen(
+                          category: challenge.category,
+                          title: challenge.title,
+                        ),
+                      ),
+                    ).then((_) => gs.completeDailyChallenge(challenge.id));
+                    return;
+                  }
+                  // Déterminer le monde et la compétence qui correspondent
+                  // vraiment à la catégorie du défi du jour.
+                  final String worldId;
+                  final String skillId;
+                  if (challenge.subject == 'french') {
+                    worldId = 'french_spelling';
+                    skillId = 'sk_spell_basic';
+                  } else if (challenge.category == 'multiplication') {
+                    worldId = 'math_numbers';
+                    skillId = 'sk_mult2_5';
+                  } else {
+                    worldId = 'math_numbers';
+                    skillId = 'sk_add100';
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => ArcadeGameScreen(
                         worldId: worldId,
-                        skillId: 'sk_add100',
+                        skillId: skillId,
                         skillLabel: challenge.title,
                         subject: challenge.subject,
                         color: Colors.orange,

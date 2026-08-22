@@ -25,29 +25,29 @@ class AppConstants {
     {'id': 'all_subjects',   'name': 'Curieuse !',          'icon': '📖'},
   ];
 
-  // Messages d'encouragement personnalisés avec les mascottes
+  // Messages d'encouragement (jamais punitifs, toujours positifs)
   static const List<String> encouragements = [
-    '🐿️🌟 Bravo Emilie ! Tu es incroyable ! Noisette est fier de toi !',
-    '🪼✨ Excellent travail ! Continue comme ça ! Bulle t\'applaudit !',
-    '🦭🚀 Super ! Tu apprends si vite ! Câlin te congratule !',
-    '⭐🏆 Magnifique ! Tu es une championne ! Toutes les mascottes dansent !',
-    '🌈✨ Fantastique ! Emilie, tu es la meilleure ! Les étoiles brillent !',
-    '🧠💡 Wow ! Quelle intelligence ! Noisette fait la cabriole !',
-    '💪🎉 Parfait ! Tu es trop forte ! Bulle te fait un High-five !',
-    '🌟🦭 Excellent ! Câlin te fait un gros câlin !',
-    '🏆✨ Tu gères ! Les mascottes sont impressionnées !',
-    '⭐🪼 Super star ! Ta fusée monte vers les étoiles !',
+    '🌟 Bravo Emilie ! Tu es incroyable !',
+    '✨ Excellent travail ! Continue comme ça !',
+    '🚀 Super ! Tu apprends si vite !',
+    '🏆 Magnifique ! Tu es une championne !',
+    '🌈 Fantastique ! Tu es la meilleure !',
+    '💡 Wow ! Quelle intelligence !',
+    '🎉 Parfait ! Tu es trop forte !',
+    '🦭 Excellent ! Les mascottes t\'applaudissent !',
+    '🏆 Tu gères ! Les mascottes sont impressionnées !',
+    '⭐ Super star ! Ta fusée monte vers les étoiles !',
   ];
 
-  // Messages pour réessayer avec encouragement
+  // Messages pour réessayer, toujours bienveillants, jamais culpabilisants
   static const List<String> tryAgainMessages = [
-    '🐿️💪 Presque ! Essaie encore une fois ! Noisette croit en toi !',
-    '🪼🌈 Tu peux le faire ! Réessaie ! Bulle t\'aide !',
-    '🦭⭐ Pas tout à fait, mais continue ! Câlin t\'encourage !',
-    '💪🤗 Courage Emilie ! Tu vas y arriver ! Les mascottes sont avec toi !',
-    '🌟🔄 Pas grave ! Chaque erreur est une occasion d\'apprendre !',
-    '✨💫 On se concentre et on recommence ! Tu es capable !',
-    '🦭🌟 Câlin sait que tu peux réussir ! Retente ta chance !',
-    '🐿️💪 Ne lâche rien ! Noisette t\'attend au tournant !',
+    '💪 Presque ! Essaie encore une fois !',
+    '🌈 Tu peux le faire ! Réessaie !',
+    '⭐ Pas tout à fait, mais continue !',
+    '🤗 Courage Emilie ! Tu vas y arriver !',
+    '🔄 Pas grave ! Chaque erreur est une occasion d\'apprendre !',
+    '💫 On se concentre et on recommence ! Tu es capable !',
+    '🌟 Retente ta chance, tu es sur la bonne voie !',
+    '💪 Ne lâche rien, tu progresses à chaque essai !',
   ];
 }

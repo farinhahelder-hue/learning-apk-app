@@ -44,7 +44,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
       sound: 'ɛ',
       description: 'Le son [ɛ] se trouve dans "père", "tête", "bête"',
       word: 'tête',
-      options: ['tête', 'tarte', 'tissu', 'tissu', 'tôle'],
+      options: ['tête', 'tarte', 'tissu', 'tôle'],
       correctIndex: 0,
       lesson: 'Le son [ɛ] s\'écrit "è", "ê", "ei" ou "ai".\nExemples : père, tête, maître',
     ),

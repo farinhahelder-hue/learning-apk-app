@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import '../models/exercise.dart';
+import '../services/accessibility_settings_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/constants.dart';
 
@@ -52,9 +54,10 @@ class _ExerciseCardState extends State<ExerciseCard> {
 
   @override
   Widget build(BuildContext context) {
+    final calm = context.watch<AccessibilitySettingsService>().calmModeEnabled;
     // Si c'est un exercice d'ecriture ou de completion
     if (widget.exercise.type == 'writing' || widget.exercise.type == 'complete') {
-      return _buildWritingExercise();
+      return _buildWritingExercise(calm);
     }
 
     return Column(
@@ -167,7 +170,8 @@ class _ExerciseCardState extends State<ExerciseCard> {
                 ),
                 textAlign: TextAlign.center,
               ),
-            ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
+            ).animate().fadeIn(duration: calm ? 200.ms : 100.ms).scale(
+                duration: 400.ms, curve: calm ? Curves.easeOut : Curves.elasticOut),
           // Choix QCM
           ...widget.exercise.options.asMap().entries.map((entry) {
             final option = entry.value;
@@ -197,14 +201,16 @@ class _ExerciseCardState extends State<ExerciseCard> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: fg),
                     textAlign: TextAlign.center),
               ),
-            ).animate(delay: Duration(milliseconds: 100 * entry.key)).fadeIn().slideX(begin: 0.1);
+            ).animate(delay: Duration(milliseconds: calm ? 0 : 100 * entry.key))
+                .fadeIn(duration: calm ? 150.ms : 300.ms)
+                .slideX(begin: calm ? 0 : 0.1);
           }),
         ],
       ],
     );
   }
 
-  Widget _buildWritingExercise() {
+  Widget _buildWritingExercise(bool calm) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -274,6 +280,7 @@ class _ExerciseCardState extends State<ExerciseCard> {
           ),
         ],
       ),
-    ).animate().fadeIn().scale(begin: const Offset(0.9, 0.9));
+    ).animate().fadeIn(duration: calm ? 200.ms : 100.ms)
+        .scale(begin: calm ? const Offset(1, 1) : const Offset(0.9, 0.9));
   }
 }
