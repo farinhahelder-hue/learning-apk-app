@@ -71,28 +71,39 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  audio.musicEnabled ? '🎵' : '🔇',
-                                  style: const TextStyle(fontSize: 20),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  audio.musicEnabled ? 'ON' : 'OFF',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: audio.musicEnabled ? Colors.green : Colors.grey,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              audio.musicEnabled ? '🎵' : '🔇',
+                              style: const TextStyle(fontSize: 20),
                             ),
                           ),
                         ).animate().fadeIn().scale(begin: const Offset(0.8, 0.8)),
                         const SizedBox(width: 8),
-                        // Bouton réglages sons / mode calme
+                        // Bouton permanent "Mode calme" : coupe d'un tap les
+                        // confettis, vibrations fortes et couleurs vives.
+                        GestureDetector(
+                          onTap: () => context.read<AccessibilitySettingsService>().toggleCalmMode(),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: calm
+                                  ? AppTheme.primaryPurple.withOpacity(0.18)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: calm
+                                  ? Border.all(color: AppTheme.primaryPurple, width: 2)
+                                  : null,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10, offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Text(calm ? '🌙' : '🌤️', style: const TextStyle(fontSize: 20)),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Réglages sons
                         GestureDetector(
                           onTap: () => Navigator.pushNamed(context, '/audio-settings'),
                           child: Container(
@@ -107,7 +118,7 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: const Text('🎵', style: TextStyle(fontSize: 20)),
+                            child: const Text('🔊', style: TextStyle(fontSize: 20)),
                           ),
                         ),
                         const SizedBox(width: 8),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -63,10 +64,23 @@ class EmilieApp extends StatelessWidget {
         title: 'Appli Émilie',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
-        builder: (context, child) => ScreenTimeGate(
-          navigatorKey: navigatorKey,
-          child: child!,
-        ),
+        builder: (context, child) {
+          final access = context.watch<AccessibilitySettingsService>();
+          // Coupe les animations globalement quand le réglage est désactivé
+          // (transitions de page, animations implicites, effets par défaut).
+          Animate.defaultDuration = access.animationsEnabled
+              ? const Duration(milliseconds: 300)
+              : Duration.zero;
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              disableAnimations: !access.animationsEnabled,
+            ),
+            child: ScreenTimeGate(
+              navigatorKey: navigatorKey,
+              child: child!,
+            ),
+          );
+        },
         initialRoute: '/',
         routes: {
           '/': (context) => const SplashScreen(),

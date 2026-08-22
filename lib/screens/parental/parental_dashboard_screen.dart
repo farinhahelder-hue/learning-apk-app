@@ -5,6 +5,7 @@ import '../../services/accessibility_settings_service.dart';
 import '../../models/screen_time.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/constants.dart';
+import '../settings/sensory_settings_screen.dart';
 
 class ParentalDashboardScreen extends StatelessWidget {
   const ParentalDashboardScreen({super.key});
@@ -101,6 +102,43 @@ class ParentalDashboardScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _SectionTitle(title: 'Confort et temps d\u2019\u00e9cran \ud83c\udf19'),
             const SizedBox(height: 12),
+            // Acc\u00e8s aux r\u00e9glages sensoriels complets (profils, voix, animations)
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SensorySettingsScreen()),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppTheme.primaryPurple.withOpacity(0.85), AppTheme.primaryPurple],
+                    begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    const Text('\ud83c\udf9b\ufe0f', style: TextStyle(fontSize: 28)),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Mes r\u00e9glages',
+                              style: TextStyle(
+                                  color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                          Text('Profil sensoriel, voix, animations, sons',
+                              style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                  ],
+                ),
+              ),
+            ),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

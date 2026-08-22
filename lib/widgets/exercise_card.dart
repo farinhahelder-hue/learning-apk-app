@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../models/exercise.dart';
 import '../services/accessibility_settings_service.dart';
+import '../services/tts_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/constants.dart';
 
@@ -27,6 +28,26 @@ class _ExerciseCardState extends State<ExerciseCard> {
   bool? _isCorrect;
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Lecture automatique de la consigne, si le réglage est activé.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (context.read<AccessibilitySettingsService>().autoReadEnabled) {
+        _speakQuestion();
+      }
+    });
+  }
+
+  /// Lit la consigne à voix haute, à la vitesse choisie dans les réglages.
+  void _speakQuestion() {
+    final access = context.read<AccessibilitySettingsService>();
+    final tts = context.read<TtsService>();
+    tts.setSpeechRate(access.voiceRate);
+    tts.speak(widget.exercise.question);
+  }
 
   @override
   void dispose() {
@@ -75,10 +96,22 @@ class _ExerciseCardState extends State<ExerciseCard> {
           ),
           child: Column(
             children: [
-              Text(
-                widget.exercise.question,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textDark),
-                textAlign: TextAlign.center,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.exercise.question,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textDark),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _speakQuestion,
+                    icon: const Icon(Icons.volume_up_rounded),
+                    tooltip: 'Écouter la consigne',
+                    color: AppTheme.primaryBlue,
+                  ),
+                ],
               ),
               if (widget.exercise.hint != null) ...[
                 const SizedBox(height: 8),
@@ -230,10 +263,22 @@ class _ExerciseCardState extends State<ExerciseCard> {
             child: const Text('🦭', style: TextStyle(fontSize: 50)),
           ),
           const SizedBox(height: 16),
-          Text(
-            widget.exercise.question,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            textAlign: TextAlign.center,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  widget.exercise.question,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              IconButton(
+                onPressed: _speakQuestion,
+                icon: const Icon(Icons.volume_up_rounded),
+                tooltip: 'Écouter la consigne',
+                color: const Color(0xFF6BB9F0),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           if (widget.exercise.displayWord != null) ...[
