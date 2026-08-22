@@ -98,6 +98,130 @@ class NewWorldsCurriculum {
       'answer': 'S\'excuser et apprendre', 'emoji': '💡',
       'lesson': 'Les erreurs sont nos meilleurs professeurs ! Chaque erreur nous rend plus intelligent(e). 🧠',
     },
+    {
+      'id': 'e7', 'question': 'Que peux-tu faire si un bruit fort te dérange ?',
+      'type': 'strategy',
+      'choices': ['Mettre mes mains sur mes oreilles ou demander un endroit calme', 'Crier plus fort que le bruit', 'Rester sans rien dire', 'Courir partout'],
+      'answer': 'Mettre mes mains sur mes oreilles ou demander un endroit calme', 'emoji': '🎧',
+      'lesson': 'C\'est bien de protéger tes oreilles ou de demander une pause calme quand un bruit te dérange. Ton corps a le droit d\'être écouté. 🎧',
+    },
+    {
+      'id': 'e8', 'question': 'Comment se concentrer quand il y a trop de bruit autour ?',
+      'type': 'strategy',
+      'choices': ['Demander un endroit plus calme ou un casque', 'Essayer très fort sans rien dire', 'Abandonner l\'activité', 'Se fâcher contre les autres'],
+      'answer': 'Demander un endroit plus calme ou un casque', 'emoji': '🎯',
+      'lesson': 'Demander de l\'aide pour mieux te concentrer, ce n\'est pas un échec — c\'est une super stratégie ! 🎯',
+    },
+    {
+      'id': 'e9', 'question': 'Que faire quand on doit attendre son tour et que c\'est difficile ?',
+      'type': 'strategy',
+      'choices': ['Respirer, compter, ou penser à autre chose en attendant', 'Pousser pour passer devant', 'Pleurer très fort', 'Partir en courant'],
+      'answer': 'Respirer, compter, ou penser à autre chose en attendant', 'emoji': '⏳',
+      'lesson': 'Attendre, c\'est difficile pour tout le monde ! Respirer ou compter jusqu\'à 10 peut vraiment aider. ⏳',
+    },
+    {
+      'id': 'e10', 'question': 'Comment se sent-on souvent avant un grand changement (déménager, nouvelle école) ?',
+      'type': 'identify',
+      'choices': ['De l\'inquiétude, et c\'est normal', 'Toujours très content', 'Rien du tout', 'Toujours en colère'],
+      'answer': 'De l\'inquiétude, et c\'est normal', 'emoji': '😟',
+      'lesson': 'Les changements peuvent inquiéter, même les adultes ! En parler aide à se sentir moins seul. 🧡',
+    },
+    {
+      'id': 'e11', 'question': 'Que peut-on faire pour se préparer à un changement (nouvelle activité, nouvel endroit) ?',
+      'type': 'strategy',
+      'choices': ['Demander ce qui va se passer, à l\'avance', 'Ne rien demander et espérer', 'Refuser d\'y aller', 'Faire semblant que ça n\'arrive pas'],
+      'answer': 'Demander ce qui va se passer, à l\'avance', 'emoji': '🗓️',
+      'lesson': 'Savoir à l\'avance ce qui va se passer aide beaucoup à se sentir prêt et moins inquiet. 🗓️',
+    },
+    {
+      'id': 'e12', 'question': 'Comment faire une tâche qui semble trop grande (ranger sa chambre, un gros devoir) ?',
+      'type': 'strategy',
+      'choices': ['La découper en petites étapes', 'Tout faire d\'un coup sans s\'arrêter', 'Ne rien faire', 'Demander à quelqu\'un de tout faire à ma place'],
+      'answer': 'La découper en petites étapes', 'emoji': '🧩',
+      'lesson': 'Une étape à la fois, et une grande tâche devient beaucoup plus facile ! 🧩',
+    },
+    {
+      'id': 'e13', 'question': 'Que faire quand on sent qu\'on va "exploser" (trop d\'émotions d\'un coup) ?',
+      'type': 'strategy',
+      'choices': ['Aller dans un coin calme et respirer', 'Garder tout à l\'intérieur', 'Crier sur les autres', 'Casser quelque chose'],
+      'answer': 'Aller dans un coin calme et respirer', 'emoji': '🌊',
+      'lesson': 'Se retirer un instant dans un endroit calme pour respirer, ce n\'est pas fuir — c\'est prendre soin de soi. 🌊',
+    },
+    {
+      'id': 'e14', 'question': 'Pourquoi est-ce important de demander une pause quand on en a besoin ?',
+      'type': 'reflection',
+      'choices': ['Parce que ton corps et ton cerveau ont besoin de repos', 'Ce n\'est jamais permis', 'Seulement si on est malade', 'Ça montre qu\'on est faible'],
+      'answer': 'Parce que ton corps et ton cerveau ont besoin de repos', 'emoji': '🛑',
+      'lesson': 'Demander une pause, c\'est écouter ses besoins. C\'est une force, pas une faiblesse. 🛑💙',
+    },
+    {
+      'id': 'e15', 'question': 'Comment se féliciter après avoir réussi quelque chose de difficile pour soi ?',
+      'type': 'reflection',
+      'choices': ['Se dire "je suis fier(e) de moi"', 'Passer vite à autre chose sans y penser', 'Dire que ce n\'était rien', 'Attendre que quelqu\'un le remarque'],
+      'answer': 'Se dire "je suis fier(e) de moi"', 'emoji': '🏅',
+      'lesson': 'Prendre un instant pour se féliciter soi-même, ça fait du bien et ça donne envie de continuer. 🏅',
+    },
+    {
+      'id': 'e16', 'question': 'Que peut-on faire si on ne comprend pas une consigne ?',
+      'type': 'strategy',
+      'choices': ['Demander de la répéter ou de l\'expliquer autrement', 'Faire semblant d\'avoir compris', 'Abandonner', 'Se sentir bête et ne rien dire'],
+      'answer': 'Demander de la répéter ou de l\'expliquer autrement', 'emoji': '❓',
+      'lesson': 'Poser une question quand on ne comprend pas, c\'est malin, pas embêtant ! On a tous besoin d\'explications parfois. ❓💡',
+    },
+  ];
+
+  // ── PETITS PHILOSOPHES ────────────────────────────────────
+  // Pas de "mauvaise réponse" ici : chaque choix est une réflexion valable.
+  // Voir DiscoveryWorldScreen : world['type'] == 'philo' change l'affichage.
+  static const List<Map<String, dynamic>> philosophy = [
+    {
+      'id': 'ph1', 'question': 'Qu\'est-ce qui rend quelqu\'un vraiment courageux ?',
+      'choices': ['Ne jamais avoir peur', 'Avoir peur et le faire quand même', 'Être très fort', 'Ne jamais pleurer'],
+      'answer': 'Avoir peur et le faire quand même', 'emoji': '🦸',
+      'lesson': 'Le vrai courage, ce n\'est pas l\'absence de peur : c\'est avancer même quand on a peur. 💪',
+    },
+    {
+      'id': 'ph2', 'question': 'Peut-on être ami avec quelqu\'un de très différent de soi ?',
+      'choices': ['Oui, la différence rend l\'amitié plus riche', 'Non, il faut se ressembler', 'Seulement un petit peu', 'Je ne sais pas'],
+      'answer': 'Oui, la différence rend l\'amitié plus riche', 'emoji': '🤝',
+      'lesson': 'Beaucoup de belles amitiés naissent entre personnes différentes : chacun apprend de l\'autre. 🤝',
+    },
+    {
+      'id': 'ph3', 'question': 'Qu\'est-ce que le bonheur, pour toi ?',
+      'choices': ['Un moment avec les gens qu\'on aime', 'Avoir plein de jouets', 'Ne jamais être triste', 'Gagner à tous les jeux'],
+      'answer': 'Un moment avec les gens qu\'on aime', 'emoji': '😊',
+      'lesson': 'Le bonheur, ça peut être tout petit : un câlin, un rire, un rayon de soleil. Il n\'y a pas une seule bonne réponse. ☀️',
+    },
+    {
+      'id': 'ph4', 'question': 'Pourquoi dit-on la vérité, même quand c\'est difficile ?',
+      'choices': ['Pour que les autres nous fassent confiance', 'Parce qu\'on n\'a pas le choix', 'Pour éviter les problèmes', 'Ça ne sert à rien'],
+      'answer': 'Pour que les autres nous fassent confiance', 'emoji': '💬',
+      'lesson': 'Dire la vérité construit la confiance, petit à petit, même quand c\'est dur sur le moment. 🌟',
+    },
+    {
+      'id': 'ph5', 'question': 'Est-ce grave de faire une erreur ?',
+      'choices': ['Non, c\'est comme ça qu\'on apprend', 'Oui, il ne faut jamais se tromper', 'Seulement à l\'école', 'Ça dépend des gens'],
+      'answer': 'Non, c\'est comme ça qu\'on apprend', 'emoji': '🌱',
+      'lesson': 'Les erreurs sont des marches sur le chemin de l\'apprentissage — même les grands se trompent ! 🧗',
+    },
+    {
+      'id': 'ph6', 'question': 'Qu\'est-ce que ça veut dire, être juste ?',
+      'choices': ['Traiter les gens équitablement', 'Toujours gagner', 'Avoir toujours raison', 'Être le plus fort'],
+      'answer': 'Traiter les gens équitablement', 'emoji': '⚖️',
+      'lesson': 'Être juste, c\'est essayer de traiter chacun avec équité, même quand c\'est plus simple de faire autrement. ⚖️',
+    },
+    {
+      'id': 'ph7', 'question': 'Pourquoi est-ce important d\'écouter les autres ?',
+      'choices': ['Pour comprendre ce qu\'ils ressentent', 'Pour pouvoir répondre vite', 'Ce n\'est pas important', 'Seulement les adultes doivent écouter'],
+      'answer': 'Pour comprendre ce qu\'ils ressentent', 'emoji': '👂',
+      'lesson': 'Écouter vraiment quelqu\'un, c\'est lui montrer qu\'il compte. C\'est un des plus beaux cadeaux qu\'on puisse offrir. 👂💛',
+    },
+    {
+      'id': 'ph8', 'question': 'Qu\'est-ce qui te rend unique ?',
+      'choices': ['Ma façon de voir le monde', 'Mes passions et mes goûts', 'Mon histoire et mes souvenirs', 'Un mélange de tout ça'],
+      'answer': 'Un mélange de tout ça', 'emoji': '🌈',
+      'lesson': 'Chaque personne est une combinaison unique d\'histoire, de goûts et de façon de voir les choses. Il n\'y a personne exactement comme toi ! 🌈',
+    },
   ];
 
   // ── GÉOGRAPHIE ────────────────────────────────────────────
@@ -249,6 +373,13 @@ class NewWorldsCurriculum {
       'color': 0xFFFFCA28, 'questions': emotions,
       'mascotId': 'papa_seal',
       'description': 'Comprends tes émotions et celles des autres',
+    },
+    {
+      'id': 'philosophy', 'title': 'Petits Philosophes', 'emoji': '🦉',
+      'color': 0xFF7E57C2, 'questions': philosophy,
+      'mascotId': 'papa_seal',
+      'type': 'philo',
+      'description': 'Réfléchis à de grandes questions, il n\'y a pas de mauvaise réponse !',
     },
     {
       'id': 'geography', 'title': 'Tour du Monde',        'emoji': '🌍',

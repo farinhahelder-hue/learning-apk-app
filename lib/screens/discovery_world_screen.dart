@@ -67,10 +67,14 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
     // context.read<TtsService>().readQuestion(q['question']);
   }
 
+  /// Un monde "philo" n'a pas de mauvaise réponse : chaque choix est une
+  /// réflexion valable, on ne juge jamais l'enfant sur ce qu'il pense.
+  bool get _isPhilo => widget.world['type'] == 'philo';
+
   void _onAnswerSelected(String answer) {
     if (_answered) return;
     final correct = _questions[_currentIndex]['answer'] as String;
-    final isCorrect = answer == correct;
+    final isCorrect = _isPhilo || answer == correct;
 
     setState(() {
       _selectedAnswer = answer;
@@ -217,11 +221,17 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
                               child: _AnswerButton(
                                 text: choice,
                                 state: _answered
-                                    ? (choice == q['answer']
-                                        ? _AnswerState.correct
-                                        : choice == _selectedAnswer
-                                            ? _AnswerState.wrong
+                                    ? (_isPhilo
+                                        // En mode philo, le choix de l'enfant est toujours
+                                        // valorisé — jamais affiché comme "faux".
+                                        ? (choice == _selectedAnswer
+                                            ? _AnswerState.correct
                                             : _AnswerState.neutral)
+                                        : (choice == q['answer']
+                                            ? _AnswerState.correct
+                                            : choice == _selectedAnswer
+                                                ? _AnswerState.wrong
+                                                : _AnswerState.neutral))
                                     : _AnswerState.neutral,
                                 onTap: () => _onAnswerSelected(choice),
                               ),

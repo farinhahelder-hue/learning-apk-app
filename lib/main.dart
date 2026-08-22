@@ -15,6 +15,7 @@ import 'screens/avatar_screen.dart';
 import 'screens/story_screen.dart';
 import 'screens/audio_settings_screen.dart';
 import 'screens/discovery/discovery_world_menu_screen.dart';
+import 'screens/games/mini_games_menu_screen.dart';
 import 'services/progress_service.dart';
 import 'services/audio_service.dart';
 import 'services/accessibility_settings_service.dart';
@@ -80,6 +81,7 @@ class EmilieApp extends StatelessWidget {
           '/story': (context) => const StoryScreen(),
           '/audio-settings': (context) => const AudioSettingsScreen(),
           '/discovery-world': (context) => const DiscoveryWorldMenuScreen(),
+          '/mini-games': (context) => const MiniGamesMenuScreen(),
         },
       ),
     );

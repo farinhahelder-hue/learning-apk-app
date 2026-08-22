@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/app_theme.dart';
+import '../widgets/breathing_bubble.dart';
 
 // 🏋️ Pause active - hybridation monde réel / numérique
 // Déclenché après 15 minutes d'écran
@@ -128,6 +129,10 @@ class _ActiveBreakScreenState extends State<ActiveBreakScreen> {
                 Text(act['title'] as String,
                     style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
                 const SizedBox(height: 12),
+                if (act['title'] == 'Respiration magique') ...[
+                  BreathingBubble(color: color),
+                  const SizedBox(height: 12),
+                ],
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
