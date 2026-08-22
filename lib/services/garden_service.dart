@@ -18,23 +18,25 @@ class GardenPlant {
 /// 🌱 Le jardin d'Emilie — une récompense calme, sans pression.
 ///
 /// Règles volontaires :
-/// - on gagne une ressource pour avoir TERMINÉ une activité, pas pour
-///   avoir tout réussi (un indice utilisé donne quand même une graine) ;
+/// - on gagne une ressource pour avoir COMMENCÉ et TERMINÉ une activité,
+///   pas pour avoir tout réussi (un indice utilisé récompense quand même) ;
 /// - aucune ressource ne disparaît jamais ;
 /// - pas de série quotidienne, pas de classement, pas de compte à rebours,
 ///   aucun message qui pousse à revenir.
+///
+/// Volontairement limité à DEUX ressources : la graine (pour planter) et
+/// l'eau (pour faire pousser). Multiplier les monnaies virtuelles
+/// complexifierait le jardin sans rien apporter à Emilie.
 class GardenService extends ChangeNotifier {
   final SharedPreferences _prefs;
 
   int _seeds = 0;
   int _drops = 0;
-  int _suns = 0;
   List<GardenPlant> _plants = [];
 
   GardenService(this._prefs) {
     _seeds = _prefs.getInt('garden_seeds') ?? 0;
     _drops = _prefs.getInt('garden_drops') ?? 0;
-    _suns = _prefs.getInt('garden_suns') ?? 0;
     final raw = _prefs.getString('garden_plants');
     if (raw != null) {
       try {
@@ -50,28 +52,30 @@ class GardenService extends ChangeNotifier {
 
   int get seeds => _seeds;
   int get drops => _drops;
-  int get suns => _suns;
   List<GardenPlant> get plants => List.unmodifiable(_plants);
+
+  /// Nombre de plantes arrivées à floraison.
+  int get bloomedCount => _plants.where((p) => p.growth >= 3).length;
 
   /// Les plantes disponibles à planter.
   static const List<String> plantChoices = ['🌻', '🌷', '🌹', '🌼', '🪻', '🌵'];
 
-  /// Petits habitants calmes du jardin, débloqués par les rayons de soleil.
+  /// Petits habitants calmes, qui viennent s'installer quand des plantes
+  /// arrivent à floraison. Rien à collectionner, rien à perdre.
   static const List<Map<String, dynamic>> critters = [
-    {'emoji': '🐌', 'name': 'l\'escargot', 'suns': 1},
-    {'emoji': '🦋', 'name': 'le papillon', 'suns': 3},
-    {'emoji': '🐞', 'name': 'la coccinelle', 'suns': 5},
-    {'emoji': '🐝', 'name': 'l\'abeille', 'suns': 8},
-    {'emoji': '🦔', 'name': 'le hérisson', 'suns': 12},
+    {'emoji': '🐌', 'name': 'l\'escargot', 'blooms': 1},
+    {'emoji': '🦋', 'name': 'le papillon', 'blooms': 2},
+    {'emoji': '🐞', 'name': 'la coccinelle', 'blooms': 3},
+    {'emoji': '🐝', 'name': 'l\'abeille', 'blooms': 5},
+    {'emoji': '🦔', 'name': 'le hérisson', 'blooms': 7},
   ];
 
   List<Map<String, dynamic>> get unlockedCritters =>
-      critters.where((c) => _suns >= (c['suns'] as int)).toList();
+      critters.where((c) => bloomedCount >= (c['blooms'] as int)).toList();
 
   Future<void> _save() async {
     await _prefs.setInt('garden_seeds', _seeds);
     await _prefs.setInt('garden_drops', _drops);
-    await _prefs.setInt('garden_suns', _suns);
     await _prefs.setString(
       'garden_plants',
       json.encode(_plants.map((p) => p.toMap()).toList()),
@@ -79,29 +83,29 @@ class GardenService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Une graine après une micro-mission terminée.
   Future<void> earnSeed([int count = 1]) async {
     _seeds += count;
     await _save();
   }
 
-  /// Une goutte d'eau après quelques exercices.
   Future<void> earnDrop([int count = 1]) async {
     _drops += count;
     await _save();
   }
 
-  /// Un rayon de soleil après une activité complète.
-  Future<void> earnSun([int count = 1]) async {
-    _suns += count;
+  /// Récompense au DÉMARRAGE d'une mission : commencer compte déjà.
+  Future<void> rewardMissionStarted() async {
+    _seeds += 1;
     await _save();
   }
 
-  /// Récompense standard de fin d'activité : toujours accordée, même si
-  /// l'enfant s'est trompée ou a utilisé des indices.
+  /// Récompense de fin d'activité : toujours accordée, même si l'enfant
+  /// s'est trompée ou a utilisé des indices.
+  /// Donne une graine ET une goutte d'eau, pour que la boucle
+  /// planter → arroser → faire fleurir fonctionne dès la première activité.
   Future<void> rewardActivityCompleted() async {
     _seeds += 1;
-    _suns += 1;
+    _drops += 1;
     await _save();
   }
 
@@ -129,7 +133,6 @@ class GardenService extends ChangeNotifier {
   Future<void> resetGarden() async {
     _seeds = 0;
     _drops = 0;
-    _suns = 0;
     _plants = [];
     await _save();
   }

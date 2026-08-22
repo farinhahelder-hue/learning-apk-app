@@ -41,11 +41,13 @@ class GardenScreen extends StatelessWidget {
             // ── Mes ressources ──
             Row(
               children: [
-                Expanded(child: _ResourceChip(emoji: '🌰', count: garden.seeds, label: 'graines')),
-                const SizedBox(width: 10),
-                Expanded(child: _ResourceChip(emoji: '💧', count: garden.drops, label: 'gouttes')),
-                const SizedBox(width: 10),
-                Expanded(child: _ResourceChip(emoji: '☀️', count: garden.suns, label: 'soleils')),
+                Expanded(
+                    child: _ResourceChip(
+                        emoji: '🌰', count: garden.seeds, label: 'graines à planter')),
+                const SizedBox(width: 12),
+                Expanded(
+                    child: _ResourceChip(
+                        emoji: '💧', count: garden.drops, label: 'gouttes à arroser')),
               ],
             ),
             const SizedBox(height: 20),
@@ -104,6 +106,8 @@ class GardenScreen extends StatelessWidget {
                   children: [
                     const Text('Les habitants de ton jardin',
                         style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                    const Text('Ils viennent quand des fleurs s\'ouvrent 🌸',
+                        style: TextStyle(fontSize: 11, color: AppTheme.textGrey)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 16,
