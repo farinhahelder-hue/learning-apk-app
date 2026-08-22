@@ -262,6 +262,54 @@ class NewWorldsCurriculum {
       'answer': 'L\'Inde', 'emoji': '🇮🇳',
       'funFact': 'Depuis 2023, l\'Inde est le pays le plus peuplé avec plus de 1,4 milliard d\'habitants !',
     },
+    {
+      'id': 'g7', 'question': 'Quelle est la plus haute montagne du monde ?',
+      'choices': ['L\'Everest', 'Le Mont Blanc', 'Le Kilimandjaro', 'Les Alpes'],
+      'answer': 'L\'Everest', 'emoji': '🏔️',
+      'funFact': 'L\'Everest culmine à 8 849 mètres, entre le Népal et le Tibet !',
+    },
+    {
+      'id': 'g8', 'question': 'Quel est le plus grand désert chaud du monde ?',
+      'choices': ['Le Sahara', 'Le Gobi', 'Le Kalahari', 'L\'Atacama'],
+      'answer': 'Le Sahara', 'emoji': '🏜️',
+      'funFact': 'Le Sahara est presque aussi grand que les États-Unis !',
+    },
+    {
+      'id': 'g9', 'question': 'Quelle est la plus haute montagne de France ?',
+      'choices': ['Le Mont Blanc', 'Le Puy de Dôme', 'Le Mont Ventoux', 'Les Vosges'],
+      'answer': 'Le Mont Blanc', 'emoji': '⛰️',
+      'funFact': 'Le Mont Blanc culmine à 4 809 mètres, entre la France et l\'Italie !',
+    },
+    {
+      'id': 'g10', 'question': 'Quel est le plus grand pays du monde ?',
+      'choices': ['La Chine', 'Le Canada', 'La Russie', 'Les États-Unis'],
+      'answer': 'La Russie', 'emoji': '🇷🇺',
+      'funFact': 'La Russie s\'étend sur 11 fuseaux horaires différents !',
+    },
+    {
+      'id': 'g11', 'question': 'Comment appelle-t-on les régions les plus froides de la Terre ?',
+      'choices': ['Les pôles', 'Les tropiques', 'Les déserts', 'Les plaines'],
+      'answer': 'Les pôles', 'emoji': '❄️',
+      'funFact': 'Il y a deux pôles : le pôle Nord (Arctique) et le pôle Sud (Antarctique) !',
+    },
+    {
+      'id': 'g12', 'question': 'Quel fleuve traverse Paris ?',
+      'choices': ['La Seine', 'La Loire', 'Le Rhône', 'La Garonne'],
+      'answer': 'La Seine', 'emoji': '🌉',
+      'funFact': 'La Seine traverse Paris sur environ 13 km et compte 37 ponts !',
+    },
+    {
+      'id': 'g13', 'question': 'Sur quel continent se trouve l\'Égypte ?',
+      'choices': ['L\'Afrique', 'L\'Asie', 'L\'Europe', 'L\'Amérique'],
+      'answer': 'L\'Afrique', 'emoji': '🌍',
+      'funFact': 'L\'Égypte est un peu à la frontière entre l\'Afrique et l\'Asie, mais elle est classée en Afrique !',
+    },
+    {
+      'id': 'g14', 'question': 'Quel océan sépare l\'Europe de l\'Amérique ?',
+      'choices': ['L\'Atlantique', 'Le Pacifique', 'L\'Indien', 'L\'Arctique'],
+      'answer': 'L\'Atlantique', 'emoji': '🌊',
+      'funFact': 'Il faut environ 7 heures en avion pour traverser l\'Atlantique entre Paris et New York !',
+    },
   ];
 
   // ── HISTOIRE ──────────────────────────────────────────────
@@ -289,6 +337,54 @@ class NewWorldsCurriculum {
       'choices': ['1789', '1800', '1945', '1492'],
       'answer': '1789', 'emoji': '🎆',
       'funFact': 'Le 14 juillet 1789, c\'est la Révolution Française ! Les Français ont voulu plus de liberté.',
+    },
+    {
+      'id': 'h5', 'question': 'Qui étaient les hommes préhistoriques qui peignaient dans les grottes ?',
+      'choices': ['Les hommes de Cro-Magnon', 'Les Gaulois', 'Les Romains', 'Les Vikings'],
+      'answer': 'Les hommes de Cro-Magnon', 'emoji': '🎨',
+      'funFact': 'Les peintures de la grotte de Lascaux ont environ 17 000 ans !',
+    },
+    {
+      'id': 'h6', 'question': 'Qui était le chef gaulois qui a résisté à Jules César ?',
+      'choices': ['Vercingétorix', 'Astérix', 'Clovis', 'Charlemagne'],
+      'answer': 'Vercingétorix', 'emoji': '⚔️',
+      'funFact': 'Vercingétorix s\'est rendu à Jules César en 52 avant J.-C., lors de la bataille d\'Alésia.',
+    },
+    {
+      'id': 'h7', 'question': 'Qui était le premier roi des Francs à se faire baptiser ?',
+      'choices': ['Clovis', 'Charlemagne', 'Louis XIV', 'Napoléon'],
+      'answer': 'Clovis', 'emoji': '👑',
+      'funFact': 'Le baptême de Clovis, vers l\'an 496, marque le début du royaume de France.',
+    },
+    {
+      'id': 'h8', 'question': 'Quel empereur a été couronné à Noël en l\'an 800 ?',
+      'choices': ['Charlemagne', 'Napoléon', 'Clovis', 'Louis XIV'],
+      'answer': 'Charlemagne', 'emoji': '👑',
+      'funFact': 'Charlemagne a créé des écoles dans tout son empire pour apprendre à lire et à écrire !',
+    },
+    {
+      'id': 'h9', 'question': 'Quel roi de France est surnommé le Roi Soleil ?',
+      'choices': ['Louis XIV', 'Louis XVI', 'François Ier', 'Henri IV'],
+      'answer': 'Louis XIV', 'emoji': '☀️',
+      'funFact': 'Louis XIV a fait construire le magnifique château de Versailles !',
+    },
+    {
+      'id': 'h10', 'question': 'Comment s\'appelle la prison prise d\'assaut le 14 juillet 1789 ?',
+      'choices': ['La Bastille', 'Le Louvre', 'Versailles', 'La Conciergerie'],
+      'answer': 'La Bastille', 'emoji': '🏰',
+      'funFact': 'La prise de la Bastille est devenue le symbole de la fin de la monarchie absolue en France.',
+    },
+    {
+      'id': 'h11', 'question': 'Qui est devenu empereur des Français en 1804 ?',
+      'choices': ['Napoléon Bonaparte', 'Louis XVI', 'Charlemagne', 'Louis XIV'],
+      'answer': 'Napoléon Bonaparte', 'emoji': '🎖️',
+      'funFact': 'Napoléon a créé le Code civil, un ensemble de lois encore utilisé aujourd\'hui en France !',
+    },
+    {
+      'id': 'h12', 'question': 'En quelle année la Seconde Guerre mondiale s\'est-elle terminée ?',
+      'choices': ['1945', '1918', '1939', '1989'],
+      'answer': '1945', 'emoji': '🕊️',
+      'funFact': 'Le 8 mai 1945 marque la fin de la guerre en Europe, c\'est un jour férié en France.',
     },
   ];
 
