@@ -17,11 +17,14 @@ import 'screens/story_screen.dart';
 import 'screens/audio_settings_screen.dart';
 import 'screens/discovery/discovery_world_menu_screen.dart';
 import 'screens/games/mini_games_menu_screen.dart';
+import 'screens/garden/garden_screen.dart';
+import 'screens/sensory/sensory_room_screen.dart';
 import 'services/progress_service.dart';
 import 'services/audio_service.dart';
 import 'services/accessibility_settings_service.dart';
 import 'services/tts_service.dart';
 import 'services/game_service.dart';
+import 'services/garden_service.dart';
 import 'models/screen_time.dart';
 import 'widgets/screen_time_gate.dart';
 import 'utils/app_theme.dart';
@@ -58,6 +61,7 @@ class EmilieApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TtsService()),
         ChangeNotifierProvider(create: (_) => GameService(prefs)),
         ChangeNotifierProvider(create: (_) => ScreenTimeService()),
+        ChangeNotifierProvider(create: (_) => GardenService(prefs)),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -96,6 +100,8 @@ class EmilieApp extends StatelessWidget {
           '/audio-settings': (context) => const AudioSettingsScreen(),
           '/discovery-world': (context) => const DiscoveryWorldMenuScreen(),
           '/mini-games': (context) => const MiniGamesMenuScreen(),
+          '/garden': (context) => const GardenScreen(),
+          '/sensory-room': (context) => const SensoryRoomScreen(),
         },
       ),
     );

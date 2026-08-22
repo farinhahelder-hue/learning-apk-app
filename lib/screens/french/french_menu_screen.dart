@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../models/mascot.dart';
 import '../../services/audio_service.dart';
+import '../../services/accessibility_settings_service.dart';
 import '../../utils/app_theme.dart';
 import 'french_exercise_screen.dart';
 
@@ -24,6 +25,8 @@ class FrenchMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final audio = context.watch<AudioService>();
+    final animationsOn =
+        context.watch<AccessibilitySettingsService>().animationsEnabled;
     WidgetsBinding.instance.addPostFrameCallback((_) => audio.startMusic('french'));
     return Scaffold(
       appBar: AppBar(
@@ -43,16 +46,11 @@ class FrenchMenuScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 for (int i = 0; i < Mascot.all.length; i++)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Mascot.all[i].color.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(Mascot.all[i].emoji, style: const TextStyle(fontSize: 32)),
-                  ).animate(delay: (i * 200).ms)
-                    .animate(onPlay: (c) => c.repeat(reverse: true))
-                    .moveY(begin: 0, end: -8, duration: 1.seconds),
+                  _MascotBubble(
+                    mascot: Mascot.all[i],
+                    index: i,
+                    animate: animationsOn,
+                  ),
               ],
             ),
           ).animate().fadeIn(),
@@ -143,5 +141,36 @@ class FrenchMenuScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Bulle de mascotte en haut du menu. Le rebond continu s'arrête
+/// complètement si les animations sont désactivées dans les réglages.
+class _MascotBubble extends StatelessWidget {
+  final Mascot mascot;
+  final int index;
+  final bool animate;
+
+  const _MascotBubble({
+    required this.mascot,
+    required this.index,
+    required this.animate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget bubble = Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: mascot.color.withOpacity(0.2),
+        shape: BoxShape.circle,
+      ),
+      child: Text(mascot.emoji, style: const TextStyle(fontSize: 32)),
+    );
+    if (!animate) return bubble;
+    return bubble
+        .animate(delay: (index * 200).ms)
+        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .moveY(begin: 0, end: -8, duration: 1.seconds);
   }
 }

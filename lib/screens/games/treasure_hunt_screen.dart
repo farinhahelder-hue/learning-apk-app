@@ -7,6 +7,7 @@ import '../../services/audio_service.dart';
 import '../../services/game_service.dart';
 import '../../services/progress_service.dart';
 import '../../services/accessibility_settings_service.dart';
+import '../../services/garden_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 
@@ -93,6 +94,7 @@ class _TreasureHuntScreenState extends State<TreasureHuntScreen> {
     final calm = context.read<AccessibilitySettingsService>().calmModeEnabled;
     context.read<AudioService>().onPerfect();
     context.read<ProgressService>().addPoints('game', 25);
+    context.read<GardenService>().rewardActivityCompleted();
     if (!calm) _confettiKey.currentState?.burst(ConfettiType.celebrate);
     setState(() => _finished = true);
   }

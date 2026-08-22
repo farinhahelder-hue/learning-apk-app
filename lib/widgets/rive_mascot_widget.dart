@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 import '../models/mascot.dart';
+import '../services/accessibility_settings_service.dart';
 
 /// Widget mascotte animée via Rive
 /// Lit un fichier .riv par mascotte et contrôle les états via StateMachine
@@ -191,6 +193,11 @@ class _AnimatedEmojiMascot extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(mascot.emoji, style: TextStyle(fontSize: size * 0.52)),
     );
+
+    // Réglage "animations désactivées" : mascotte totalement immobile.
+    if (!context.watch<AccessibilitySettingsService>().animationsEnabled) {
+      return emoji;
+    }
 
     // Applique l'animation selon le mood
     switch (mood) {

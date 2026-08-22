@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import '../models/mascot.dart';
+import '../services/accessibility_settings_service.dart';
 import 'mascot_illustrations.dart';
 
 /// Widget mascotte animé façon Duolingo
@@ -171,6 +173,12 @@ class _MascotWidgetState extends State<MascotWidget>
         circle,
       ],
     );
+
+    // Réglage "animations désactivées" : la mascotte reste totalement
+    // immobile — aucune respiration, aucun saut, aucun balancement.
+    if (!context.watch<AccessibilitySettingsService>().animationsEnabled) {
+      return mascot;
+    }
 
     // Applique l'animation selon le mood
     switch (widget.mood) {

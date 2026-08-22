@@ -5,6 +5,7 @@ import '../../models/exercise.dart';
 import '../../services/progress_service.dart';
 import '../../services/audio_service.dart';
 import '../../services/accessibility_settings_service.dart';
+import '../../services/garden_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/exercise_card.dart';
 import '../../widgets/confetti_overlay.dart';
@@ -60,6 +61,8 @@ class _ScienceExerciseScreenState extends State<ScienceExerciseScreen> {
 
   void _finish() {
     context.read<ProgressService>().addPoints('science', _score * 10);
+    // Récompense pour avoir TERMINÉ l'activité, quel que soit le score.
+    context.read<GardenService>().rewardActivityCompleted();
     if (_score == _exercises.length) {
       context.read<AudioService>().onPerfect();
       _confettiKey.currentState?.burst(ConfettiType.celebrate);

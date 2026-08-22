@@ -281,6 +281,16 @@ class HomeScreen extends StatelessWidget {
                         color: AppTheme.primaryYellow,
                         onTap: () => Navigator.pushNamed(context, '/mini-games'),
                       ),
+                      _ExploreCard(
+                        emoji: '🌱', label: 'Mon jardin',
+                        color: AppTheme.primaryGreen,
+                        onTap: () => Navigator.pushNamed(context, '/garden'),
+                      ),
+                      _ExploreCard(
+                        emoji: '🫧', label: 'Salle calme',
+                        color: AppTheme.primaryBlue,
+                        onTap: () => Navigator.pushNamed(context, '/sensory-room'),
+                      ),
                     ],
                   ),
                 ).animate(delay: 1100.ms).fadeIn().slideX(begin: 0.1),
