@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
+import '../../services/audio_service.dart';
 import '../../utils/app_theme.dart';
 import 'science_exercise_screen.dart';
 
@@ -16,6 +18,8 @@ class ScienceMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final audio = context.watch<AudioService>();
+    WidgetsBinding.instance.addPostFrameCallback((_) => audio.startMusic('science'));
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sciences 🔬'),

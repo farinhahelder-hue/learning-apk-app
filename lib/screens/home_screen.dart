@@ -17,6 +17,7 @@ class HomeScreen extends StatelessWidget {
     final progress = context.watch<ProgressService>().progress;
     final audio = context.watch<AudioService>();
     final calm = context.watch<AccessibilitySettingsService>().calmModeEnabled;
+    WidgetsBinding.instance.addPostFrameCallback((_) => audio.startMusic('home'));
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
