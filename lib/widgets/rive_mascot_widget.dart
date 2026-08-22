@@ -199,9 +199,9 @@ class _AnimatedEmojiMascot extends StatelessWidget {
         return emoji
             .animate(onPlay: (c) => c.repeat(reverse: true))
             .moveY(begin: 0, end: -15, duration: 200.ms)
-            .scale(begin: 1.0, end: 1.15, duration: 200.ms)
+            .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.15, 1.15), duration: 200.ms)
             .then()
-            .scale(begin: 1.15, end: 1.0, duration: 200.ms)
+            .scale(begin: const Offset(1.15, 1.15), end: const Offset(1.0, 1.0), duration: 200.ms)
             .shake(duration: 300.ms, hz: 4);
 
       case MascotMood.wrong:
@@ -209,18 +209,18 @@ class _AnimatedEmojiMascot extends StatelessWidget {
         return emoji
             .animate()
             .shake(duration: 400.ms, hz: 3, delay: 100.ms)
-            .scale(begin: 1.0, end: 0.9, duration: 100.ms)
+            .scale(begin: const Offset(1.0, 1.0), end: const Offset(0.9, 0.9), duration: 100.ms)
             .then()
-            .scale(begin: 0.9, end: 1.0, duration: 200.ms);
+            .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.0, 1.0), duration: 200.ms);
 
       case MascotMood.celebrate:
         // Danse / rotation
         return emoji
             .animate(onPlay: (c) => c.repeat(reverse: true))
             .rotate(begin: -0.05, end: 0.05, duration: 150.ms)
-            .scale(begin: 1.0, end: 1.2, duration: 200.ms)
+            .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.2, 1.2), duration: 200.ms)
             .then()
-            .scale(begin: 1.2, end: 1.0, duration: 200.ms)
+            .scale(begin: const Offset(1.2, 1.2), end: const Offset(1.0, 1.0), duration: 200.ms)
             .rotate(begin: 0.05, end: -0.05, duration: 150.ms);
 
       case MascotMood.thinking:
@@ -234,7 +234,7 @@ class _AnimatedEmojiMascot extends StatelessWidget {
         // Respiration lente
         return emoji
             .animate(onPlay: (c) => c.repeat(reverse: true))
-            .scale(begin: 0.95, end: 1.0, duration: 2000.ms)
+            .scale(begin: const Offset(0.95, 0.95), end: const Offset(1.0, 1.0), duration: 2000.ms)
             .fade(begin: 0.7, end: 1.0, duration: 1500.ms);
 
       case MascotMood.encourage:
@@ -243,12 +243,12 @@ class _AnimatedEmojiMascot extends StatelessWidget {
         // Respiration douce + clignement occasionnel
         return emoji
             .animate(onPlay: (c) => c.repeat(reverse: true))
-            .scale(begin: 1.0, end: 1.05, duration: 1500.ms)
+            .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.05, 1.05), duration: 1500.ms)
             .moveY(begin: 0, end: -5, duration: 2000.ms)
             .then(delay: 3000.ms)
-            .scale(begin: 1.05, end: 0.98, duration: 100.ms)
+            .scale(begin: const Offset(1.05, 1.05), end: const Offset(0.98, 0.98), duration: 100.ms)
             .then()
-            .scale(begin: 0.98, end: 1.0, duration: 100.ms);
+            .scale(begin: const Offset(0.98, 0.98), end: const Offset(1.0, 1.0), duration: 100.ms);
     }
   }
 }
