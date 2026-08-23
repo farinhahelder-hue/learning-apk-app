@@ -298,6 +298,16 @@ class _LearningReportScreenState extends State<LearningReportScreen> {
                     value: access.letterBlocksEnabled ? 'oui' : 'non (lettres)'),
                 const Divider(height: 18),
                 _MiniRow(
+                    label: 'Vibrations',
+                    value: access.hapticsEnabled ? 'activées' : 'coupées'),
+                const Divider(height: 18),
+                _MiniRow(label: 'Taille du texte', value: access.textScaleLabel),
+                const Divider(height: 18),
+                _MiniRow(
+                    label: 'Pause proposée après',
+                    value: screenTime.sessionLimitLabel),
+                const Divider(height: 18),
+                _MiniRow(
                     label: 'Musique / effets',
                     value:
                         '${audio.musicEnabled ? "musique on" : "musique off"} · '

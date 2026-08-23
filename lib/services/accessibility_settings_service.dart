@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/haptics.dart';
 
 /// Profils sensoriels prédéfinis. Chaque profil règle d'un coup les
 /// animations, la vitesse de voix et le niveau de stimulation, mais chaque
@@ -42,8 +43,10 @@ class AccessibilitySettingsService extends ChangeNotifier {
   bool _animationsEnabled = true;
   bool _autoReadEnabled = false;
   bool _letterBlocksEnabled = false;
+  bool _hapticsEnabled = true;
   SensoryProfile _profile = SensoryProfile.normal;
   double _voiceRate = 0.45;
+  double _textScale = 1.0;
 
   AccessibilitySettingsService(this._prefs) {
     _calmModeEnabled = _prefs.getBool('calm_mode') ?? false;
@@ -51,7 +54,10 @@ class AccessibilitySettingsService extends ChangeNotifier {
     _animationsEnabled = _prefs.getBool('animations_on') ?? true;
     _autoReadEnabled = _prefs.getBool('auto_read') ?? false;
     _letterBlocksEnabled = _prefs.getBool('letter_blocks') ?? false;
+    _hapticsEnabled = _prefs.getBool('haptics_on') ?? true;
     _voiceRate = _prefs.getDouble('voice_rate') ?? 0.45;
+    _textScale = _prefs.getDouble('text_scale') ?? 1.0;
+    AppHaptics.enabled = _hapticsEnabled;
     final saved = _prefs.getString('sensory_profile');
     _profile = SensoryProfile.values.firstWhere(
       (p) => p.id == saved,
@@ -79,6 +85,21 @@ class AccessibilitySettingsService extends ChangeNotifier {
   /// que de proposer les lettres une par une. C'est une option pédagogique
   /// à essayer avec Emilie, pas une règle fixe.
   bool get letterBlocksEnabled => _letterBlocksEnabled;
+
+  /// Vibrations du téléphone. Certaines personnes s'en servent pour
+  /// s'ancrer, d'autres les vivent comme une agression : c'est un
+  /// interrupteur à part entière, pas un effet du mode calme.
+  bool get hapticsEnabled => _hapticsEnabled;
+
+  /// Facteur de taille du texte, appliqué à toute l'application.
+  double get textScale => _textScale;
+
+  String get textScaleLabel {
+    if (_textScale <= 0.95) return 'Petit';
+    if (_textScale <= 1.05) return 'Normal';
+    if (_textScale <= 1.25) return 'Grand';
+    return 'Très grand';
+  }
 
   SensoryProfile get profile => _profile;
 
@@ -124,6 +145,19 @@ class AccessibilitySettingsService extends ChangeNotifier {
 
   Future<void> toggleLetterBlocks() => setLetterBlocks(!_letterBlocksEnabled);
 
+  Future<void> setHaptics(bool value) async {
+    _hapticsEnabled = value;
+    AppHaptics.enabled = value;
+    await _prefs.setBool('haptics_on', value);
+    notifyListeners();
+  }
+
+  Future<void> setTextScale(double value) async {
+    _textScale = value.clamp(0.9, 1.4);
+    await _prefs.setDouble('text_scale', _textScale);
+    notifyListeners();
+  }
+
   Future<void> setVoiceRate(double value) async {
     _voiceRate = value.clamp(0.25, 0.60);
     await _prefs.setDouble('voice_rate', _voiceRate);
@@ -134,6 +168,7 @@ class AccessibilitySettingsService extends ChangeNotifier {
   Future<void> toggleThinkingTimer() => setShowThinkingTimer(!_showThinkingTimer);
   Future<void> toggleAnimations() => setAnimationsEnabled(!_animationsEnabled);
   Future<void> toggleAutoRead() => setAutoRead(!_autoReadEnabled);
+  Future<void> toggleHaptics() => setHaptics(!_hapticsEnabled);
 
   // ── Profils ────────────────────────────────────────────────
   /// Applique un profil : règle d'un coup calme, animations et voix.
@@ -145,25 +180,30 @@ class AccessibilitySettingsService extends ChangeNotifier {
         _calmModeEnabled = true;
         _animationsEnabled = false;
         _autoReadEnabled = true;
+        _hapticsEnabled = false;
         _voiceRate = 0.35;
         break;
       case SensoryProfile.normal:
         _calmModeEnabled = false;
         _animationsEnabled = true;
         _autoReadEnabled = false;
+        _hapticsEnabled = true;
         _voiceRate = 0.45;
         break;
       case SensoryProfile.dynamique:
         _calmModeEnabled = false;
         _animationsEnabled = true;
         _autoReadEnabled = false;
+        _hapticsEnabled = true;
         _voiceRate = 0.55;
         break;
     }
+    AppHaptics.enabled = _hapticsEnabled;
     await _prefs.setString('sensory_profile', p.id);
     await _prefs.setBool('calm_mode', _calmModeEnabled);
     await _prefs.setBool('animations_on', _animationsEnabled);
     await _prefs.setBool('auto_read', _autoReadEnabled);
+    await _prefs.setBool('haptics_on', _hapticsEnabled);
     await _prefs.setDouble('voice_rate', _voiceRate);
     notifyListeners();
   }

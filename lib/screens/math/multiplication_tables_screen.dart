@@ -8,7 +8,11 @@ import '../../utils/app_theme.dart';
 import '../../widgets/bounce_button.dart';
 import '../../widgets/rive_mascot_widget.dart';
 import '../../models/mascot.dart';
+import '../../services/accessibility_settings_service.dart';
 import '../../services/audio_service.dart';
+import '../../services/game_service.dart';
+import '../../services/garden_service.dart';
+import '../../services/stats_service.dart';
 
 /// Mode de jeu pour les tables de multiplication
 enum MultiplicationMode {
@@ -20,7 +24,13 @@ enum MultiplicationMode {
 /// - Mode séparé: une table à la fois
 /// - Mode mixte: mélange de toutes les tables
 class MultiplicationTablesScreen extends StatefulWidget {
-  const MultiplicationTablesScreen({super.key});
+  /// Compétence du parcours à créditer.
+  final String competence;
+
+  const MultiplicationTablesScreen({
+    super.key,
+    this.competence = 'multiplication_ce2',
+  });
 
   @override
   State<MultiplicationTablesScreen> createState() => _MultiplicationTablesScreenState();
@@ -40,6 +50,13 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   late ConfettiController _confetti;
   final Mascot _mascot = Mascots.barbeNoire;
   
+  late final String _level;
+
+  /// Le chronomètre n'existe que si le minuteur de réflexion a été
+  /// activé dans les réglages. Il est coupé par défaut : aucune
+  /// pression de temps tant qu'un adulte ne l'a pas choisie.
+  bool _timerOn = false;
+
   // Compteur de série (streak)
   int _streak = 0;
   bool _showStreakBadge = false;
@@ -63,6 +80,10 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   void initState() {
     super.initState();
     _confetti = ConfettiController(duration: const Duration(seconds: 3));
+    _level = context.read<GameService>().gradeLevel;
+    _timerOn = context.read<AccessibilitySettingsService>().showThinkingTimer;
+    context.read<GardenService>().rewardMissionStarted();
+    context.read<StatsService>().recordStarted(_level, widget.competence);
   }
 
   @override
@@ -172,6 +193,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
 
   void _startTimer() {
     _timer?.cancel();
+    if (!_timerOn) return;
     _remainingSeconds = 30;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
@@ -258,12 +280,16 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
   void _finish() {
     _timer?.cancel();
     final audio = context.read<AudioService>();
-    // Animation boss final si score parfait ou > 80%
-    final pct = _score / _exercises.length;
-    if (pct >= 0.8) {
-      _confetti.play();
-      audio.onPerfect(); // Son niveau terminé + applaudissements
-    }
+    final calm = context.read<AccessibilitySettingsService>().calmModeEnabled;
+
+    // La manche est allée au bout : c'est ça qu'on récompense, pas le
+    // sans-faute. Le score reste affiché, mais il ne conditionne rien.
+    context.read<GardenService>().rewardActivityCompleted();
+    context.read<StatsService>()
+        .recordCompleted(_level, widget.competence, hintsUsed: 0);
+
+    audio.onPerfect();
+    if (!calm) _confetti.play();
     setState(() => _finished = true);
   }
 
@@ -613,7 +639,8 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                   ],
                 ),
               ),
-              Container(
+              if (_timerOn)
+                Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: _remainingSeconds <= 10 ? Colors.red : Colors.white,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../data/sentence_workshop_data.dart';
 import '../../services/accessibility_settings_service.dart';
@@ -12,6 +11,7 @@ import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
+import '../../utils/haptics.dart';
 
 /// 🧱 Chantier des phrases — construire, repérer, accorder.
 ///
@@ -96,7 +96,7 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
 
   // ── Interactions selon le type de mission ────────────────
   void _takeWord(int i) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     context.read<AudioService>().onButtonTap();
     setState(() {
       _note = null;
@@ -105,7 +105,7 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
   }
 
   void _returnWord(int i) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     setState(() {
       _note = null;
       _reserve.add(_placed.removeAt(i));
@@ -114,7 +114,7 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
 
   void _tapNature(SentenceWord w) {
     if (_chosen != null) return;
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() => _chosen = w.text);
     if (w.nature == _m.targetNature) {
       _onSuccess();
@@ -129,7 +129,7 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
 
   void _tapChoice(String choice) {
     if (_chosen != null) return;
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     if (choice == _m.answer) {
       setState(() => _chosen = choice);
       _onSuccess();
@@ -157,7 +157,7 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
         _placed[firstWrong].text == expected[firstWrong]) {
       firstWrong++;
     }
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() {
       if (firstWrong < _placed.length) {
         final returned = _placed.sublist(firstWrong);
@@ -179,7 +179,7 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
         .recordCompleted(_level, _m.competence, hintsUsed: _hintsShown);
     context.read<ProgressService>().addPoints('french', 15);
     context.read<AudioService>().onCorrectAnswer();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
 
     if (!access.calmModeEnabled) _confettiKey.currentState?.burst();
     if (access.profile == SensoryProfile.dynamique) {

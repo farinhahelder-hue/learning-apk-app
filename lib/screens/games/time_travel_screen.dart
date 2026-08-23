@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/discovery_games_data.dart';
@@ -10,6 +9,7 @@ import '../../services/accessibility_settings_service.dart';
 import '../../services/garden_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../utils/haptics.dart';
 
 /// ⏳ Voyage dans le temps — remettre une frise dans l'ordre.
 /// L'enfant tape les cartes une par une pour construire sa frise.
@@ -56,7 +56,7 @@ class _TimeTravelScreenState extends State<TimeTravelScreen> {
 
   void _onTapCard(int originalIndex) {
     if (_checked || _placed.contains(originalIndex)) return;
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     context.read<AudioService>().onButtonTap();
     setState(() => _placed.add(originalIndex));
 
@@ -67,7 +67,7 @@ class _TimeTravelScreenState extends State<TimeTravelScreen> {
 
   void _undo() {
     if (_checked || _placed.isEmpty) return;
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     setState(() => _placed.removeLast());
   }
 
@@ -88,7 +88,7 @@ class _TimeTravelScreenState extends State<TimeTravelScreen> {
     });
 
     if (correct) {
-      HapticFeedback.mediumImpact();
+      AppHaptics.medium();
       audio.onCorrectAnswer();
       context.read<ProgressService>().addPoints('game', 15);
       if (!calm) _confettiKey.currentState?.burst();

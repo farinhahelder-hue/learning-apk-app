@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../data/problem_missions_data.dart';
 import '../../services/accessibility_settings_service.dart';
@@ -12,6 +11,7 @@ import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
+import '../../utils/haptics.dart';
 
 /// 🧩 Mission-problème — résoudre un problème étape par étape.
 ///
@@ -101,7 +101,7 @@ class _ProblemMissionScreenState extends State<ProblemMissionScreen> {
 
   void _chooseOp(ProblemOp op) {
     if (_chosenOp != null) return;
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     if (op == _step.operation) {
       context.read<AudioService>().onCorrectAnswer();
       setState(() {
@@ -116,7 +116,7 @@ class _ProblemMissionScreenState extends State<ProblemMissionScreen> {
 
   void _chooseResult(int value) {
     if (_chosenResult != null) return;
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     if (value == _step.result) {
       setState(() {
         _chosenResult = value;
@@ -153,7 +153,7 @@ class _ProblemMissionScreenState extends State<ProblemMissionScreen> {
         .recordCompleted(_level, _m.competence, hintsUsed: _hintsShown);
     context.read<ProgressService>().addPoints('math', 20);
     context.read<AudioService>().onPerfect();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
 
     if (!access.calmModeEnabled) _confettiKey.currentState?.burst();
     if (access.profile == SensoryProfile.dynamique) {

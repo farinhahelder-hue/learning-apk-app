@@ -61,7 +61,7 @@ class EmilieApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AudioService()),
         ChangeNotifierProvider(create: (_) => TtsService()),
         ChangeNotifierProvider(create: (_) => GameService(prefs)),
-        ChangeNotifierProvider(create: (_) => ScreenTimeService()),
+        ChangeNotifierProvider(create: (_) => ScreenTimeService(prefs)),
         ChangeNotifierProvider(create: (_) => GardenService(prefs)),
         ChangeNotifierProvider(create: (_) => StatsService(prefs)),
       ],
@@ -80,6 +80,9 @@ class EmilieApp extends StatelessWidget {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
               disableAnimations: !access.animationsEnabled,
+              // Taille de texte choisie dans les réglages, appliquée
+              // partout d'un seul endroit.
+              textScaler: TextScaler.linear(access.textScale),
             ),
             child: ScreenTimeGate(
               navigatorKey: navigatorKey,

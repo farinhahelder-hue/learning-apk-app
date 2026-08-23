@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../data/dictee_image_data.dart';
 import '../../services/accessibility_settings_service.dart';
@@ -12,6 +11,7 @@ import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
+import '../../utils/haptics.dart';
 
 /// 🖼️ Dictée image — écouter un mot, puis le construire avec des lettres
 /// mobiles (ou des blocs phonologiques, selon le réglage).
@@ -100,7 +100,7 @@ class _DicteeImageScreenState extends State<DicteeImageScreen> {
   }
 
   void _takePiece(int reserveIndex) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     context.read<AudioService>().onButtonTap();
     setState(() {
       _note = null;
@@ -110,7 +110,7 @@ class _DicteeImageScreenState extends State<DicteeImageScreen> {
 
   /// Retirer une pièce déjà posée : elle retourne dans la réserve.
   void _returnPiece(int placedIndex) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     setState(() {
       _note = null;
       _reserve.add(_placed.removeAt(placedIndex));
@@ -154,7 +154,7 @@ class _DicteeImageScreenState extends State<DicteeImageScreen> {
       firstWrong++;
     }
 
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() {
       if (firstWrong < _placed.length) {
         final returned = _placed.sublist(firstWrong);
@@ -177,7 +177,7 @@ class _DicteeImageScreenState extends State<DicteeImageScreen> {
         .recordCompleted(_level, _word.competence, hintsUsed: _hintsShown);
     context.read<ProgressService>().addPoints('french', 15);
     context.read<AudioService>().onCorrectAnswer();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
 
     if (!access.calmModeEnabled) _confettiKey.currentState?.burst();
     if (access.profile == SensoryProfile.dynamique) {

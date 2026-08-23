@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../services/audio_service.dart';
 import '../../utils/app_theme.dart';
 import 'math_exercise_screen.dart';
+import 'multiplication_tables_screen.dart';
 
 class MathMenuScreen extends StatelessWidget {
   const MathMenuScreen({super.key});
@@ -40,6 +41,49 @@ class MathMenuScreen extends StatelessWidget {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
             ).animate().fadeIn(duration: 400.ms),
             const SizedBox(height: 20),
+          // Atelier à part : ce n'est pas un QCM, on le sort de la liste.
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MultiplicationTablesScreen()),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0288D1), Color(0xFF01579B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  const Text('✖️', style: TextStyle(fontSize: 32)),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Tables de multiplication',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800)),
+                        SizedBox(height: 2),
+                        Text('Une table à la fois, ou toutes mélangées',
+                            style: TextStyle(
+                                color: Colors.white70, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white, size: 18),
+                ],
+              ),
+            ),
+          ),
             Expanded(
               child: ListView.separated(
                 itemCount: _categories.length,

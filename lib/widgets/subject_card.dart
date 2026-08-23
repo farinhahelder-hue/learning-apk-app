@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../utils/haptics.dart';
 
 /// Carte matière avec effet bounce au tap (feedback haptique + visuel)
 /// Accessible neurodivergences : grande zone de tap, contraste élevé
@@ -50,7 +50,7 @@ class _SubjectCardState extends State<SubjectCard>
   }
 
   void _handleTap() async {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     await _ctrl.forward();
     await _ctrl.reverse();
     widget.onTap();

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/discovery_games_data.dart';
@@ -10,6 +9,7 @@ import '../../services/accessibility_settings_service.dart';
 import '../../services/garden_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../utils/haptics.dart';
 
 /// 🗺️ Chasse au trésor — se repérer sur un plan.
 /// L'enfant déplace vraiment son personnage sur une grille avec des
@@ -53,7 +53,7 @@ class _TreasureHuntScreenState extends State<TreasureHuntScreen> {
     final newCol = (_col + dCol).clamp(0, TreasureHuntData.gridSize - 1);
     if (newRow == _row && newCol == _col) return; // bord du plan
 
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     context.read<AudioService>().onButtonTap();
     setState(() {
       _row = newRow;
@@ -68,7 +68,7 @@ class _TreasureHuntScreenState extends State<TreasureHuntScreen> {
 
   void _onArrived() {
     final calm = context.read<AccessibilitySettingsService>().calmModeEnabled;
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     context.read<AudioService>().onCorrectAnswer();
     context.read<ProgressService>().addPoints('game', 10);
     setState(() {

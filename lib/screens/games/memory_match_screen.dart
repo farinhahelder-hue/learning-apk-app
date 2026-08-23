@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/mascot.dart';
@@ -9,6 +8,7 @@ import '../../services/progress_service.dart';
 import '../../services/accessibility_settings_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../utils/haptics.dart';
 
 /// Jeu de mémoire : retrouver les paires de mascottes.
 /// Jamais de pénalité sur une paire ratée — juste on réessaie.
@@ -57,7 +57,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
   void _onTapCard(int index) {
     if (_busy || _cards[index].flipped || _cards[index].matched || _finished) return;
 
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() => _cards[index].flipped = true);
 
     if (_firstIndex == null) {
@@ -74,7 +74,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
     final audio = context.read<AudioService>();
 
     if (isMatch) {
-      HapticFeedback.mediumImpact();
+      AppHaptics.medium();
       setState(() {
         _cards[first].matched = true;
         _cards[index].matched = true;

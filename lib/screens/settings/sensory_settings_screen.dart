@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/accessibility_settings_service.dart';
+import '../../models/screen_time.dart';
 import '../../services/audio_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
@@ -16,6 +17,7 @@ class SensorySettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final access = context.watch<AccessibilitySettingsService>();
     final audio = context.watch<AudioService>();
+    final screenTime = context.watch<ScreenTimeService>();
 
     final allSilent = !audio.musicEnabled && !audio.soundEnabled;
 
@@ -146,6 +148,13 @@ class SensorySettingsScreen extends StatelessWidget {
             onChanged: (_) => access.toggleAnimations(),
           ),
           _SwitchTile(
+            emoji: '📳',
+            title: 'Vibrations',
+            subtitle: 'Petite vibration quand on pose ou valide quelque chose',
+            value: access.hapticsEnabled,
+            onChanged: (_) => access.toggleHaptics(),
+          ),
+          _SwitchTile(
             emoji: '🗣️',
             title: 'Lire les consignes à voix haute',
             subtitle: 'La question est lue automatiquement à chaque exercice',
@@ -166,6 +175,96 @@ class SensorySettingsScreen extends StatelessWidget {
                 'au lieu des lettres une par une. À essayer avec Emilie.',
             value: access.letterBlocksEnabled,
             onChanged: (_) => access.toggleLetterBlocks(),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Taille du texte ──
+          const _SectionTitle('Taille du texte'),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Aa',
+                        style: TextStyle(fontSize: 12, color: AppTheme.textGrey)),
+                    Text(access.textScaleLabel,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.primaryPurple)),
+                    const Text('Aa',
+                        style: TextStyle(fontSize: 22, color: AppTheme.textGrey)),
+                  ],
+                ),
+                Slider(
+                  value: access.textScale,
+                  min: 0.9,
+                  max: 1.4,
+                  divisions: 5,
+                  activeColor: AppTheme.primaryPurple,
+                  onChanged: (v) => access.setTextScale(v),
+                ),
+                // L'apercu suit le reglage : on voit tout de suite l'effet.
+                const Text(
+                  'Voici à quoi ressemblera le texte des exercices.',
+                  style: TextStyle(fontSize: 15, height: 1.5),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Durée avant de proposer une pause ──
+          const _SectionTitle('Proposer une pause après'),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final m in ScreenTimeService.sessionChoices)
+                      ChoiceChip(
+                        label: Text(m == 0 ? 'Aucune' : '$m min'),
+                        selected: screenTime.sessionLimitMinutes == m,
+                        selectedColor:
+                            AppTheme.primaryPurple.withOpacity(0.25),
+                        onSelected: (_) => screenTime.setSessionLimit(m),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'La pause est toujours proposée, jamais imposée : Emilie '
+                  'choisit entre continuer, souffler un moment, ou revenir '
+                  'au menu.',
+                  style: TextStyle(
+                      fontSize: 11, height: 1.5, color: AppTheme.textGrey),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 20),

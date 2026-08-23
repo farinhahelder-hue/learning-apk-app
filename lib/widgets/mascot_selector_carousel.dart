@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/mascot.dart';
 import 'rive_mascot_widget.dart';
+import '../utils/haptics.dart';
 
 /// Carousel de sélection de mascotte
 /// Affiché sur l'écran d'accueil ou en début d'exercice
@@ -70,7 +70,7 @@ class _MascotSelectorCarouselState
             itemCount: mascots.length,
             onPageChanged: (i) {
               setState(() => _selected = i);
-              HapticFeedback.selectionClick();
+              AppHaptics.selection();
               widget.onSelected?.call(mascots[i]);
             },
             itemBuilder: (ctx, i) {

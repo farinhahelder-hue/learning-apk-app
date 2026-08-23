@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../data/tales_data.dart';
 import '../../services/accessibility_settings_service.dart';
@@ -11,6 +10,7 @@ import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../utils/haptics.dart';
 
 /// 📖 Lire ou écouter une histoire, puis répondre à des questions.
 ///
@@ -73,7 +73,7 @@ class _TaleReaderScreenState extends State<TaleReaderScreen> {
 
   void _answer(String choice) {
     if (_selected != null) return;
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     final correct = choice == _q.answer;
     setState(() {
       _selected = choice;

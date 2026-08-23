@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../models/mascot.dart';
@@ -11,6 +10,7 @@ import '../widgets/confetti_overlay.dart';
 import '../widgets/mascot_widget.dart';
 import '../widgets/thinking_timer.dart';
 import '../widgets/bounce_button.dart';
+import '../utils/haptics.dart';
 
 /// Écran générique pour les nouveaux mondes de découverte
 /// (Animaux, Émotions, Géo, Histoire, Univers, Faits incroyables)
@@ -88,7 +88,7 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
     });
 
     _timerKey.currentState?.stop();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
 
     final audio = context.read<AudioService>();
     if (isCorrect) {

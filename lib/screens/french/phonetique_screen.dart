@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../models/mascot.dart';
+import '../../services/accessibility_settings_service.dart';
+import '../../services/game_service.dart';
+import '../../services/garden_service.dart';
+import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/bounce_button.dart';
@@ -10,7 +14,13 @@ import '../../widgets/rive_mascot_widget.dart';
 /// Écran d'exercices de phonétique française CE1
 /// 6 sons à discrimination : [a], [o], [ɛ], [j], [ã], [ʃ]
 class PhonetiqueScreen extends StatefulWidget {
-  const PhonetiqueScreen({super.key});
+  /// Compétence du parcours à créditer.
+  final String competence;
+
+  const PhonetiqueScreen({
+    super.key,
+    this.competence = 'phonologie_sons_ce1',
+  });
 
   @override
   State<PhonetiqueScreen> createState() => _PhonetiqueScreenState();
@@ -79,6 +89,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
 
   late List<PhonetiqueExercise> _exercises;
   int _current = 0;
+  late final String _level;
   int _score = 0;
   bool _finished = false;
   int? _selectedIndex;
@@ -88,6 +99,9 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
   @override
   void initState() {
     super.initState();
+    _level = context.read<GameService>().gradeLevel;
+    context.read<GardenService>().rewardMissionStarted();
+    context.read<StatsService>().recordStarted(_level, widget.competence);
     _exercises = List.from(_allExercises)..shuffle();
   }
 
@@ -140,8 +154,17 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
         _speakWord(_exercises[_current].word);
       });
     } else {
-      setState(() => _finished = true);
+      _finish();
     }
+  }
+
+  /// Aller au bout de la série suffit : le score n'ouvre ni ne ferme
+  /// rien, il est juste affiché.
+  void _finish() {
+    context.read<GardenService>().rewardActivityCompleted();
+    context.read<StatsService>()
+        .recordCompleted(_level, widget.competence, hintsUsed: 0);
+    setState(() => _finished = true);
   }
 
   void _restart() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'confetti_overlay.dart';
+import '../utils/haptics.dart';
 
 /// Widget de feedback visuel complet pour bonne réponse :
 /// confettis + message animé + vibration
@@ -18,7 +18,7 @@ class CorrectAnswerFeedback extends StatelessWidget {
     String message = 'Bravo ! 🌟',
   }) {
     // Vibration haptique forte (satisfaction)
-    HapticFeedback.heavyImpact();
+    AppHaptics.heavy();
     // Confettis
     confettiKey.currentState?.burst();
     // Snackbar animé cute

@@ -3,19 +3,40 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ScreenTimeService extends ChangeNotifier {
-  static const int sessionLimitMinutes = 15;   // pause oblig. après 15 min
-  static const int dailyLimitMinutes   = 45;   // max par jour
+  /// Durées proposées, en minutes. 0 = aucune proposition de pause.
+  static const List<int> sessionChoices = [10, 15, 20, 30, 45, 0];
+
+  static const int dailyLimitMinutes = 45;   // repère indicatif
+
+  final SharedPreferences _prefs;
+
+  /// Au bout de combien de minutes proposer une pause. C'est bien une
+  /// proposition à trois choix, pas une coupure : voir ScreenTimeGate.
+  int _sessionLimitMinutes = 15;
 
   int _sessionSeconds = 0;
   int _dailySeconds   = 0;
   bool _pauseRequested = false;
   DateTime? _sessionStart;
 
+  int get sessionLimitMinutes => _sessionLimitMinutes;
+
+  String get sessionLimitLabel =>
+      _sessionLimitMinutes == 0 ? 'Aucune' : '$_sessionLimitMinutes min';
+
+  Future<void> setSessionLimit(int minutes) async {
+    _sessionLimitMinutes = minutes;
+    await _prefs.setInt('session_limit', minutes);
+    notifyListeners();
+  }
+
   int get sessionSeconds  => _sessionSeconds;
   int get dailySeconds    => _dailySeconds;
   bool get pauseRequested => _pauseRequested;
 
-  double get sessionProgress => _sessionSeconds / (sessionLimitMinutes * 60);
+  double get sessionProgress => _sessionLimitMinutes == 0
+      ? 0
+      : _sessionSeconds / (_sessionLimitMinutes * 60);
   double get dailyProgress   => _dailySeconds   / (dailyLimitMinutes   * 60);
 
   String get sessionTimeLabel {
@@ -32,7 +53,9 @@ class ScreenTimeService extends ChangeNotifier {
   void tick() {
     _sessionSeconds++;
     _dailySeconds++;
-    if (_sessionSeconds >= sessionLimitMinutes * 60 && !_pauseRequested) {
+    if (_sessionLimitMinutes > 0 &&
+        _sessionSeconds >= _sessionLimitMinutes * 60 &&
+        !_pauseRequested) {
       _pauseRequested = true;
       notifyListeners();
     }
@@ -46,22 +69,24 @@ class ScreenTimeService extends ChangeNotifier {
 
   bool get dailyLimitReached => _dailySeconds >= dailyLimitMinutes * 60;
 
+  ScreenTimeService(this._prefs) {
+    _sessionLimitMinutes = _prefs.getInt('session_limit') ?? 15;
+  }
+
   Future<void> loadToday() async {
-    final p = await SharedPreferences.getInstance();
     final today = DateTime.now().toIso8601String().substring(0, 10);
-    final saved = p.getString('screentime_date');
+    final saved = _prefs.getString('screentime_date');
     if (saved == today) {
-      _dailySeconds = p.getInt('screentime_daily') ?? 0;
+      _dailySeconds = _prefs.getInt('screentime_daily') ?? 0;
     } else {
       _dailySeconds = 0;
-      await p.setString('screentime_date', today);
+      await _prefs.setString('screentime_date', today);
     }
   }
 
   Future<void> saveToday() async {
-    final p = await SharedPreferences.getInstance();
     final today = DateTime.now().toIso8601String().substring(0, 10);
-    await p.setString('screentime_date', today);
-    await p.setInt('screentime_daily', _dailySeconds);
+    await _prefs.setString('screentime_date', today);
+    await _prefs.setInt('screentime_daily', _dailySeconds);
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/discovery_games_data.dart';
@@ -11,6 +10,7 @@ import '../../services/garden_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../utils/haptics.dart';
 
 /// 🌦️ Météo Express — Emilie devient présentatrice météo.
 /// CE1 : reconnaître les symboles, associer tenue et saison.
@@ -53,7 +53,7 @@ class _WeatherExpressScreenState extends State<WeatherExpressScreen> {
     final calm = context.read<AccessibilitySettingsService>().calmModeEnabled;
     final audio = context.read<AudioService>();
 
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() {
       _selected = choice;
       if (correct) _score++;

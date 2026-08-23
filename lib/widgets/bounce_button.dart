@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../utils/haptics.dart';
 
 /// Bouton avec effet bounce + retour haptique + animations
 /// Compatible neurodivergences : grande zone de tap (min 64px), feedback immédiat
@@ -60,7 +60,7 @@ class _BounceButtonState extends State<BounceButton>
 
   void _onTapDown(TapDownDetails _) {
     if (widget.onTap == null) return;
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() => _isPressed = true);
     _ctrl.forward();
   }

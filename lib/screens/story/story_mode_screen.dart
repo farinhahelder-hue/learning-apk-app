@@ -11,7 +11,9 @@ import '../games/number_bars_screen.dart';
 import '../games/problem_mission_screen.dart';
 import '../games/sentence_workshop_screen.dart';
 import '../french/french_menu_screen.dart';
+import '../french/phonetique_screen.dart';
 import '../math/math_menu_screen.dart';
+import '../math/multiplication_tables_screen.dart';
 import '../science/science_menu_screen.dart';
 import 'tale_reader_screen.dart';
 
@@ -248,6 +250,12 @@ class StoryChapterScreen extends StatelessWidget {
         break;
       case LearningActivity.tale:
         screen = TaleReaderScreen(competence: c.id);
+        break;
+      case LearningActivity.multiplication:
+        screen = MultiplicationTablesScreen(competence: c.id);
+        break;
+      case LearningActivity.phonetique:
+        screen = PhonetiqueScreen(competence: c.id);
         break;
       case LearningActivity.mathQuiz:
         screen = const MathMenuScreen();

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../data/number_bars_missions.dart';
 import '../../services/accessibility_settings_service.dart';
@@ -12,6 +11,7 @@ import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
+import '../../utils/haptics.dart';
 
 /// 🔢 Barres de nombres — micro-missions de numération.
 ///
@@ -92,7 +92,7 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
   }
 
   void _add(String col) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     context.read<AudioService>().onButtonTap();
     setState(() {
       _note = null;
@@ -126,7 +126,7 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
   }
 
   void _remove(String col) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     setState(() {
       _note = null;
       switch (col) {
@@ -171,7 +171,7 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
     if (_total == _mission.target) {
       _onSuccess();
     } else {
-      HapticFeedback.lightImpact();
+      AppHaptics.light();
       setState(() => _note = _gentleGuidance());
     }
   }
@@ -187,7 +187,7 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
         .recordCompleted(_level, _mission.competence, hintsUsed: _hintsShown);
 
     audio.onCorrectAnswer();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
 
     // Feedback gradué selon le profil sensoriel.
     if (!access.calmModeEnabled) {

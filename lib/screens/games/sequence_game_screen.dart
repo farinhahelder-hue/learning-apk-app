@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../services/audio_service.dart';
 import '../../services/progress_service.dart';
 import '../../utils/app_theme.dart';
+import '../../utils/haptics.dart';
 
 /// Jeu de séquence façon "Simon" : répéter une séquence de couleurs qui
 /// s'allonge à chaque tour. Pas de chronomètre, pas de son d'erreur — en cas
@@ -78,7 +78,7 @@ class _SequenceGameScreenState extends State<SequenceGameScreen> {
   void _onTapButton(int i) {
     if (!_accepting || _isPlaying) return;
 
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() => _activeButton = i);
     Future.delayed(const Duration(milliseconds: 180), () {
       if (mounted) setState(() => _activeButton = -1);
@@ -89,7 +89,7 @@ class _SequenceGameScreenState extends State<SequenceGameScreen> {
       _playerStep++;
       if (_playerStep == _sequence.length) {
         _accepting = false;
-        HapticFeedback.mediumImpact();
+        AppHaptics.medium();
         if (_sequence.length > _bestLength) {
           setState(() => _bestLength = _sequence.length);
         }

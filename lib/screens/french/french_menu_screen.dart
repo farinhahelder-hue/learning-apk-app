@@ -6,6 +6,7 @@ import '../../services/audio_service.dart';
 import '../../services/accessibility_settings_service.dart';
 import '../../utils/app_theme.dart';
 import 'french_exercise_screen.dart';
+import 'phonetique_screen.dart';
 
 class FrenchMenuScreen extends StatelessWidget {
   const FrenchMenuScreen({super.key});
@@ -75,7 +76,50 @@ class FrenchMenuScreen extends StatelessWidget {
           ).animate().fadeIn(duration: 400.ms),
           
           const SizedBox(height: 16),
-          
+
+          // Atelier à part : ce n'est pas un QCM, on le sort de la liste.
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PhonetiqueScreen()),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFEC407A), Color(0xFFC2185B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  const Text('🔊', style: TextStyle(fontSize: 32)),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Atelier des sons',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800)),
+                        SizedBox(height: 2),
+                        Text('Écouter un mot et retrouver le son entendu',
+                            style: TextStyle(
+                                color: Colors.white70, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white, size: 18),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(20),
