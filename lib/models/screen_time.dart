@@ -17,7 +17,6 @@ class ScreenTimeService extends ChangeNotifier {
   int _sessionSeconds = 0;
   int _dailySeconds   = 0;
   bool _pauseRequested = false;
-  DateTime? _sessionStart;
 
   int get sessionLimitMinutes => _sessionLimitMinutes;
 
@@ -46,7 +45,6 @@ class ScreenTimeService extends ChangeNotifier {
   }
 
   void startSession() {
-    _sessionStart = DateTime.now();
     _pauseRequested = false;
   }
 
