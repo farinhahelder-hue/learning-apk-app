@@ -114,7 +114,7 @@ class SpeechService extends ChangeNotifier {
         _confidence = result.confidence;
         
         if (kDebugMode) {
-          print('STT Result: "${result.recognizedWords}" (confidence: ${result.confidence})');
+          print('STT Result received (confidence: ${result.confidence})');
         }
 
         onResult(result.recognizedWords);
