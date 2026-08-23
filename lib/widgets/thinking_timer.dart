@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../utils/app_theme.dart';
 
 /// Timer visuel "bulle" façon Duolingo
 /// Cercle qui se vide progressivement, change de couleur (vert→orange→rouge)
 /// Compatible neurodivergences : visuel uniquement, pas de son angoissant
 class ThinkingTimer extends StatefulWidget {
-  final int seconds;           // durée totale
-  final VoidCallback? onEnd;   // appelé quand temps écoulé
+  final int seconds; // durée totale
+  final VoidCallback? onEnd; // appelé quand temps écoulé
   final double size;
   final bool autoStart;
 
@@ -29,7 +28,6 @@ class ThinkingTimerState extends State<ThinkingTimer>
   late Animation<double> _progress;
   Timer? _ticker;
   int _remaining = 0;
-  bool _running = false;
 
   @override
   void initState() {
@@ -39,21 +37,24 @@ class ThinkingTimerState extends State<ThinkingTimer>
       vsync: this,
       duration: Duration(seconds: widget.seconds),
     );
-    _progress = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.linear),
-    );
+    _progress = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.linear));
     if (widget.autoStart) start();
   }
 
   void start() {
-    _running = true;
     _ctrl.forward(from: 0);
     _ticker = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (!mounted) { t.cancel(); return; }
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
       setState(() => _remaining--);
       if (_remaining <= 0) {
         t.cancel();
-        _running = false;
+
         widget.onEnd?.call();
       }
     });
@@ -62,7 +63,6 @@ class ThinkingTimerState extends State<ThinkingTimer>
   void stop() {
     _ticker?.cancel();
     _ctrl.stop();
-    _running = false;
   }
 
   void reset() {
@@ -75,7 +75,7 @@ class ThinkingTimerState extends State<ThinkingTimer>
     final ratio = _remaining / widget.seconds;
     if (ratio > 0.6) return const Color(0xFF4CAF50); // vert
     if (ratio > 0.3) return const Color(0xFFFF9800); // orange
-    return const Color(0xFFF44336);                   // rouge
+    return const Color(0xFFF44336); // rouge
   }
 
   @override
@@ -101,7 +101,7 @@ class ThinkingTimerState extends State<ThinkingTimer>
                 child: CircularProgressIndicator(
                   value: _progress.value,
                   strokeWidth: 6,
-                  backgroundColor: _timerColor.withOpacity(0.2),
+                  backgroundColor: _timerColor.withValues(alpha: 0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(_timerColor),
                   strokeCap: StrokeCap.round,
                 ),
