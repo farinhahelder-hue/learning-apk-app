@@ -4,6 +4,7 @@ import '../../models/screen_time.dart';
 import '../../services/accessibility_settings_service.dart';
 import '../../services/audio_service.dart';
 import '../../data/official_curriculum.dart';
+import '../../utils/adaptive_difficulty.dart';
 import '../../services/stats_service.dart';
 import '../../utils/app_theme.dart';
 
@@ -223,6 +224,7 @@ class _LearningReportScreenState extends State<LearningReportScreen> {
             _Section('Compétences travaillées'),
             ...competences.map((e) {
               final st = e.value;
+              final stage = AdaptiveDifficulty.stageFor(st);
               return Container(
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(14),
@@ -253,6 +255,26 @@ class _LearningReportScreenState extends State<LearningReportScreen> {
                           _Tag('🌟 ${st.autonomous} sans aide', AppTheme.primaryYellow),
                         if (st.withHelp > 0)
                           _Tag('💡 ${st.withHelp} avec aide', AppTheme.primaryOrange),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Ce que l'application proposera d'abord sur cette
+                    // compétence, et le constat qui motive ce choix.
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${stage.emoji} ',
+                            style: const TextStyle(fontSize: 13)),
+                        Expanded(
+                          child: Text(
+                            'Proposé ensuite : « ${stage.label} » — '
+                            '${stage.adultHint}',
+                            style: const TextStyle(
+                                fontSize: 11,
+                                height: 1.4,
+                                color: AppTheme.textGrey),
+                          ),
+                        ),
                       ],
                     ),
                   ],

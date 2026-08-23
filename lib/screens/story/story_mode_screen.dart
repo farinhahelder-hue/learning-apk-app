@@ -5,6 +5,7 @@ import '../../services/accessibility_settings_service.dart';
 import '../../services/game_service.dart';
 import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
+import '../../utils/adaptive_difficulty.dart';
 import '../../utils/app_theme.dart';
 import '../games/dictee_image_screen.dart';
 import '../games/number_bars_screen.dart';
@@ -355,6 +356,8 @@ class StoryChapterScreen extends StatelessWidget {
                 .toList();
             final completed = entry.isNotEmpty ? entry.first.value.completed : 0;
             final available = c.activity.isAvailable;
+            final stage = AdaptiveDifficulty
+                .stageFor(entry.isEmpty ? null : entry.first.value);
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -394,9 +397,40 @@ class StoryChapterScreen extends StatelessWidget {
                                 style: const TextStyle(
                                     fontSize: 11, color: AppTheme.textGrey),
                               ),
+                              if (available) ...[
+                                const SizedBox(height: 6),
+                                // L'étape est nommée pareil pour tout le
+                                // monde : revenir sur une base et découvrir
+                                // du neuf portent le même genre de nom.
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: color.withOpacity(0.12),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Text(
+                                          '${stage.emoji} ${stage.label}',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w800,
+                                              color: color)),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(stage.childHint,
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              color: AppTheme.textGrey)),
+                                    ),
+                                  ],
+                                ),
+                              ],
                               if (completed > 0)
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 3),
+                                  padding: const EdgeInsets.only(top: 4),
                                   child: Text('Déjà visitée $completed fois',
                                       style: const TextStyle(
                                           fontSize: 10,

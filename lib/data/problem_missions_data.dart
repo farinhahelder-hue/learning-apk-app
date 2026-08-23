@@ -196,6 +196,116 @@ class ProblemMissionsData {
         '24 + 13 = 37.',
       ],
     ),
+    ProblemMission(
+      id: 'pb_ce1_05',
+      level: 'CE1',
+      competence: 'probleme_soustraction_une_etape_ce1',
+      missionType: 'Je découvre',
+      statement:
+          'Emilie a 9 billes. Elle en donne 3 à son amie. Combien lui reste-t-il de billes ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien de billes lui reste-t-il ?',
+          operation: ProblemOp.retirer,
+          a: 9, b: 3, result: 6,
+          choices: [6, 12, 5, 3],
+        ),
+      ],
+      answerSentence: 'Il lui reste 6 billes.',
+      hints: [
+        'Elle donne des billes : elle en a moins qu\'avant.',
+        'C\'est une soustraction : 9 − 3.',
+        '9 − 3 = 6.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce1_06',
+      level: 'CE1',
+      competence: 'probleme_soustraction_une_etape_ce1',
+      missionType: 'Je réussis',
+      statement:
+          'La bibliothèque a 45 livres. On en emprunte 17. Combien de livres restent sur les étagères ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien de livres restent ?',
+          operation: ProblemOp.retirer,
+          a: 45, b: 17, result: 28,
+          choices: [28, 62, 32, 38],
+        ),
+      ],
+      answerSentence: 'Il reste 28 livres.',
+      hints: [
+        'Des livres partent : il en reste moins.',
+        'C\'est une soustraction : 45 − 17.',
+        '45 − 17 = 28.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce1_07',
+      level: 'CE1',
+      competence: 'probleme_comparaison_ce1',
+      missionType: 'Je découvre',
+      statement:
+          'Léo a 8 images. Sa sœur en a 5. Combien Léo a-t-il d\'images de plus que sa sœur ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien d\'images de plus ?',
+          operation: ProblemOp.comparer,
+          a: 8, b: 5, result: 3,
+          choices: [3, 13, 4, 2],
+        ),
+      ],
+      answerSentence: 'Léo a 3 images de plus que sa sœur.',
+      hints: [
+        'On ne rassemble pas les images : on cherche l\'écart.',
+        'C\'est une comparaison : 8 − 5.',
+        '8 − 5 = 3.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce1_08',
+      level: 'CE1',
+      competence: 'probleme_comparaison_ce1',
+      missionType: 'Je réussis',
+      statement:
+          'Dans la classe verte il y a 34 enfants, dans la classe bleue 27. Combien y a-t-il d\'enfants de plus dans la classe verte ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien d\'enfants de plus ?',
+          operation: ProblemOp.comparer,
+          a: 34, b: 27, result: 7,
+          choices: [7, 61, 13, 8],
+        ),
+      ],
+      answerSentence: 'Il y a 7 enfants de plus dans la classe verte.',
+      hints: [
+        'On compare deux classes : on cherche la différence.',
+        'C\'est une comparaison : 34 − 27.',
+        '34 − 27 = 7.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce1_09',
+      level: 'CE1',
+      competence: 'probleme_addition_une_etape_ce1',
+      missionType: 'Je consolide',
+      statement:
+          'Emilie ramasse 16 coquillages le matin et 12 l\'après-midi. Combien de coquillages a-t-elle en tout ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien de coquillages en tout ?',
+          operation: ProblemOp.ajouter,
+          a: 16, b: 12, result: 28,
+          choices: [28, 4, 26, 30],
+        ),
+      ],
+      answerSentence: 'Elle a 28 coquillages en tout.',
+      hints: [
+        'Elle ramasse deux fois : on met les deux tas ensemble.',
+        'C\'est une addition : 16 + 12.',
+        '16 + 12 = 28.',
+      ],
+    ),
   ];
 
   // ── CE2 : partage et problèmes en deux étapes ──
@@ -344,6 +454,106 @@ class ProblemMissionsData {
         'Des groupes égaux : chacun a le même nombre d\'enfants.',
         'C\'est une division : 35 ÷ 5.',
         '35 ÷ 5 = 7.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce2_07',
+      level: 'CE2',
+      competence: 'probleme_deux_etapes_ce2',
+      missionType: 'Je découvre',
+      statement:
+          'Emilie a 10 crayons. Elle en achète 5 de plus, puis en perd 3. Combien lui en reste-t-il ?',
+      steps: [
+        ProblemStep(
+          question: 'Étape 1 : combien de crayons après l\'achat ?',
+          operation: ProblemOp.ajouter,
+          a: 10, b: 5, result: 15,
+          choices: [15, 5, 13, 50],
+        ),
+        ProblemStep(
+          question: 'Étape 2 : et après en avoir perdu 3 ?',
+          operation: ProblemOp.retirer,
+          a: 15, b: 3, result: 12,
+          choices: [12, 18, 11, 8],
+        ),
+      ],
+      answerSentence: 'Il lui reste 12 crayons.',
+      hints: [
+        'Il se passe deux choses : elle achète, puis elle perd.',
+        'D\'abord l\'addition : 10 + 5 = 15.',
+        'Ensuite la soustraction : 15 − 3 = 12.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce2_08',
+      level: 'CE2',
+      competence: 'probleme_deux_etapes_ce2',
+      missionType: 'Je réussis',
+      statement:
+          'Un car transporte 48 personnes. À l\'arrêt, 15 descendent et 9 montent. Combien de personnes y a-t-il dans le car ?',
+      steps: [
+        ProblemStep(
+          question: 'Étape 1 : combien après les descentes ?',
+          operation: ProblemOp.retirer,
+          a: 48, b: 15, result: 33,
+          choices: [33, 63, 37, 23],
+        ),
+        ProblemStep(
+          question: 'Étape 2 : et après les montées ?',
+          operation: ProblemOp.ajouter,
+          a: 33, b: 9, result: 42,
+          choices: [42, 24, 41, 39],
+        ),
+      ],
+      answerSentence: 'Il y a 42 personnes dans le car.',
+      hints: [
+        'Deux mouvements de suite : des gens partent, puis d\'autres arrivent.',
+        'D\'abord la soustraction : 48 − 15 = 33.',
+        'Ensuite l\'addition : 33 + 9 = 42.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce2_09',
+      level: 'CE2',
+      competence: 'probleme_partage_ce2',
+      missionType: 'Je consolide',
+      statement:
+          'On range 36 livres sur 4 étagères, autant sur chacune. Combien de livres par étagère ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien de livres par étagère ?',
+          operation: ProblemOp.partager,
+          a: 36, b: 4, result: 9,
+          choices: [9, 8, 32, 40],
+        ),
+      ],
+      answerSentence: 'Il y a 9 livres par étagère.',
+      hints: [
+        'Autant sur chacune : les parts sont égales.',
+        'C\'est une division : 36 ÷ 4.',
+        '36 ÷ 4 = 9.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce2_10',
+      level: 'CE2',
+      competence: 'division_partage_ce2',
+      missionType: 'Je consolide',
+      statement:
+          'Emilie colle 42 photos dans un album, 6 par page. Combien de pages remplit-elle ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien de pages remplies ?',
+          operation: ProblemOp.partager,
+          a: 42, b: 6, result: 7,
+          choices: [7, 8, 36, 48],
+        ),
+      ],
+      answerSentence: 'Elle remplit 7 pages.',
+      hints: [
+        'On fait des groupes égaux de 6 photos.',
+        'C\'est une division : 42 ÷ 6.',
+        '42 ÷ 6 = 7.',
       ],
     ),
   ];

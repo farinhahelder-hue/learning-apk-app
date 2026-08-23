@@ -8,6 +8,7 @@ import '../../services/garden_service.dart';
 import '../../services/progress_service.dart';
 import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
+import '../../utils/adaptive_difficulty.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
@@ -60,7 +61,13 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
   void initState() {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
-    _missions = _filtered(SentenceWorkshopData.forLevel(_level))..shuffle();
+    _missions = AdaptiveDifficulty.ordered(
+      _filtered(SentenceWorkshopData.forLevel(_level))..shuffle(),
+      stats: context.read<StatsService>(),
+      level: _level,
+      competenceOf: (m) => m.competence,
+      missionTypeOf: (m) => m.missionType,
+    );
   }
 
   void _speak(String text) {
