@@ -728,7 +728,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.w900,
-                              color: AppTheme.textLight,
+                              color: AppTheme.textGrey,
                             ),
                           ),
                           Text(
@@ -744,7 +744,7 @@ class _MultiplicationTablesScreenState extends State<MultiplicationTablesScreen>
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.w900,
-                              color: AppTheme.textLight,
+                              color: AppTheme.textGrey,
                             ),
                           ),
                         ],
