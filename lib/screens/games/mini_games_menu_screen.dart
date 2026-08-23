@@ -7,6 +7,7 @@ import 'memory_match_screen.dart';
 import 'sequence_game_screen.dart';
 import 'question_rain_screen.dart';
 import 'flash_quiz_screen.dart';
+import 'number_bars_screen.dart';
 import 'treasure_hunt_screen.dart';
 import 'time_travel_screen.dart';
 import 'weather_express_screen.dart';
@@ -28,6 +29,12 @@ class MiniGamesMenuScreen extends StatelessWidget {
 
     // Jeux qui suivent le programme scolaire (contenu distinct CE1/CE2)
     final programGames = [
+      {
+        'title': 'Barres de nombres', 'emoji': '🔢',
+        'subtitle': 'Construis les nombres avec des objets',
+        'color': const Color(0xFF42A5F5),
+        'builder': (BuildContext c) => const NumberBarsScreen(),
+      },
       {
         'title': 'Chasse au trésor', 'emoji': '🗺️',
         'subtitle': 'Repère-toi sur le plan et trouve le trésor',
