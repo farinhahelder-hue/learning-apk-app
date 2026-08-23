@@ -66,7 +66,7 @@ class DiscoveryWorldMenuScreen extends StatelessWidget {
                           SizedBox(height: 2),
                           Text('Des scènes à lire, sans bonne ni mauvaise façon de réagir',
                               style: TextStyle(
-                                  color: Colors.white70, fontSize: 12)),
+                                  color: Colors.white, fontSize: 12)),
                         ],
                       ),
                     ),

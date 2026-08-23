@@ -136,7 +136,7 @@ class ParentalDashboardScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w800,
                                   fontSize: 16)),
                           Text('Comp\u00e9tences, aides et observations \u00b7 CE1 / CE2',
-                              style: TextStyle(color: Colors.white70, fontSize: 12)),
+                              style: TextStyle(color: Colors.white, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -173,7 +173,7 @@ class ParentalDashboardScreen extends StatelessWidget {
                               style: TextStyle(
                                   color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
                           Text('Profil sensoriel, voix, animations, sons',
-                              style: TextStyle(color: Colors.white70, fontSize: 12)),
+                              style: TextStyle(color: Colors.white, fontSize: 12)),
                         ],
                       ),
                     ),

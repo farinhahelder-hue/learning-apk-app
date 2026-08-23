@@ -92,13 +92,7 @@ def check_braces():
 
 # Fichiers tolérés malgré des imports cassés, en attendant une décision.
 # Cette liste doit rester vide : chaque entrée est une dette assumée.
-#
-# - dictee_interactive_screen.dart : orphelin ET doublon de la Dictée
-#   image déjà en service, avec une classe DicteeWord concurrente. À
-#   supprimer ou à remettre en service — décision en attente.
-IMPORT_EXCEPTIONS = {
-    'lib/screens/dictee_interactive_screen.dart',
-}
+IMPORT_EXCEPTIONS = set()
 
 
 def check_imports():

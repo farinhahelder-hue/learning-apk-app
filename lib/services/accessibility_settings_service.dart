@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/contrast_filter.dart';
 import '../utils/haptics.dart';
 
 /// Profils sensoriels prédéfinis. Chaque profil règle d'un coup les
@@ -47,6 +48,7 @@ class AccessibilitySettingsService extends ChangeNotifier {
   SensoryProfile _profile = SensoryProfile.normal;
   double _voiceRate = 0.45;
   double _textScale = 1.0;
+  double _contrastLevel = ContrastFilter.normal;
 
   AccessibilitySettingsService(this._prefs) {
     _calmModeEnabled = _prefs.getBool('calm_mode') ?? false;
@@ -57,6 +59,8 @@ class AccessibilitySettingsService extends ChangeNotifier {
     _hapticsEnabled = _prefs.getBool('haptics_on') ?? true;
     _voiceRate = _prefs.getDouble('voice_rate') ?? 0.45;
     _textScale = _prefs.getDouble('text_scale') ?? 1.0;
+    _contrastLevel =
+        _prefs.getDouble('contrast_level') ?? ContrastFilter.normal;
     AppHaptics.enabled = _hapticsEnabled;
     final saved = _prefs.getString('sensory_profile');
     _profile = SensoryProfile.values.firstWhere(
@@ -93,6 +97,12 @@ class AccessibilitySettingsService extends ChangeNotifier {
 
   /// Facteur de taille du texte, appliqué à toute l'application.
   double get textScale => _textScale;
+
+  /// Renforcement du contraste. 1.0 = aucun filtre, donc aucun coût
+  /// de rendu tant que le réglage n'est pas utilisé.
+  double get contrastLevel => _contrastLevel;
+
+  String get contrastLabel => ContrastFilter.labelFor(_contrastLevel);
 
   String get textScaleLabel {
     if (_textScale <= 0.95) return 'Petit';
@@ -149,6 +159,12 @@ class AccessibilitySettingsService extends ChangeNotifier {
     _hapticsEnabled = value;
     AppHaptics.enabled = value;
     await _prefs.setBool('haptics_on', value);
+    notifyListeners();
+  }
+
+  Future<void> setContrastLevel(double value) async {
+    _contrastLevel = value;
+    await _prefs.setDouble('contrast_level', value);
     notifyListeners();
   }
 

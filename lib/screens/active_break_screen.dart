@@ -117,7 +117,7 @@ class _ActiveBreakScreenState extends State<ActiveBreakScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('⏰ Pause Active !',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white70)),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                 const SizedBox(height: 8),
                 const Text('Bravo ! C’est l’heure de bouger !',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white),

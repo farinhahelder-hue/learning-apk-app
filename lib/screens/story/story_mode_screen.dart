@@ -93,7 +93,7 @@ class StoryModeScreen extends StatelessWidget {
                     'nouvelles, d\'autres servent à renforcer ses pouvoirs. '
                     'Elle avance à son rythme.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.5),
+                    style: TextStyle(color: Colors.white, fontSize: 12, height: 1.5),
                   ),
                   const SizedBox(height: 14),
                   ClipRRect(
@@ -107,7 +107,7 @@ class StoryModeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text('$done étape(s) découverte(s) sur $total',
-                      style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                      style: const TextStyle(color: Colors.white, fontSize: 11)),
                 ],
               ),
             ),

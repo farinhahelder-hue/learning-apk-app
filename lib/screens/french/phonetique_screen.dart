@@ -229,7 +229,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                     const SizedBox(height: 4),
                     Text(
                       '${_current + 1} / ${_exercises.length}',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
@@ -413,7 +413,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                     'Choisis le bon mot :',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -547,7 +547,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                   const SizedBox(height: 12),
                   Text(
                     '$_score / ${_exercises.length} bonnes réponses',
-                    style: const TextStyle(fontSize: 18, color: Colors.white70),
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ],
               ),
@@ -582,7 +582,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 '← Retour au menu',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ],

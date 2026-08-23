@@ -325,6 +325,8 @@ class _LearningReportScreenState extends State<LearningReportScreen> {
                 const Divider(height: 18),
                 _MiniRow(label: 'Taille du texte', value: access.textScaleLabel),
                 const Divider(height: 18),
+                _MiniRow(label: 'Contraste', value: access.contrastLabel),
+                const Divider(height: 18),
                 _MiniRow(
                     label: 'Pause proposée après',
                     value: screenTime.sessionLimitLabel),

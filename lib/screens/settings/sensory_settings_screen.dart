@@ -5,6 +5,7 @@ import '../../models/screen_time.dart';
 import '../../services/audio_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
+import '../../utils/contrast_filter.dart';
 
 /// 🎛️ « Mes réglages » — confort sensoriel.
 /// Accessible depuis l'espace parents (protégé par code).
@@ -219,6 +220,49 @@ class SensorySettingsScreen extends StatelessWidget {
                 const Text(
                   'Voici à quoi ressemblera le texte des exercices.',
                   style: TextStyle(fontSize: 15, height: 1.5),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Contraste ──
+          const _SectionTitle('Contraste'),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final lvl in ContrastFilter.levels)
+                      ChoiceChip(
+                        label: Text(ContrastFilter.labelFor(lvl)),
+                        selected: (access.contrastLevel - lvl).abs() < 0.01,
+                        selectedColor:
+                            AppTheme.primaryPurple.withOpacity(0.25),
+                        onSelected: (_) => access.setContrastLevel(lvl),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Assombrit les textes gris et le blanc pâle posé sur les '
+                  'couleurs. Les fonds clairs restent clairs. L\'effet est '
+                  'visible tout de suite sur cet écran.',
+                  style: TextStyle(
+                      fontSize: 11, height: 1.5, color: AppTheme.textGrey),
                 ),
               ],
             ),

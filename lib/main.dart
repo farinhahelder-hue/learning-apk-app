@@ -29,6 +29,7 @@ import 'services/game_service.dart';
 import 'services/garden_service.dart';
 import 'services/stats_service.dart';
 import 'services/story_factory_service.dart';
+import 'utils/contrast_filter.dart';
 import 'models/screen_time.dart';
 import 'widgets/screen_time_gate.dart';
 import 'utils/app_theme.dart';
@@ -88,9 +89,15 @@ class EmilieApp extends StatelessWidget {
               // partout d'un seul endroit.
               textScaler: TextScaler.linear(access.textScale),
             ),
-            child: ScreenTimeGate(
-              navigatorKey: navigatorKey,
-              child: child!,
+            // Le filtre de contraste enveloppe tout l'arbre : c'est le
+            // seul moyen d'atteindre aussi les couleurs figées dans des
+            // const TextStyle. Au niveau normal il n'ajoute aucune couche.
+            child: ContrastFilter.wrap(
+              level: access.contrastLevel,
+              child: ScreenTimeGate(
+                navigatorKey: navigatorKey,
+                child: child!,
+              ),
             ),
           );
         },

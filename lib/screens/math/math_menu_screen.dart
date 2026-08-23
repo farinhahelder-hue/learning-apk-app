@@ -75,7 +75,7 @@ class MathMenuScreen extends StatelessWidget {
                         SizedBox(height: 2),
                         Text('Une table à la fois, ou toutes mélangées',
                             style: TextStyle(
-                                color: Colors.white70, fontSize: 12)),
+                                color: Colors.white, fontSize: 12)),
                       ],
                     ),
                   ),
@@ -117,7 +117,7 @@ class MathMenuScreen extends StatelessWidget {
                         SizedBox(height: 2),
                         Text('Monnaie, longueurs, poids et contenances',
                             style: TextStyle(
-                                color: Colors.white70, fontSize: 12)),
+                                color: Colors.white, fontSize: 12)),
                       ],
                     ),
                   ),

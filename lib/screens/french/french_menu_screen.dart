@@ -111,7 +111,7 @@ class FrenchMenuScreen extends StatelessWidget {
                         SizedBox(height: 2),
                         Text('Écouter un mot et retrouver le son entendu',
                             style: TextStyle(
-                                color: Colors.white70, fontSize: 12)),
+                                color: Colors.white, fontSize: 12)),
                       ],
                     ),
                   ),
@@ -153,7 +153,7 @@ class FrenchMenuScreen extends StatelessWidget {
                         SizedBox(height: 2),
                         Text("Écris tes propres histoires, rien n'est corrigé",
                             style: TextStyle(
-                                color: Colors.white70, fontSize: 12)),
+                                color: Colors.white, fontSize: 12)),
                       ],
                     ),
                   ),
