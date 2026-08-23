@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/new_worlds_curriculum.dart';
 import '../discovery_world_screen.dart';
+import '../theatre/theatre_screen.dart';
 
 /// Menu de sélection des mondes de découverte
 /// (Animaux, Émotions, Géographie, Histoire, Univers, Faits incroyables)
@@ -31,6 +32,50 @@ class DiscoveryWorldMenuScreen extends StatelessWidget {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
             ).animate().fadeIn(duration: 400.ms),
             const SizedBox(height: 20),
+            // Le theatre n'est pas un monde de questions : il a son propre
+            // deroule, donc sa propre carte au-dessus de la grille.
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TheatreScreen()),
+              ),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 18),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFAB47BC), Color(0xFF6A1B9A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Text('🎭', style: TextStyle(fontSize: 32)),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Théâtre des personnages',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w800)),
+                          SizedBox(height: 2),
+                          Text('Des scènes à lire, sans bonne ni mauvaise façon de réagir',
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios,
+                        color: Colors.white, size: 18),
+                  ],
+                ),
+              ),
+            ),
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
