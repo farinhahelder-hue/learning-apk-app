@@ -7,6 +7,7 @@ import '../../services/audio_service.dart';
 import '../../services/game_service.dart';
 import '../../services/garden_service.dart';
 import '../../services/progress_service.dart';
+import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
@@ -59,6 +60,7 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
 
   void _startMission() {
     context.read<GardenService>().rewardMissionStarted();
+    context.read<StatsService>().recordStarted(_level, _m.competence);
     setState(() {
       _phase = _Phase.playing;
       _placed = [];
@@ -161,6 +163,8 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
   void _onSuccess() {
     final access = context.read<AccessibilitySettingsService>();
     context.read<GardenService>().rewardActivityCompleted();
+    context.read<StatsService>()
+        .recordCompleted(_level, _m.competence, hintsUsed: _hintsShown);
     context.read<ProgressService>().addPoints('french', 15);
     context.read<AudioService>().onCorrectAnswer();
     HapticFeedback.mediumImpact();

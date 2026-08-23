@@ -7,6 +7,7 @@ import '../../services/audio_service.dart';
 import '../../services/game_service.dart';
 import '../../services/garden_service.dart';
 import '../../services/progress_service.dart';
+import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
@@ -68,6 +69,7 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
   void _startMission() {
     // Commencer une mission compte déjà : Emilie gagne une graine.
     context.read<GardenService>().rewardMissionStarted();
+    context.read<StatsService>().recordStarted(_level, _mission.competence);
     setState(() {
       _phase = _Phase.playing;
       _thousands = 0; _hundreds = 0; _tens = 0; _units = 0;
@@ -169,6 +171,8 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
     // Récompense pour avoir terminé, même avec des aides.
     context.read<GardenService>().rewardActivityCompleted();
     context.read<ProgressService>().addPoints('math', 15);
+    context.read<StatsService>()
+        .recordCompleted(_level, _mission.competence, hintsUsed: _hintsShown);
 
     audio.onCorrectAnswer();
     HapticFeedback.mediumImpact();

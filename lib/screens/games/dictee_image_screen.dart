@@ -7,6 +7,7 @@ import '../../services/audio_service.dart';
 import '../../services/game_service.dart';
 import '../../services/garden_service.dart';
 import '../../services/progress_service.dart';
+import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
@@ -74,6 +75,7 @@ class _DicteeImageScreenState extends State<DicteeImageScreen> {
     final useBlocks =
         context.read<AccessibilitySettingsService>().letterBlocksEnabled;
     context.read<GardenService>().rewardMissionStarted();
+    context.read<StatsService>().recordStarted(_level, _word.competence);
     setState(() {
       _phase = _Phase.playing;
       _targetPieces = _word.piecesFor(useBlocks: useBlocks);
@@ -159,6 +161,8 @@ class _DicteeImageScreenState extends State<DicteeImageScreen> {
   void _onSuccess() {
     final access = context.read<AccessibilitySettingsService>();
     context.read<GardenService>().rewardActivityCompleted();
+    context.read<StatsService>()
+        .recordCompleted(_level, _word.competence, hintsUsed: _hintsShown);
     context.read<ProgressService>().addPoints('french', 15);
     context.read<AudioService>().onCorrectAnswer();
     HapticFeedback.mediumImpact();

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/screen_time.dart';
 import '../screens/active_break_screen.dart';
+import '../services/game_service.dart';
+import '../services/stats_service.dart';
 import '../utils/app_theme.dart';
 
 /// Suit le temps d'écran (règle 3-6-9-12) et PROPOSE une pause après
@@ -52,6 +54,10 @@ class _ScreenTimeGateState extends State<ScreenTimeGate> {
 
   void _offerBreak(ScreenTimeService svc) {
     _dialogShowing = true;
+    // On note qu'une pause a été PROPOSÉE — pas qu'Emilie était fatiguée :
+    // l'application ne peut pas le savoir.
+    final level = context.read<GameService>().gradeLevel;
+    context.read<StatsService>().recordPauseRequested(level);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final navigator = widget.navigatorKey.currentState;
       if (navigator == null) {

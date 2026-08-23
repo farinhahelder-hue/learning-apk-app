@@ -25,6 +25,7 @@ import 'services/accessibility_settings_service.dart';
 import 'services/tts_service.dart';
 import 'services/game_service.dart';
 import 'services/garden_service.dart';
+import 'services/stats_service.dart';
 import 'models/screen_time.dart';
 import 'widgets/screen_time_gate.dart';
 import 'utils/app_theme.dart';
@@ -62,6 +63,7 @@ class EmilieApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GameService(prefs)),
         ChangeNotifierProvider(create: (_) => ScreenTimeService()),
         ChangeNotifierProvider(create: (_) => GardenService(prefs)),
+        ChangeNotifierProvider(create: (_) => StatsService(prefs)),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
