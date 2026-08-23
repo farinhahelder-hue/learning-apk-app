@@ -18,7 +18,10 @@ import '../sensory/sensory_room_screen.dart';
 /// Les natures de mots ont un code couleur inspiré de Montessori, mais le
 /// nom de la nature est toujours écrit : rien à mémoriser de tête.
 class SentenceWorkshopScreen extends StatefulWidget {
-  const SentenceWorkshopScreen({super.key});
+  /// Si fourni, ne propose que les missions de cette competence
+  /// (utilise par le mode histoire pour ouvrir une etape precise).
+  final String? competence;
+  const SentenceWorkshopScreen({super.key, this.competence});
 
   @override
   State<SentenceWorkshopScreen> createState() => _SentenceWorkshopScreenState();
@@ -44,11 +47,20 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
   Color get _levelColor =>
       _level == 'CE2' ? AppTheme.primaryPurple : AppTheme.primaryBlue;
 
+  /// Restreint a la competence demandee ; si aucune ne correspond,
+  /// on garde tout le niveau plutot que d'afficher un ecran vide.
+  List<SentenceMission> _filtered(List<SentenceMission> all) {
+    final c = widget.competence;
+    if (c == null) return List.of(all);
+    final sub = all.where((m) => m.competence == c).toList();
+    return sub.isEmpty ? List.of(all) : sub;
+  }
+
   @override
   void initState() {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
-    _missions = List.of(SentenceWorkshopData.forLevel(_level))..shuffle();
+    _missions = _filtered(SentenceWorkshopData.forLevel(_level))..shuffle();
   }
 
   void _speak(String text) {

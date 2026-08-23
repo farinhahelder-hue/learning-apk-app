@@ -20,7 +20,10 @@ import '../sensory/sensory_room_screen.dart';
 /// demande — jamais imposé, pour ne pas transformer chaque problème en
 /// procédure rigide.
 class ProblemMissionScreen extends StatefulWidget {
-  const ProblemMissionScreen({super.key});
+  /// Si fourni, ne propose que les missions de cette competence
+  /// (utilise par le mode histoire pour ouvrir une etape precise).
+  final String? competence;
+  const ProblemMissionScreen({super.key, this.competence});
 
   @override
   State<ProblemMissionScreen> createState() => _ProblemMissionScreenState();
@@ -48,11 +51,20 @@ class _ProblemMissionScreenState extends State<ProblemMissionScreen> {
   Color get _levelColor =>
       _level == 'CE2' ? AppTheme.primaryPurple : AppTheme.primaryBlue;
 
+  /// Restreint a la competence demandee ; si aucune ne correspond,
+  /// on garde tout le niveau plutot que d'afficher un ecran vide.
+  List<ProblemMission> _filtered(List<ProblemMission> all) {
+    final c = widget.competence;
+    if (c == null) return List.of(all);
+    final sub = all.where((m) => m.competence == c).toList();
+    return sub.isEmpty ? List.of(all) : sub;
+  }
+
   @override
   void initState() {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
-    _missions = List.of(ProblemMissionsData.forLevel(_level))..shuffle();
+    _missions = _filtered(ProblemMissionsData.forLevel(_level))..shuffle();
   }
 
   void _speak(String text) {

@@ -19,7 +19,10 @@ import '../sensory/sensory_room_screen.dart';
 /// Aucun son d'erreur, aucune croix rouge : quand une lettre ne convient
 /// pas, elle revient doucement dans la réserve et le mot est répété.
 class DicteeImageScreen extends StatefulWidget {
-  const DicteeImageScreen({super.key});
+  /// Si fourni, ne propose que les mots de cette competence
+  /// (utilise par le mode histoire pour ouvrir une etape precise).
+  final String? competence;
+  const DicteeImageScreen({super.key, this.competence});
 
   @override
   State<DicteeImageScreen> createState() => _DicteeImageScreenState();
@@ -53,11 +56,20 @@ class _DicteeImageScreenState extends State<DicteeImageScreen> {
   /// garde le découpage avec lequel elle a commencé.
   List<String> _targetPieces = [];
 
+  /// Restreint a la competence demandee ; si aucune ne correspond,
+  /// on garde tout le niveau plutot que d'afficher un ecran vide.
+  List<DicteeWord> _filtered(List<DicteeWord> all) {
+    final c = widget.competence;
+    if (c == null) return List.of(all);
+    final sub = all.where((m) => m.competence == c).toList();
+    return sub.isEmpty ? List.of(all) : sub;
+  }
+
   @override
   void initState() {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
-    _words = List.of(DicteeImageData.forLevel(_level))..shuffle();
+    _words = _filtered(DicteeImageData.forLevel(_level))..shuffle();
   }
 
   // ── Audio ────────────────────────────────────────────────

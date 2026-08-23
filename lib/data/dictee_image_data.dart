@@ -74,6 +74,17 @@ class DicteeImageData {
       blocks: ['ch', 'e', 'v', 'a', 'l'],
       competence: 'graphie_ch_ce1',
     ),
+    // Consignes entendues puis ecrites : on ecoute avant d'agir.
+    DicteeWord(
+      emoji: '👂', word: 'écoute',
+      blocks: ['é', 'c', 'ou', 't', 'e'],
+      competence: 'ecouter_consigne_ce1',
+    ),
+    DicteeWord(
+      emoji: '🧹', word: 'range',
+      blocks: ['r', 'an', 'g', 'e'],
+      competence: 'ecouter_consigne_ce1',
+    ),
   ];
 
   // ── CE2 : mots plus longs et plus complexes ──

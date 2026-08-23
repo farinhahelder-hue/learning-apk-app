@@ -19,7 +19,10 @@ import '../sensory/sensory_room_screen.dart';
 /// et un choix laissé à Emilie à la fin.
 /// Aucun chronomètre, aucune vie, aucune perte de progression.
 class NumberBarsScreen extends StatefulWidget {
-  const NumberBarsScreen({super.key});
+  /// Si fourni, ne propose que les missions de cette competence
+  /// (utilise par le mode histoire pour ouvrir une etape precise).
+  final String? competence;
+  const NumberBarsScreen({super.key, this.competence});
 
   @override
   State<NumberBarsScreen> createState() => _NumberBarsScreenState();
@@ -44,11 +47,20 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
   Color get _levelColor =>
       _level == 'CE2' ? AppTheme.primaryPurple : AppTheme.primaryBlue;
 
+  /// Restreint a la competence demandee ; si aucune ne correspond,
+  /// on garde tout le niveau plutot que d'afficher un ecran vide.
+  List<NumberBarsMission> _filtered(List<NumberBarsMission> all) {
+    final c = widget.competence;
+    if (c == null) return List.of(all);
+    final sub = all.where((m) => m.competence == c).toList();
+    return sub.isEmpty ? List.of(all) : sub;
+  }
+
   @override
   void initState() {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
-    _missions = NumberBarsData.forLevel(_level);
+    _missions = _filtered(NumberBarsData.forLevel(_level));
   }
 
   // ── Lecture de la consigne ───────────────────────────────

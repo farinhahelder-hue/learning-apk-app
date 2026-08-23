@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/screen_time.dart';
 import '../../services/accessibility_settings_service.dart';
 import '../../services/audio_service.dart';
+import '../../data/official_curriculum.dart';
 import '../../services/stats_service.dart';
 import '../../utils/app_theme.dart';
 
@@ -305,6 +306,54 @@ class _LearningReportScreenState extends State<LearningReportScreen> {
             ),
           ),
           const SizedBox(height: 24),
+
+          // ── Couverture du parcours ──
+          _Section('Couverture du parcours $_level'),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6)
+              ],
+            ),
+            child: Column(
+              children: [
+                for (final d in OfficialCurriculum.all)
+                  _DomainCoverage(
+                    domain: d,
+                    level: _level,
+                    touched: d
+                        .forLevel(_level)
+                        .where((c) => competences
+                            .any((e) => e.key == c.id && e.value.completed > 0))
+                        .length,
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(OfficialCurriculum.reference,
+                    style: const TextStyle(
+                        fontSize: 11, height: 1.5, color: AppTheme.textGrey)),
+                const SizedBox(height: 8),
+                Text(OfficialCurriculum.disclaimer,
+                    style: const TextStyle(
+                        fontSize: 11, height: 1.5, color: AppTheme.textGrey)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -451,6 +500,58 @@ class _LevelTab extends StatelessWidget {
               fontSize: 15,
               color: selected ? Colors.white : AppTheme.textGrey,
             )),
+      ),
+    );
+  }
+}
+
+/// Une ligne « domaine → étapes déjà menées au bout », sans jugement.
+class _DomainCoverage extends StatelessWidget {
+  final CurriculumDomain domain;
+  final String level;
+  final int touched;
+
+  const _DomainCoverage({
+    required this.domain,
+    required this.level,
+    required this.touched,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final total = domain.forLevel(level).length;
+    final color = Color(domain.colorValue);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Text(domain.emoji, style: const TextStyle(fontSize: 20)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(domain.label,
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: total == 0 ? 0 : touched / total,
+                    minHeight: 6,
+                    backgroundColor: color.withOpacity(0.15),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text('$touched/$total',
+              style: TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.w800, color: color)),
+        ],
       ),
     );
   }

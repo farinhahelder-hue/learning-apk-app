@@ -267,7 +267,7 @@ class HomeScreen extends StatelessWidget {
                         onTap: () => Navigator.pushNamed(context, '/avatar'),
                       ),
                       _ExploreCard(
-                        emoji: '📜', label: 'Mon aventure',
+                        emoji: '📜', label: 'Mon parcours',
                         color: AppTheme.primaryOrange,
                         onTap: () => Navigator.pushNamed(context, '/story'),
                       ),

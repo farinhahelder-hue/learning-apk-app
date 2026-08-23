@@ -13,7 +13,7 @@ import 'screens/parental/parental_dashboard_screen.dart';
 import 'screens/world_map_screen.dart';
 import 'screens/daily_challenge_screen.dart';
 import 'screens/avatar_screen.dart';
-import 'screens/story_screen.dart';
+import 'screens/story/story_mode_screen.dart';
 import 'screens/audio_settings_screen.dart';
 import 'screens/discovery/discovery_world_menu_screen.dart';
 import 'screens/games/mini_games_menu_screen.dart';
@@ -98,7 +98,7 @@ class EmilieApp extends StatelessWidget {
           '/world-map': (context) => const WorldMapScreen(),
           '/daily-challenge': (context) => const DailyChallengeScreen(),
           '/avatar': (context) => const AvatarScreen(),
-          '/story': (context) => const StoryScreen(),
+          '/story': (context) => const StoryModeScreen(),
           '/audio-settings': (context) => const AudioSettingsScreen(),
           '/discovery-world': (context) => const DiscoveryWorldMenuScreen(),
           '/mini-games': (context) => const MiniGamesMenuScreen(),

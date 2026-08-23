@@ -300,5 +300,51 @@ class ProblemMissionsData {
         '56 ÷ 8 = 7.',
       ],
     ),
+    ProblemMission(
+      id: 'pb_ce2_05',
+      level: 'CE2',
+      competence: 'division_partage_ce2',
+      missionType: 'Je découvre',
+      statement:
+          'Emilie range 18 crayons dans 3 trousses, autant dans chacune. '
+          'Combien de crayons dans chaque trousse ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien de crayons dans chaque trousse ?',
+          operation: ProblemOp.partager,
+          a: 18, b: 3, result: 6,
+          choices: [6, 5, 15, 21],
+        ),
+      ],
+      answerSentence: 'Il y a 6 crayons dans chaque trousse.',
+      hints: [
+        'Autant dans chacune : les parts sont égales.',
+        'C\'est une division : 18 ÷ 3.',
+        '18 ÷ 3 = 6.',
+      ],
+    ),
+    ProblemMission(
+      id: 'pb_ce2_06',
+      level: 'CE2',
+      competence: 'division_partage_ce2',
+      missionType: 'Je réussis',
+      statement:
+          'Un maître-nageur répartit 35 enfants en 5 groupes égaux. '
+          'Combien d\'enfants dans chaque groupe ?',
+      steps: [
+        ProblemStep(
+          question: 'Combien d\'enfants par groupe ?',
+          operation: ProblemOp.partager,
+          a: 35, b: 5, result: 7,
+          choices: [7, 6, 30, 40],
+        ),
+      ],
+      answerSentence: 'Il y a 7 enfants dans chaque groupe.',
+      hints: [
+        'Des groupes égaux : chacun a le même nombre d\'enfants.',
+        'C\'est une division : 35 ÷ 5.',
+        '35 ÷ 5 = 7.',
+      ],
+    ),
   ];
 }
