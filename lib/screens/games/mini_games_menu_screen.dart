@@ -9,6 +9,7 @@ import 'question_rain_screen.dart';
 import 'flash_quiz_screen.dart';
 import 'dictee_image_screen.dart';
 import 'number_bars_screen.dart';
+import 'problem_mission_screen.dart';
 import 'sentence_workshop_screen.dart';
 import 'treasure_hunt_screen.dart';
 import 'time_travel_screen.dart';
@@ -42,6 +43,12 @@ class MiniGamesMenuScreen extends StatelessWidget {
         'subtitle': 'Écoute un mot et écris-le avec des lettres',
         'color': const Color(0xFFEC407A),
         'builder': (BuildContext c) => const DicteeImageScreen(),
+      },
+      {
+        'title': 'Mission-problème', 'emoji': '🧩',
+        'subtitle': 'Résous un problème étape par étape',
+        'color': const Color(0xFF26A69A),
+        'builder': (BuildContext c) => const ProblemMissionScreen(),
       },
       {
         'title': 'Chantier des phrases', 'emoji': '🧱',
