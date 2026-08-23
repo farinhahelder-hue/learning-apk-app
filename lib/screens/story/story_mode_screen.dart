@@ -8,6 +8,7 @@ import '../../services/tts_service.dart';
 import '../../utils/adaptive_difficulty.dart';
 import '../../utils/app_theme.dart';
 import '../games/dictee_image_screen.dart';
+import '../games/market_screen.dart';
 import '../games/number_bars_screen.dart';
 import '../games/problem_mission_screen.dart';
 import '../games/sentence_workshop_screen.dart';
@@ -257,6 +258,9 @@ class StoryChapterScreen extends StatelessWidget {
         break;
       case LearningActivity.phonetique:
         screen = PhonetiqueScreen(competence: c.id);
+        break;
+      case LearningActivity.market:
+        screen = MarketScreen(competence: c.id);
         break;
       case LearningActivity.mathQuiz:
         screen = const MathMenuScreen();
