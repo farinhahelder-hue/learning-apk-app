@@ -53,19 +53,29 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
       (m) => m.id == mascotId,
       orElse: () => Mascots.papaSeal,
     );
-    _showCurrentQuestion();
+    // Première question : on renseigne l'état directement. Appeler
+    // setState() depuis initState est une erreur — l'écran n'est pas
+    // encore construit. En release les assertions sautent et ça passe
+    // inaperçu, mais ça reste faux, et le minuteur n'existe pas encore.
+    _applyQuestionState();
+  }
+
+  /// Remet l'écran dans l'état « nouvelle question ».
+  void _applyQuestionState() {
+    _mood = MascotMood.thinking;
+    _speechText =
+        _mascot.thinkPhrases[_currentIndex % _mascot.thinkPhrases.length];
+    _selectedAnswer = null;
+    _answered = false;
+    _showFunFact = false;
   }
 
   void _showCurrentQuestion() {
     if (_currentIndex >= _questions.length) return;
-    final q = _questions[_currentIndex];
-    setState(() {
-      _mood         = MascotMood.thinking;
-      _speechText   = _mascot.thinkPhrases[_currentIndex % _mascot.thinkPhrases.length];
-      _selectedAnswer = null;
-      _answered       = false;
-      _showFunFact    = false;
-    });
+    setState(_applyQuestionState);
+    // Relance le décompte pour cette question. reset() repart bien de la
+    // durée complète — il se contentait d'arrêter le minuteur, ce qui le
+    // laissait figé dès la deuxième question.
     _timerKey.currentState?.reset();
     // Optionnel : lire la question via TTS
     // context.read<TtsService>().readQuestion(q['question']);

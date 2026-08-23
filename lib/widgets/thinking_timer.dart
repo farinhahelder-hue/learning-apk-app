@@ -1,14 +1,34 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../utils/app_theme.dart';
 
-/// Timer visuel "bulle" façon Duolingo
-/// Cercle qui se vide progressivement, change de couleur (vert→orange→rouge)
-/// Compatible neurodivergences : visuel uniquement, pas de son angoissant
+/// Minuteur visuel : un cercle qui se vide, sans aucun son.
+///
+/// Il n'est affiché que si « Minuteur de réflexion » est activé dans les
+/// réglages — désactivé par défaut, parce qu'une contrainte de temps ne
+/// convient pas à tout le monde.
+///
+/// **Trois règles de fonctionnement**, apprises en corrigeant des bugs
+/// bien réels :
+///
+/// - [start] annule toujours le décompte précédent. Sans ça, deux appels
+///   laissaient tourner deux `Timer.periodic` en même temps et le compte
+///   à rebours descendait deux fois plus vite.
+/// - [reset] **relance** le décompte. Il se contentait de l'arrêter, si
+///   bien que le minuteur ne fonctionnait qu'à la première question :
+///   l'écran appelle `reset()` à chaque nouvelle question, et le
+///   décompte restait figé sur 30 pour toutes les suivantes.
+/// - [onEnd] n'est appelé qu'une fois par décompte.
 class ThinkingTimer extends StatefulWidget {
-  final int seconds;           // durée totale
-  final VoidCallback? onEnd;   // appelé quand temps écoulé
+  /// Durée totale, en secondes.
+  final int seconds;
+
+  /// Appelé une seule fois, quand le temps est écoulé.
+  final VoidCallback? onEnd;
+
   final double size;
+
+  /// Démarre seul à l'affichage. Les changements de cette valeur sont
+  /// pris en compte après coup (voir [didUpdateWidget]).
   final bool autoStart;
 
   const ThinkingTimer({
@@ -29,15 +49,23 @@ class ThinkingTimerState extends State<ThinkingTimer>
   late Animation<double> _progress;
   Timer? _ticker;
   int _remaining = 0;
-  bool _running = false;
+
+  /// Empêche [onEnd] de partir deux fois pour un même décompte.
+  bool _ended = false;
+
+  bool get isRunning => _ticker?.isActive ?? false;
+
+  /// Durée sûre : une durée nulle ou négative diviserait par zéro dans
+  /// le calcul de couleur.
+  int get _total => widget.seconds > 0 ? widget.seconds : 1;
 
   @override
   void initState() {
     super.initState();
-    _remaining = widget.seconds;
+    _remaining = _total;
     _ctrl = AnimationController(
       vsync: this,
-      duration: Duration(seconds: widget.seconds),
+      duration: Duration(seconds: _total),
     );
     _progress = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _ctrl, curve: Curves.linear),
@@ -45,37 +73,88 @@ class ThinkingTimerState extends State<ThinkingTimer>
     if (widget.autoStart) start();
   }
 
+  @override
+  void didUpdateWidget(ThinkingTimer old) {
+    super.didUpdateWidget(old);
+
+    // L'écran garde le même minuteur d'une question à l'autre (même
+    // GlobalKey), donc l'état est réutilisé et initState ne repasse
+    // jamais. Sans ce bloc, changer `seconds` ou `autoStart` n'avait
+    // aucun effet.
+    if (widget.seconds != old.seconds) {
+      _ctrl.duration = Duration(seconds: _total);
+      reset();
+      return;
+    }
+    if (widget.autoStart && !old.autoStart && !isRunning) {
+      start();
+    } else if (!widget.autoStart && old.autoStart && isRunning) {
+      stop();
+    }
+  }
+
+  /// (Re)démarre le décompte depuis le début.
   void start() {
-    _running = true;
+    // Toujours annuler l'ancien : deux décomptes simultanés font
+    // descendre le compteur deux fois plus vite.
+    _ticker?.cancel();
+    _ended = false;
+
+    if (mounted) {
+      setState(() => _remaining = _total);
+    } else {
+      _remaining = _total;
+    }
+
+    _ctrl.duration = Duration(seconds: _total);
     _ctrl.forward(from: 0);
+
     _ticker = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (!mounted) { t.cancel(); return; }
-      setState(() => _remaining--);
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      // Le compteur ne descend jamais sous zéro, même si un décompte
+      // oublié tournait encore.
+      setState(() => _remaining = _remaining > 0 ? _remaining - 1 : 0);
       if (_remaining <= 0) {
         t.cancel();
-        _running = false;
-        widget.onEnd?.call();
+        if (!_ended) {
+          _ended = true;
+          widget.onEnd?.call();
+        }
       }
     });
   }
 
+  /// Fige le décompte là où il en est.
   void stop() {
     _ticker?.cancel();
-    _ctrl.stop();
-    _running = false;
+    _ticker = null;
+    if (_ctrl.isAnimating) _ctrl.stop();
   }
 
-  void reset() {
+  /// Repart de la durée complète — c'est ce qu'attend un écran qui passe
+  /// à la question suivante.
+  void reset() => start();
+
+  /// Remet à la durée complète sans repartir.
+  void resetAndHold() {
     stop();
-    setState(() => _remaining = widget.seconds);
+    _ended = false;
+    if (mounted) {
+      setState(() => _remaining = _total);
+    } else {
+      _remaining = _total;
+    }
     _ctrl.reset();
   }
 
   Color get _timerColor {
-    final ratio = _remaining / widget.seconds;
-    if (ratio > 0.6) return const Color(0xFF4CAF50); // vert
-    if (ratio > 0.3) return const Color(0xFFFF9800); // orange
-    return const Color(0xFFF44336);                   // rouge
+    final ratio = _remaining / _total;
+    if (ratio > 0.6) return const Color(0xFF4CAF50);
+    if (ratio > 0.3) return const Color(0xFFFF9800);
+    return const Color(0xFFF44336);
   }
 
   @override
@@ -96,7 +175,6 @@ class ThinkingTimerState extends State<ThinkingTimer>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Cercle de fond
               SizedBox.expand(
                 child: CircularProgressIndicator(
                   value: _progress.value,
@@ -106,7 +184,6 @@ class ThinkingTimerState extends State<ThinkingTimer>
                   strokeCap: StrokeCap.round,
                 ),
               ),
-              // Chiffre restant
               Text(
                 '$_remaining',
                 style: TextStyle(

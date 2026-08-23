@@ -511,6 +511,90 @@ def check_sounds():
                             % rel)
 
 
+def _strip_comments(src):
+    """Retire commentaires et chaines, pour ne pas lire le mot 'setState'
+    dans une phrase de documentation."""
+    out, i, n = [], 0, len(src)
+    while i < n:
+        c = src[i]
+        if c == '/' and i + 1 < n and src[i + 1] == '/':
+            while i < n and src[i] != chr(10):
+                i += 1
+        elif c == '/' and i + 1 < n and src[i + 1] == '*':
+            i += 2
+            while i + 1 < n and not (src[i] == '*' and src[i + 1] == '/'):
+                i += 1
+            i += 2
+        elif c in "'" + chr(34):
+            q = c
+            i += 1
+            while i < n and src[i] != q:
+                if src[i] == BS:
+                    i += 1
+                i += 1
+            i += 1
+        else:
+            out.append(c)
+            i += 1
+    return ''.join(out)
+
+
+def _body_of(src, header):
+    """Corps d'une methode, par comptage d'accolades."""
+    m = re.search(header, src)
+    if not m:
+        return None
+    i = m.end()
+    depth, j = 1, i
+    while j < len(src) and depth:
+        if src[j] == '{':
+            depth += 1
+        elif src[j] == '}':
+            depth -= 1
+        j += 1
+    return src[i:j]
+
+
+def check_lifecycle():
+    """Erreurs de cycle de vie invisibles dans l'APK livre.
+
+    Deux pieges qui ne se voient pas a l'execution en release, parce que
+    les assertions du framework y sont retirees :
+
+    - `setState()` appele depuis `initState()` : l'ecran n'est pas encore
+      construit. En debug Flutter leve une erreur, en release ca passe.
+    - un `Timer.periodic` jamais annule dans `dispose()` : il continue de
+      tourner apres la fermeture de l'ecran.
+
+    Trouve pour de vrai : l'ecran Mondes de decouverte appelait setState
+    depuis initState, et ThinkingTimer.reset() arretait le minuteur sans
+    le relancer — il ne fonctionnait donc qu'a la premiere question.
+    """
+    verifies = 0
+    for f in dart_files():
+        src = _strip_comments(read(f))
+
+        body = _body_of(src, r'void\s+initState\(\)\s*\{')
+        if body is not None:
+            verifies += 1
+            # Un setState differe (addPostFrameCallback) est legitime.
+            sans_differe = re.sub(
+                r'addPostFrameCallback\((.|\n)*?\}\s*\)\s*;', '', body)
+            if 'setState(' in sans_differe:
+                problems.append('%s : setState() dans initState() — '
+                                'l\'ecran n\'est pas encore construit' % f)
+
+        if 'Timer.periodic' in src:
+            d = _body_of(src, r'void\s+dispose\(\)\s*\{')
+            if d is None:
+                problems.append('%s : Timer.periodic sans dispose()' % f)
+            elif '.cancel()' not in d:
+                problems.append('%s : Timer.periodic non annule dans '
+                                'dispose() — il tourne apres la fermeture' % f)
+
+    notes.append('%d ecrans verifies (cycle de vie)' % verifies)
+
+
 CHECKS = [
     ('délimiteurs', check_braces),
     ('imports', check_imports),
@@ -526,6 +610,7 @@ CHECKS = [
     ('questions du Théâtre', check_theatre),
     ('mélange des propositions', check_shuffled_choices),
     ('sons', check_sounds),
+    ('cycle de vie des écrans', check_lifecycle),
 ]
 
 if __name__ == '__main__':
