@@ -9,6 +9,7 @@ import 'question_rain_screen.dart';
 import 'flash_quiz_screen.dart';
 import 'dictee_image_screen.dart';
 import 'number_bars_screen.dart';
+import 'sentence_workshop_screen.dart';
 import 'treasure_hunt_screen.dart';
 import 'time_travel_screen.dart';
 import 'weather_express_screen.dart';
@@ -41,6 +42,12 @@ class MiniGamesMenuScreen extends StatelessWidget {
         'subtitle': 'Écoute un mot et écris-le avec des lettres',
         'color': const Color(0xFFEC407A),
         'builder': (BuildContext c) => const DicteeImageScreen(),
+      },
+      {
+        'title': 'Chantier des phrases', 'emoji': '🧱',
+        'subtitle': 'Construis, repère et accorde les mots',
+        'color': const Color(0xFF7E57C2),
+        'builder': (BuildContext c) => const SentenceWorkshopScreen(),
       },
       {
         'title': 'Chasse au trésor', 'emoji': '🗺️',
