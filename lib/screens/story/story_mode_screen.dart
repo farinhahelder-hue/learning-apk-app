@@ -17,6 +17,7 @@ import '../french/phonetique_screen.dart';
 import '../math/math_menu_screen.dart';
 import '../math/multiplication_tables_screen.dart';
 import '../science/science_menu_screen.dart';
+import 'story_factory_screen.dart';
 import 'tale_reader_screen.dart';
 
 /// 📜 Mode histoire — le voyage d'Emilie à travers le programme.
@@ -261,6 +262,9 @@ class StoryChapterScreen extends StatelessWidget {
         break;
       case LearningActivity.market:
         screen = MarketScreen(competence: c.id);
+        break;
+      case LearningActivity.storyFactory:
+        screen = StoryFactoryScreen(competence: c.id);
         break;
       case LearningActivity.mathQuiz:
         screen = const MathMenuScreen();

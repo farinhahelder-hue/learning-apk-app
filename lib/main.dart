@@ -13,6 +13,8 @@ import 'screens/parental/parental_dashboard_screen.dart';
 import 'screens/world_map_screen.dart';
 import 'screens/daily_challenge_screen.dart';
 import 'screens/avatar_screen.dart';
+import 'screens/story/my_stories_screen.dart';
+import 'screens/story/story_factory_screen.dart';
 import 'screens/story/story_mode_screen.dart';
 import 'screens/audio_settings_screen.dart';
 import 'screens/discovery/discovery_world_menu_screen.dart';
@@ -26,6 +28,7 @@ import 'services/tts_service.dart';
 import 'services/game_service.dart';
 import 'services/garden_service.dart';
 import 'services/stats_service.dart';
+import 'services/story_factory_service.dart';
 import 'models/screen_time.dart';
 import 'widgets/screen_time_gate.dart';
 import 'utils/app_theme.dart';
@@ -64,6 +67,7 @@ class EmilieApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ScreenTimeService(prefs)),
         ChangeNotifierProvider(create: (_) => GardenService(prefs)),
         ChangeNotifierProvider(create: (_) => StatsService(prefs)),
+        ChangeNotifierProvider(create: (_) => StoryFactoryService(prefs)),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -102,6 +106,8 @@ class EmilieApp extends StatelessWidget {
           '/daily-challenge': (context) => const DailyChallengeScreen(),
           '/avatar': (context) => const AvatarScreen(),
           '/story': (context) => const StoryModeScreen(),
+          '/story-factory': (context) => const StoryFactoryScreen(),
+          '/my-stories': (context) => const MyStoriesScreen(),
           '/audio-settings': (context) => const AudioSettingsScreen(),
           '/discovery-world': (context) => const DiscoveryWorldMenuScreen(),
           '/mini-games': (context) => const MiniGamesMenuScreen(),
