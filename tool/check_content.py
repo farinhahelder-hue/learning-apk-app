@@ -595,6 +595,102 @@ def check_lifecycle():
     notes.append('%d ecrans verifies (cycle de vie)' % verifies)
 
 
+def _luminance(c):
+    def canal(v):
+        v = v / 255.0
+        return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+    return (0.2126 * canal((c >> 16) & 255)
+            + 0.7152 * canal((c >> 8) & 255)
+            + 0.0722 * canal(c & 255))
+
+
+def _contraste(a, b):
+    la, lb = _luminance(a), _luminance(b)
+    haut, bas = max(la, lb), min(la, lb)
+    return (haut + 0.05) / (bas + 0.05)
+
+
+def check_feedback_contrast():
+    """Le retour apres une reponse doit rester lisible.
+
+    Mesure avant correction : du texte blanc sur le vert pastel donnait
+    2,01 de contraste, 2,15 sur le rouge pastel, la ou WCAG AA demande
+    4,5. C'est le moment le plus important de l'application, et c'etait
+    le moins lisible.
+
+    On verifie ici que les jetons de retour existent et tiennent leurs
+    valeurs, et qu'aucun ecran ne repose du texte clair sur un fond
+    pastel sature.
+    """
+    theme = read('lib/utils/app_theme.dart')
+    jetons = {}
+    for nom in ('correctBg', 'correctInk', 'correctBorder',
+                'retryBg', 'retryInk', 'retryBorder', 'textDark'):
+        m = re.search(r'%s\s*=\s*Color\(0x(?:FF)?([0-9A-Fa-f]{6,8})\)' % nom, theme)
+        if not m:
+            problems.append('AppTheme.%s manquant' % nom)
+            continue
+        jetons[nom] = int(m.group(1)[-6:], 16)
+
+    exigences = [
+        ('correctInk', 'correctBg', 4.5),
+        ('retryInk', 'retryBg', 4.5),
+        ('textDark', 'correctBg', 4.5),
+        ('textDark', 'retryBg', 4.5),
+    ]
+    for fg, bg, seuil in exigences:
+        if fg in jetons and bg in jetons:
+            r = _contraste(jetons[fg], jetons[bg])
+            if r < seuil:
+                problems.append('contraste %s sur %s : %.2f (minimum %.1f)'
+                                % (fg, bg, r, seuil))
+
+    # Les anciens fonds pastel ne doivent plus recevoir de texte blanc.
+    PASTELS = {'0xFF81C784': 2.01, '0xFFEF9A9A': 2.15}
+    for f in dart_files():
+        src = read(f)
+        for code in PASTELS:
+            for m in re.finditer(re.escape('Color(%s)' % code), src):
+                suite = src[m.end():m.end() + 200]
+                if 'Colors.white' in suite:
+                    ligne = src[:m.start()].count(chr(10)) + 1
+                    problems.append(
+                        '%s:%d  texte blanc sur %s : contraste %.2f, '
+                        'illisible' % (f, ligne, code, PASTELS[code]))
+
+    notes.append('%d jetons de retour verifies' % len(jetons))
+
+
+def check_tap_targets():
+    """Zones tactiles d'au moins 48 dp.
+
+    Material impose 48 dp. Pour une enfant de 7-8 ans dont la motricite
+    fine est en construction, rater un bouton trois fois de suite
+    decourage plus qu'un exercice difficile.
+
+    IconButton garantit deja 48 dp par lui-meme ; ce sont les
+    GestureDetector et InkWell sur un petit element qui posent
+    probleme. TapTarget existe pour ca.
+    """
+    petites = 0
+    for f in dart_files():
+        src = read(f)
+        for m in re.finditer(
+                r'GestureDetector\(|InkWell\(', src):
+            seg = src[m.start():m.start() + 500]
+            mm = re.search(r'width:\s*(\d+(?:\.\d+)?)\s*,\s*height:\s*(\d+(?:\.\d+)?)', seg)
+            if not mm:
+                continue
+            w, h = float(mm.group(1)), float(mm.group(2))
+            if w < 48 or h < 48:
+                ligne = src[:m.start()].count(chr(10)) + 1
+                problems.append('%s:%d  zone tactile %.0fx%.0f dp '
+                                '(minimum 48) — utiliser TapTarget'
+                                % (f, ligne, w, h))
+                petites += 1
+    notes.append('zones tactiles : %d sous le minimum' % petites)
+
+
 CHECKS = [
     ('délimiteurs', check_braces),
     ('imports', check_imports),
@@ -611,6 +707,8 @@ CHECKS = [
     ('mélange des propositions', check_shuffled_choices),
     ('sons', check_sounds),
     ('cycle de vie des écrans', check_lifecycle),
+    ('contraste du retour', check_feedback_contrast),
+    ('zones tactiles', check_tap_targets),
 ]
 
 if __name__ == '__main__':

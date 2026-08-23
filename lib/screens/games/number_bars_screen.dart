@@ -13,6 +13,7 @@ import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
 import '../../utils/haptics.dart';
+import '../../widgets/tap_target.dart';
 
 /// 🔢 Barres de nombres — micro-missions de numération.
 ///
@@ -648,7 +649,9 @@ class _MiniButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    // La pastille reste à 34 dp — c'est TapTarget qui porte la zone
+    // sensible à 48, sans rien changer à l'aspect.
+    return TapTarget(
       onTap: onTap,
       child: Container(
         width: 34, height: 34,

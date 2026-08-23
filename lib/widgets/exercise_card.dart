@@ -218,11 +218,19 @@ class _ExerciseCardState extends State<ExerciseCard> {
             final option = entry.value;
             Color bg = Colors.white;
             Color fg = AppTheme.textDark;
+            Color border = Colors.grey.withOpacity(0.2);
+            // Fond clair et texte sombre : le blanc sur pastel tombait à
+            // 2,01 de contraste, illisible au moment qui compte le plus.
             if (_selected == option) {
-              bg = _isCorrect! ? const Color(0xFF81C784) : const Color(0xFFEF9A9A);
-              fg = Colors.white;
+              final juste = _isCorrect!;
+              bg = juste ? AppTheme.correctBg : AppTheme.retryBg;
+              fg = juste ? AppTheme.correctInk : AppTheme.retryInk;
+              border = juste ? AppTheme.correctBorder : AppTheme.retryBorder;
             } else if (_isCorrect == false && option == widget.exercise.correctAnswer) {
-              bg = const Color(0xFF81C784); fg = Colors.white;
+              // La bonne réponse reste montrée, sans rien reprocher.
+              bg = AppTheme.correctBg;
+              fg = AppTheme.correctInk;
+              border = AppTheme.correctBorder;
             }
             return GestureDetector(
               onTap: () => _checkAnswer(option),
@@ -233,7 +241,7 @@ class _ExerciseCardState extends State<ExerciseCard> {
                 decoration: BoxDecoration(
                   color: bg,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: bg == Colors.white ? Colors.grey.withOpacity(0.2) : bg),
+                  border: Border.all(color: border, width: 2),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3)),
                   ],

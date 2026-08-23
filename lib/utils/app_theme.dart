@@ -11,6 +11,29 @@ class AppTheme {
   static const Color cardWhite    = Color(0xFFFFFFFF);
   static const Color textDark     = Color(0xFF2D3436);
   static const Color textGrey     = Color(0xFF636E72);
+  // ── Retour après une réponse ────────────────────────────────
+  //
+  // Ces couleurs portent le moment qui compte le plus : ce qu'Emilie
+  // voit juste après avoir répondu. C'était le moins lisible de
+  // l'application — du texte blanc sur le vert pastel donnait 2,01 de
+  // contraste, 2,15 sur le rouge pastel, là où WCAG AA demande 4,5.
+  //
+  // Le motif retenu — fond très clair, bordure colorée, texte sombre —
+  // garde la palette pastel et remonte le texte à 11,3 et 11,1.
+  //
+  //   correctInk sur correctBg .... 4,56
+  //   textDark   sur correctBg ... 11,27
+  //   retryInk   sur retryBg ...... 4,92
+  //   textDark   sur retryBg ..... 11,09
+  //
+  // « À revoir » et non « faux » : l'application ne punit pas.
+  static const Color correctBg     = Color(0xFFE8F5E9);
+  static const Color correctBorder = Color(0xFF4CAF50);
+  static const Color correctInk    = Color(0xFF2E7D32);
+  static const Color retryBg       = Color(0xFFFFEBEE);
+  static const Color retryBorder   = Color(0xFFE57373);
+  static const Color retryInk      = Color(0xFFC62828);
+
   static const Color mathColor    = Color(0xFF4FC3F7);
   static const Color frenchColor  = Color(0xFFFF80AB);
   static const Color scienceColor = Color(0xFF81C784);

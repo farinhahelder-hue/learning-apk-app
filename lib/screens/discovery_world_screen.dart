@@ -12,6 +12,7 @@ import '../widgets/thinking_timer.dart';
 import '../widgets/bounce_button.dart';
 import '../utils/haptics.dart';
 import '../utils/shuffled_choices.dart';
+import '../widgets/tap_target.dart';
 
 /// Écran générique pour les nouveaux mondes de découverte
 /// (Animaux, Émotions, Géo, Histoire, Univers, Faits incroyables)
@@ -450,8 +451,12 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          GestureDetector(
+          // 38 dp auparavant (icône 18 + 2x10 de marge) : sous le
+          // minimum de 48. La pastille blanche garde sa taille, seule la
+          // zone sensible s'élargit.
+          TapTarget(
             onTap: onBack,
+            label: 'Revenir en arrière',
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(

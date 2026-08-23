@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/audio_service.dart';
 import '../utils/app_theme.dart';
+import 'tap_target.dart';
 
 /// Mini lecteur flottant affiché en bas de l'écran d'accueil
 class MiniMusicPlayer extends StatelessWidget {
@@ -44,8 +45,12 @@ class MiniMusicPlayer extends StatelessWidget {
               ),
             ),
             // Bouton toggle rapide
-            GestureDetector(
+            // Icône nue de 30 dp : la zone sensible s'arrêtait au dessin.
+            TapTarget(
               onTap: audio.toggleMusic,
+              label: audio.musicEnabled
+                  ? 'Mettre la musique en pause'
+                  : 'Reprendre la musique',
               child: Icon(
                 audio.musicEnabled ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
                 color: audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,
@@ -78,7 +83,8 @@ class AudioControlFAB extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             onTap: audio.toggleMusic,
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              // 42 dp auparavant : juste sous le minimum.
+              padding: const EdgeInsets.all(13),
               child: Icon(
                 audio.musicEnabled ? Icons.music_note_rounded : Icons.music_off_rounded,
                 color: audio.musicEnabled ? AppTheme.primaryPurple : Colors.grey,

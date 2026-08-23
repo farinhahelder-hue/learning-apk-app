@@ -448,13 +448,15 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                     
                     if (_selectedIndex != null) {
                       if (idx == _selectedIndex) {
-                        bg = _isCorrect! ? const Color(0xFF81C784) : const Color(0xFFEF9A9A);
-                        fg = Colors.white;
-                        border = bg;
+                        final juste = _isCorrect!;
+                        bg = juste ? AppTheme.correctBg : AppTheme.retryBg;
+                        fg = juste ? AppTheme.correctInk : AppTheme.retryInk;
+                        border =
+                            juste ? AppTheme.correctBorder : AppTheme.retryBorder;
                       } else if (option == _correctOption(exercise)) {
-                        bg = const Color(0xFF81C784);
-                        fg = Colors.white;
-                        border = bg;
+                        bg = AppTheme.correctBg;
+                        fg = AppTheme.correctInk;
+                        border = AppTheme.correctBorder;
                       }
                     }
 

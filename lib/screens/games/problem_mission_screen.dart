@@ -537,9 +537,19 @@ class _ProblemMissionScreenState extends State<ProblemMissionScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   alignment: Alignment.center,
-                  child: Text('$value',
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+                  // La barre descend à 8 % de la largeur disponible : un
+                  // nombre à deux ou trois chiffres n'y tient pas, et le
+                  // réglage « taille du texte » aggrave le cas. FittedBox
+                  // rétrécit le nombre au lieu de le laisser déborder —
+                  // il n'agit que si c'est nécessaire.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text('$value',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13)),
+                  ),
                 );
               }),
             ),
