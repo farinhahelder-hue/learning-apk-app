@@ -13,6 +13,7 @@ import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
 import '../../utils/haptics.dart';
+import '../../utils/shuffled_choices.dart';
 
 /// 🧱 Chantier des phrases — construire, repérer, accorder.
 ///
@@ -31,6 +32,9 @@ class SentenceWorkshopScreen extends StatefulWidget {
 enum _Phase { objective, playing, success }
 
 class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   late final String _level;
   late final List<SentenceMission> _missions;
 
@@ -520,7 +524,9 @@ class _SentenceWorkshopScreenState extends State<SentenceWorkshopScreen> {
           color: _levelColor,
         ),
         const SizedBox(height: 8),
-        ...(_m.choices ?? []).map((c) => Padding(
+        ...Shuffled.of(_m.choices ?? const <String>[],
+                salt: _salt, index: _m.id.hashCode)
+            .map((c) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: GestureDetector(
                 onTap: () => _tapChoice(c),

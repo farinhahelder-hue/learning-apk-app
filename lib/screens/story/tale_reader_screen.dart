@@ -11,6 +11,7 @@ import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../../utils/haptics.dart';
+import '../../utils/shuffled_choices.dart';
 
 /// 📖 Lire ou écouter une histoire, puis répondre à des questions.
 ///
@@ -33,6 +34,9 @@ class TaleReaderScreen extends StatefulWidget {
 enum _Phase { reading, questions, done }
 
 class _TaleReaderScreenState extends State<TaleReaderScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   late final String _level;
   late final Tale _tale;
   late final String _competence;
@@ -256,7 +260,8 @@ class _TaleReaderScreenState extends State<TaleReaderScreen> {
           ),
           const SizedBox(height: 12),
 
-          ..._q.choices.map((c) {
+          ...Shuffled.of(_q.choices, salt: _salt, index: _q.question.hashCode)
+              .map((c) {
             Color bg = Colors.white;
             Color border = Colors.grey.shade300;
             Color fg = AppTheme.textDark;

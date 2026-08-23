@@ -63,7 +63,7 @@ class _MarketScreenState extends State<MarketScreen> {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
     _missions = AdaptiveDifficulty.ordered(
-      _filtered(MarketData.forLevel(_level)),
+      _filtered(MarketData.forLevel(_level))..shuffle(),
       stats: context.read<StatsService>(),
       level: _level,
       competenceOf: (m) => m.competence,

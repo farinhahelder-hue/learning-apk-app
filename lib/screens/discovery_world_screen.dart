@@ -11,6 +11,7 @@ import '../widgets/mascot_widget.dart';
 import '../widgets/thinking_timer.dart';
 import '../widgets/bounce_button.dart';
 import '../utils/haptics.dart';
+import '../utils/shuffled_choices.dart';
 
 /// Écran générique pour les nouveaux mondes de découverte
 /// (Animaux, Émotions, Géo, Histoire, Univers, Faits incroyables)
@@ -25,6 +26,9 @@ class DiscoveryWorldScreen extends StatefulWidget {
 }
 
 class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   final _confettiKey = GlobalKey<ConfettiOverlayState>();
   final _timerKey    = GlobalKey<ThinkingTimerState>();
 
@@ -215,7 +219,10 @@ class _DiscoveryWorldScreenState extends State<DiscoveryWorldScreen> {
                           const SizedBox(height: 24),
 
                           // Choix de réponses
-                          ...((q['choices'] as List).cast<String>()).map(
+                          ...Shuffled.of((q['choices'] as List).cast<String>(),
+                                  salt: _salt,
+                                  index: (q['question'] as String).hashCode)
+                              .map(
                             (choice) => Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               child: _AnswerButton(

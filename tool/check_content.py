@@ -361,6 +361,62 @@ def check_theatre():
                                 % (sid, i + 1))
 
 
+def check_shuffled_choices():
+    """Les écrans à choix doivent mélanger les propositions à l'affichage.
+
+    Les données sont rédigées avec la bonne réponse en premier — c'est
+    plus simple à écrire et à relire. Mesuré une fois : 143 questions,
+    bonne réponse en position 1 dans 85 % des cas, 100 % pour trois jeux
+    de données. Sans mélange, il suffit de toucher le premier bouton, et
+    le suivi parental affiche « terminée sans aide » pour rien.
+
+    On vérifie donc que chaque écran affichant des propositions passe par
+    Shuffled, plutôt que de vérifier l'ordre dans les données.
+    """
+    ecrans = [
+        'lib/widgets/exercise_card.dart',
+        'lib/screens/arcade_game_screen.dart',
+        'lib/screens/discovery_world_screen.dart',
+        'lib/screens/french/phonetique_screen.dart',
+        'lib/screens/games/flash_quiz_screen.dart',
+        'lib/screens/games/problem_mission_screen.dart',
+        'lib/screens/games/question_rain_screen.dart',
+        'lib/screens/games/sentence_workshop_screen.dart',
+        'lib/screens/games/weather_express_screen.dart',
+        'lib/screens/story/tale_reader_screen.dart',
+        'lib/screens/theatre/theatre_screen.dart',
+    ]
+    for f in ecrans:
+        if not os.path.exists(f):
+            problems.append('%s : écran à choix introuvable' % f)
+            continue
+        s = read(f)
+        if 'Shuffled.of(' not in s:
+            problems.append('%s : les propositions ne sont pas mélangées' % f)
+        elif '_salt' not in s:
+            problems.append('%s : Shuffled utilisé sans sel stable' % f)
+    notes.append('%d écrans à choix vérifiés' % len(ecrans))
+
+    # La phonétique vérifiait par indice : la comparaison doit passer par
+    # la valeur, sinon le mélange rend toutes les réponses fausses.
+    ph = read('lib/screens/french/phonetique_screen.dart')
+    if 'index == exercise.correctIndex' in ph:
+        problems.append('phonétique : réponse encore vérifiée par indice '
+                        'alors que les options sont mélangées')
+
+    # Mélanger une liste `const` lève une exception à l'exécution.
+    for f in dart_files():
+        s = read(f)
+        for m in re.finditer(r'(\w+(?:Data)?\.\w+)\s*\)?\.\.shuffle\(\)', s):
+            expr = m.group(1)
+            ctx = s[max(0, m.start() - 120):m.start()]
+            if 'List.of' in ctx or 'List.from' in ctx or 'toList()' in ctx:
+                continue
+            line = s[:m.start()].count('\n') + 1
+            problems.append('%s:%d  shuffle() sur %s sans copie préalable '
+                            '(liste const ?)' % (f, line, expr))
+
+
 CHECKS = [
     ('délimiteurs', check_braces),
     ('imports', check_imports),
@@ -374,6 +430,7 @@ CHECKS = [
     ('couverture du parcours', check_curriculum),
     ('marqueurs de la Fabrique', check_placeholders),
     ('questions du Théâtre', check_theatre),
+    ('mélange des propositions', check_shuffled_choices),
 ]
 
 if __name__ == '__main__':

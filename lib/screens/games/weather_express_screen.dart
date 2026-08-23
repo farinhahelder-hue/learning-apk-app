@@ -11,6 +11,7 @@ import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../../utils/haptics.dart';
+import '../../utils/shuffled_choices.dart';
 
 /// 🌦️ Météo Express — Emilie devient présentatrice météo.
 /// CE1 : reconnaître les symboles, associer tenue et saison.
@@ -24,6 +25,9 @@ class WeatherExpressScreen extends StatefulWidget {
 }
 
 class _WeatherExpressScreenState extends State<WeatherExpressScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   late final String _level;
   late List<WeatherQuestion> _questions;
 
@@ -208,7 +212,8 @@ class _WeatherExpressScreenState extends State<WeatherExpressScreen> {
           const SizedBox(height: 16),
 
           // Réponses
-          ..._q.choices.map((choice) {
+          ...Shuffled.of(_q.choices, salt: _salt, index: _q.prompt.hashCode)
+              .map((choice) {
             Color bg = Colors.white;
             Color border = Colors.grey.shade200;
             Color fg = AppTheme.textDark;

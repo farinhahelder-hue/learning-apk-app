@@ -106,7 +106,7 @@ class _TreasureMapScreenState extends State<TreasureMapScreen> {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
     _missions = AdaptiveDifficulty.ordered(
-      _filtered(MapMissionsData.forLevel(_level)),
+      _filtered(MapMissionsData.forLevel(_level))..shuffle(),
       stats: context.read<StatsService>(),
       level: _level,
       competenceOf: (m) => m.competence,

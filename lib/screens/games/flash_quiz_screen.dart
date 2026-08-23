@@ -9,6 +9,7 @@ import '../../services/accessibility_settings_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/curriculum.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../utils/shuffled_choices.dart';
 
 /// Manche courte et cadrée de 10 questions du niveau choisi (CE1 ou CE2,
 /// jamais mélangés), avec un résultat en étoiles à la fin.
@@ -20,6 +21,9 @@ class FlashQuizScreen extends StatefulWidget {
 }
 
 class _FlashQuizScreenState extends State<FlashQuizScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   static const _roundLength = 10;
 
   late final String _level;
@@ -155,7 +159,9 @@ class _FlashQuizScreenState extends State<FlashQuizScreen> {
           const SizedBox(height: 20),
           Expanded(
             child: ListView(
-              children: ex.options.map((option) {
+              children: Shuffled.of(ex.options,
+                      salt: _salt, index: ex.question.hashCode)
+                  .map((option) {
                 Color bg = Colors.white;
                 Color border = Colors.grey.shade200;
                 Color fg = AppTheme.textDark;

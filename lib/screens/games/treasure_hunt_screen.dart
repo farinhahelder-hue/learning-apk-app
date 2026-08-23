@@ -42,7 +42,12 @@ class _TreasureHuntScreenState extends State<TreasureHuntScreen> {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
     _landmarks = _isCE2 ? TreasureHuntData.ce2Landmarks : TreasureHuntData.ce1Landmarks;
-    _missions = _isCE2 ? TreasureHuntData.ce2Missions : TreasureHuntData.ce1Missions;
+    // Copie explicite avant mélange : les listes de données sont const.
+    // Les repères de la carte, eux, gardent leur ordre — ce sont des
+    // positions, pas des questions.
+    _missions = List.of(
+        _isCE2 ? TreasureHuntData.ce2Missions : TreasureHuntData.ce1Missions)
+      ..shuffle();
   }
 
   TreasureMission get _mission => _missions[_missionIndex];

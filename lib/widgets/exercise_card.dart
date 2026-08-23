@@ -6,6 +6,7 @@ import '../services/accessibility_settings_service.dart';
 import '../services/tts_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/constants.dart';
+import '../utils/shuffled_choices.dart';
 
 class ExerciseCard extends StatefulWidget {
   final Exercise exercise;
@@ -24,6 +25,9 @@ class ExerciseCard extends StatefulWidget {
 }
 
 class _ExerciseCardState extends State<ExerciseCard> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   String? _selected;
   bool? _isCorrect;
   final TextEditingController _controller = TextEditingController();
@@ -206,7 +210,11 @@ class _ExerciseCardState extends State<ExerciseCard> {
             ).animate().fadeIn(duration: calm ? 200.ms : 100.ms).scale(
                 duration: 400.ms, curve: calm ? Curves.easeOut : Curves.elasticOut),
           // Choix QCM
-          ...widget.exercise.options.asMap().entries.map((entry) {
+          ...Shuffled.of(widget.exercise.options,
+                  salt: _salt, index: widget.exercise.question.hashCode)
+              .asMap()
+              .entries
+              .map((entry) {
             final option = entry.value;
             Color bg = Colors.white;
             Color fg = AppTheme.textDark;

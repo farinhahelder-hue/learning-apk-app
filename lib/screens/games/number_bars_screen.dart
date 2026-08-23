@@ -62,7 +62,7 @@ class _NumberBarsScreenState extends State<NumberBarsScreen> {
     super.initState();
     _level = context.read<GameService>().gradeLevel;
     _missions = AdaptiveDifficulty.ordered(
-      _filtered(NumberBarsData.forLevel(_level)),
+      _filtered(NumberBarsData.forLevel(_level))..shuffle(),
       stats: context.read<StatsService>(),
       level: _level,
       competenceOf: (m) => m.competence,

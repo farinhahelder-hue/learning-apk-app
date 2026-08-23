@@ -7,6 +7,7 @@ import '../../services/game_service.dart';
 import '../../services/progress_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/curriculum.dart';
+import '../../utils/shuffled_choices.dart';
 
 /// Mode "sans fin" : une question à la fois, tirée du programme du niveau
 /// choisi (CE1 ou CE2, jamais mélangés). Le streak remplace le chrono —
@@ -19,6 +20,9 @@ class QuestionRainScreen extends StatefulWidget {
 }
 
 class _QuestionRainScreenState extends State<QuestionRainScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   late final String _level;
   late List<Exercise> _pool;
   int _index = 0;
@@ -145,7 +149,9 @@ class _QuestionRainScreenState extends State<QuestionRainScreen> {
           const SizedBox(height: 20),
           Expanded(
             child: ListView(
-              children: ex.options.map((option) {
+              children: Shuffled.of(ex.options,
+                      salt: _salt, index: ex.question.hashCode)
+                  .map((option) {
                 Color bg = Colors.white;
                 Color border = Colors.grey.shade200;
                 Color fg = AppTheme.textDark;

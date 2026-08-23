@@ -10,6 +10,7 @@ import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/haptics.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../utils/shuffled_choices.dart';
 
 /// 🎭 Théâtre des personnages — comprendre ce que vit quelqu'un d'autre.
 ///
@@ -31,6 +32,9 @@ class TheatreScreen extends StatefulWidget {
 enum _Phase { scene, questions, done }
 
 class _TheatreScreenState extends State<TheatreScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   late final String _level;
   late final TheatreScene _scene;
 
@@ -267,7 +271,8 @@ class _TheatreScreenState extends State<TheatreScreen> {
           ),
           const SizedBox(height: 12),
 
-          ..._q.choices.map((c) {
+          ...Shuffled.of(_q.choices, salt: _salt, index: _q.question.hashCode)
+              .map((c) {
             Color bg = Colors.white;
             Color border = Colors.grey.shade300;
             if (_selected != null) {

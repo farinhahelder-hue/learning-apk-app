@@ -8,6 +8,7 @@ import '../../services/garden_service.dart';
 import '../../services/stats_service.dart';
 import '../../services/tts_service.dart';
 import '../../utils/app_theme.dart';
+import '../../utils/shuffled_choices.dart';
 import '../../widgets/bounce_button.dart';
 import '../../widgets/rive_mascot_widget.dart';
 
@@ -92,6 +93,9 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
   late final String _level;
   int _score = 0;
   bool _finished = false;
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   int? _selectedIndex;
   bool? _isCorrect;
   bool _showLesson = false;
@@ -109,11 +113,22 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
     context.read<TtsService>().speak(word);
   }
 
+  /// La bonne réponse, telle qu'écrite dans les données.
+  String _correctOption(PhonetiqueExercise e) => e.options[e.correctIndex];
+
+  /// Les propositions dans l'ordre affiché — mélangé, mais stable tant
+  /// que l'exercice ne change pas.
+  List<String> _shuffledOptions(PhonetiqueExercise e) =>
+      Shuffled.of(e.options, salt: _salt, index: e.word.hashCode);
+
+  /// [index] est la position DANS LA LISTE AFFICHÉE, pas dans les données :
+  /// la comparaison se fait donc sur le mot, jamais sur le rang.
   void _checkAnswer(int index) {
     if (_selectedIndex != null) return;
-    
+
     final exercise = _exercises[_current];
-    final correct = index == exercise.correctIndex;
+    final correct =
+        _shuffledOptions(exercise)[index] == _correctOption(exercise);
     
     setState(() {
       _selectedIndex = index;
@@ -420,7 +435,10 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                   const SizedBox(height: 12),
 
                   // Options
-                  ...exercise.options.asMap().entries.map((entry) {
+                  ..._shuffledOptions(exercise)
+                      .asMap()
+                      .entries
+                      .map((entry) {
                     final idx = entry.key;
                     final option = entry.value;
                     
@@ -433,7 +451,7 @@ class _PhonetiqueScreenState extends State<PhonetiqueScreen> {
                         bg = _isCorrect! ? const Color(0xFF81C784) : const Color(0xFFEF9A9A);
                         fg = Colors.white;
                         border = bg;
-                      } else if (idx == exercise.correctIndex) {
+                      } else if (option == _correctOption(exercise)) {
                         bg = const Color(0xFF81C784);
                         fg = Colors.white;
                         border = bg;

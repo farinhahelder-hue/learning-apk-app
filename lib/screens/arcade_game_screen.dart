@@ -12,6 +12,7 @@ import '../utils/constants.dart';
 import '../utils/curriculum.dart';
 import '../models/adaptive_engine.dart';
 import 'coach_screen.dart';
+import '../utils/shuffled_choices.dart';
 
 class ArcadeGameScreen extends StatefulWidget {
   final String worldId;
@@ -38,6 +39,9 @@ class ArcadeGameScreen extends StatefulWidget {
 }
 
 class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   late List<Exercise> _exercises;
   int _current = 0;
   int _score = 0;
@@ -280,7 +284,10 @@ class _ArcadeGameScreenState extends State<ArcadeGameScreen> {
           ).animate(key: ValueKey(_current)).fadeIn(duration: 250.ms).slideY(begin: 0.1),
           const SizedBox(height: 20),
           // Options
-          ...ex.options.asMap().entries.map((e) {
+          ...Shuffled.of(ex.options, salt: _salt, index: ex.question.hashCode)
+              .asMap()
+              .entries
+              .map((e) {
             return GestureDetector(
               onTap: () => _answer(e.value),
               child: Container(

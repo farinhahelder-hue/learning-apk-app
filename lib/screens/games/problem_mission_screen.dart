@@ -13,6 +13,7 @@ import '../../utils/app_theme.dart';
 import '../../widgets/confetti_overlay.dart';
 import '../sensory/sensory_room_screen.dart';
 import '../../utils/haptics.dart';
+import '../../utils/shuffled_choices.dart';
 
 /// 🧩 Mission-problème — résoudre un problème étape par étape.
 ///
@@ -33,6 +34,9 @@ class ProblemMissionScreen extends StatefulWidget {
 enum _Phase { objective, reading, solving, success }
 
 class _ProblemMissionScreenState extends State<ProblemMissionScreen> {
+  /// Sel de mélange des propositions, tiré une fois par écran.
+  final int _salt = Shuffled.newSalt();
+
   late final String _level;
   late final List<ProblemMission> _missions;
 
@@ -429,7 +433,9 @@ class _ProblemMissionScreenState extends State<ProblemMissionScreen> {
             Wrap(
               spacing: 10, runSpacing: 10,
               alignment: WrapAlignment.center,
-              children: _step.choices.map((v) {
+              children: Shuffled.of(_step.choices,
+                      salt: _salt, index: _step.question.hashCode)
+                  .map((v) {
                 final picked = _chosenResult == v;
                 return GestureDetector(
                   onTap: () => _chooseResult(v),
