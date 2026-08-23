@@ -41,6 +41,7 @@ class AccessibilitySettingsService extends ChangeNotifier {
   bool _showThinkingTimer = false;
   bool _animationsEnabled = true;
   bool _autoReadEnabled = false;
+  bool _letterBlocksEnabled = false;
   SensoryProfile _profile = SensoryProfile.normal;
   double _voiceRate = 0.45;
 
@@ -49,6 +50,7 @@ class AccessibilitySettingsService extends ChangeNotifier {
     _showThinkingTimer = _prefs.getBool('show_timer') ?? false;
     _animationsEnabled = _prefs.getBool('animations_on') ?? true;
     _autoReadEnabled = _prefs.getBool('auto_read') ?? false;
+    _letterBlocksEnabled = _prefs.getBool('letter_blocks') ?? false;
     _voiceRate = _prefs.getDouble('voice_rate') ?? 0.45;
     final saved = _prefs.getString('sensory_profile');
     _profile = SensoryProfile.values.firstWhere(
@@ -72,6 +74,11 @@ class AccessibilitySettingsService extends ChangeNotifier {
 
   /// Lit automatiquement la consigne à voix haute à chaque question.
   bool get autoReadEnabled => _autoReadEnabled;
+
+  /// Dictée image : regrouper les digrammes (ch, ou, eau…) en blocs plutôt
+  /// que de proposer les lettres une par une. C'est une option pédagogique
+  /// à essayer avec Emilie, pas une règle fixe.
+  bool get letterBlocksEnabled => _letterBlocksEnabled;
 
   SensoryProfile get profile => _profile;
 
@@ -108,6 +115,14 @@ class AccessibilitySettingsService extends ChangeNotifier {
     await _prefs.setBool('auto_read', value);
     notifyListeners();
   }
+
+  Future<void> setLetterBlocks(bool value) async {
+    _letterBlocksEnabled = value;
+    await _prefs.setBool('letter_blocks', value);
+    notifyListeners();
+  }
+
+  Future<void> toggleLetterBlocks() => setLetterBlocks(!_letterBlocksEnabled);
 
   Future<void> setVoiceRate(double value) async {
     _voiceRate = value.clamp(0.25, 0.60);

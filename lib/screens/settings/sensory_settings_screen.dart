@@ -159,6 +159,14 @@ class SensorySettingsScreen extends StatelessWidget {
             value: access.showThinkingTimer,
             onChanged: (_) => access.toggleThinkingTimer(),
           ),
+          _SwitchTile(
+            emoji: '🔤',
+            title: 'Dictée : blocs de sons',
+            subtitle: 'Propose « ch », « ou », « eau » en un seul morceau '
+                'au lieu des lettres une par une. À essayer avec Emilie.',
+            value: access.letterBlocksEnabled,
+            onChanged: (_) => access.toggleLetterBlocks(),
+          ),
 
           const SizedBox(height: 20),
 

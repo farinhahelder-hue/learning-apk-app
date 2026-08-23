@@ -7,6 +7,7 @@ import 'memory_match_screen.dart';
 import 'sequence_game_screen.dart';
 import 'question_rain_screen.dart';
 import 'flash_quiz_screen.dart';
+import 'dictee_image_screen.dart';
 import 'number_bars_screen.dart';
 import 'treasure_hunt_screen.dart';
 import 'time_travel_screen.dart';
@@ -34,6 +35,12 @@ class MiniGamesMenuScreen extends StatelessWidget {
         'subtitle': 'Construis les nombres avec des objets',
         'color': const Color(0xFF42A5F5),
         'builder': (BuildContext c) => const NumberBarsScreen(),
+      },
+      {
+        'title': 'Dictée image', 'emoji': '🖼️',
+        'subtitle': 'Écoute un mot et écris-le avec des lettres',
+        'color': const Color(0xFFEC407A),
+        'builder': (BuildContext c) => const DicteeImageScreen(),
       },
       {
         'title': 'Chasse au trésor', 'emoji': '🗺️',
