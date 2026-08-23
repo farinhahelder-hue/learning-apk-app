@@ -12,6 +12,7 @@ import '../games/market_screen.dart';
 import '../games/number_bars_screen.dart';
 import '../games/problem_mission_screen.dart';
 import '../games/sentence_workshop_screen.dart';
+import '../games/treasure_map_screen.dart';
 import '../french/french_menu_screen.dart';
 import '../french/phonetique_screen.dart';
 import '../math/math_menu_screen.dart';
@@ -265,6 +266,9 @@ class StoryChapterScreen extends StatelessWidget {
         break;
       case LearningActivity.storyFactory:
         screen = StoryFactoryScreen(competence: c.id);
+        break;
+      case LearningActivity.treasureMap:
+        screen = TreasureMapScreen(competence: c.id);
         break;
       case LearningActivity.mathQuiz:
         screen = const MathMenuScreen();
