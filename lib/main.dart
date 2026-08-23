@@ -77,6 +77,14 @@ class EmilieApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         builder: (context, child) {
           final access = context.watch<AccessibilitySettingsService>();
+          // Le volume suit les réglages sensoriels. Après la frame :
+          // applySensoryGain prévient ses auditeurs, ce qu'on ne peut pas
+          // faire pendant une construction. L'appel est ignoré si rien
+          // n'a changé, donc le répéter à chaque build ne coûte rien.
+          final audio = context.read<AudioService>();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            audio.applySensoryGain(access.audioGain);
+          });
           // Coupe les animations globalement quand le réglage est désactivé
           // (transitions de page, animations implicites, effets par défaut).
           Animate.defaultDuration = access.animationsEnabled

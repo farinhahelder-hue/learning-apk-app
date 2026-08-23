@@ -417,6 +417,100 @@ def check_shuffled_choices():
                             '(liste const ?)' % (f, line, expr))
 
 
+def check_sounds():
+    """Les sons doivent rester courts, doux et non saturés.
+
+    Les fichiers livrés au départ étaient des placeholders : tap.wav
+    durait 1,75 s alors qu'il se déclenche à chaque appui, correct.wav
+    saturait à 100 % de crête, countdown.wav sifflait à 5 100 Hz. Rien
+    dans le dépôt ne le signalait — on ne peut pas écouter un WAV depuis
+    un script de vérification, mais on peut le mesurer.
+
+    Les limites ci-dessous sont celles que produit tool/make_sounds.py.
+    """
+    import wave
+    import array as _array
+    import math as _math
+
+    # nom -> duree max en secondes
+    limites = {
+        'tap.wav': 0.12,           # à chaque appui : doit être un clic
+        'countdown.wav': 0.20,
+        'correct.wav': 0.60,
+        'wrong.wav': 0.60,
+        'star.wav': 0.60,
+        'combo.wav': 0.70,
+        'unlock.wav': 0.80,
+        'level_up.wav': 0.90,
+        'celebrate.wav': 1.20,
+        'perfect.wav': 1.30,
+    }
+    CRETE_MAX = 0.70          # au-delà, on entre dans la saturation
+    MUSIQUE_MIN = 20.0        # une boucle plus courte s'entend tourner
+
+    d = 'assets/sounds'
+    if not os.path.isdir(d):
+        problems.append('assets/sounds introuvable')
+        return
+
+    verifies = 0
+    for nom, dmax in sorted(limites.items()):
+        p = os.path.join(d, nom)
+        if not os.path.exists(p):
+            problems.append('son manquant : %s' % nom)
+            continue
+        try:
+            w = wave.open(p, 'rb')
+            n, sr, sw = w.getnframes(), w.getframerate(), w.getsampwidth()
+            raw = w.readframes(n)
+            w.close()
+        except Exception as e:
+            problems.append('%s illisible (%s)' % (nom, e))
+            continue
+        dur = n / float(sr) if sr else 0
+        if dur > dmax:
+            problems.append('%s dure %.2fs (max %.2fs) — trop long'
+                            % (nom, dur, dmax))
+        if sw == 2 and raw:
+            a = _array.array('h')
+            a.frombytes(raw[:len(raw) // 2 * 2])
+            if len(a):
+                crete = max(abs(min(a)), abs(max(a))) / 32768.0
+                if crete > CRETE_MAX:
+                    problems.append('%s : crête à %.0f%% — saturation'
+                                    % (nom, crete * 100))
+        verifies += 1
+
+    md = os.path.join(d, 'music')
+    if os.path.isdir(md):
+        for nom in sorted(os.listdir(md)):
+            if not nom.endswith('.wav'):
+                continue
+            p = os.path.join(md, nom)
+            try:
+                w = wave.open(p, 'rb')
+                dur = w.getnframes() / float(w.getframerate())
+                w.close()
+            except Exception as e:
+                problems.append('%s illisible (%s)' % (nom, e))
+                continue
+            if dur < MUSIQUE_MIN:
+                problems.append('musique %s : boucle de %.1fs (min %.0fs) — '
+                                'la répétition s\'entend' % (nom, dur, MUSIQUE_MIN))
+            verifies += 1
+
+    notes.append('%d fichiers son vérifiés' % verifies)
+
+    # Un son déclaré dans le code mais absent du dossier ne se voit qu'à
+    # l'exécution, et le service échoue en silence.
+    src = read('lib/services/audio_service.dart')
+    for m in re.finditer(r"'(sounds/[^']+\.wav)'", src):
+        rel = m.group(1)
+        if not os.path.exists(os.path.join('assets', rel)):
+            problems.append('audio_service référence %s, absent du dossier'
+                            % rel)
+
+
 CHECKS = [
     ('délimiteurs', check_braces),
     ('imports', check_imports),
@@ -431,6 +525,7 @@ CHECKS = [
     ('marqueurs de la Fabrique', check_placeholders),
     ('questions du Théâtre', check_theatre),
     ('mélange des propositions', check_shuffled_choices),
+    ('sons', check_sounds),
 ]
 
 if __name__ == '__main__':

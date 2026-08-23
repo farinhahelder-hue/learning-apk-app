@@ -33,9 +33,33 @@ class AudioService extends ChangeNotifier {
 
   bool _musicEnabled  = true;
   bool _soundEnabled  = true;
-  double _musicVolume = 0.35;
-  double _sfxVolume   = 0.85;
+  // Volumes par défaut volontairement bas. Les anciens (0.85 pour les
+  // effets) rendaient l'application fatigante ; on peut toujours les
+  // remonter dans « Sons et musique ».
+  double _musicVolume = 0.20;
+  double _sfxVolume   = 0.55;
   BackgroundMusic? _currentMusic;
+
+  /// Atténuation décidée par les réglages sensoriels.
+  ///
+  /// Le profil « Doux » et le mode calme ne touchaient jusqu'ici qu'aux
+  /// animations : une enfant réglée sur « Doux » recevait quand même les
+  /// effets à plein volume. C'est corrigé ici — le réglage porte enfin
+  /// sur ce qu'on entend.
+  double _sensoryGain = 1.0;
+
+  /// Appelé quand les réglages sensoriels changent.
+  /// [gain] : 1.0 = aucune atténuation, 0.0 = silence.
+  void applySensoryGain(double gain) {
+    final g = gain.clamp(0.0, 1.0);
+    if (g == _sensoryGain) return;
+    _sensoryGain = g;
+    _bgPlayer.setVolume(_musicVolume * _sensoryGain);
+    notifyListeners();
+  }
+
+  /// Volume réellement envoyé aux effets.
+  double get _effectiveSfx => _sfxVolume * _sensoryGain;
 
   bool get musicEnabled  => _musicEnabled;
   bool get soundEnabled  => _soundEnabled;
@@ -75,8 +99,8 @@ class AudioService extends ChangeNotifier {
     final p = await SharedPreferences.getInstance();
     _musicEnabled  = p.getBool('music_on')    ?? true;
     _soundEnabled  = p.getBool('sound_on')    ?? true;
-    _musicVolume   = p.getDouble('music_vol') ?? 0.35;
-    _sfxVolume     = p.getDouble('sfx_vol')   ?? 0.85;
+    _musicVolume   = p.getDouble('music_vol') ?? 0.20;
+    _sfxVolume     = p.getDouble('sfx_vol')   ?? 0.55;
     notifyListeners();
   }
 
@@ -87,7 +111,7 @@ class AudioService extends ChangeNotifier {
     _currentMusic = music;
     try {
       await _bgPlayer.stop();
-      await _bgPlayer.setVolume(_musicVolume);
+      await _bgPlayer.setVolume(_musicVolume * _sensoryGain);
       await _bgPlayer.play(ap.AssetSource(_musicPaths[music]!));
     } catch (e) {
       debugPrint('AudioService: musique indisponible ${_musicPaths[music]} - $e');
@@ -105,10 +129,35 @@ class AudioService extends ChangeNotifier {
   }
 
   // ── Effets sonores ────────────────────────────────────────────
+
+  /// Dernier déclenchement de chaque effet, pour ne pas les empiler.
+  final Map<SoundEffect, DateTime> _lastPlayed = {};
+
+  /// Délai minimal entre deux fois le même effet. Le clic revient très
+  /// vite quand on appuie plusieurs fois de suite ; sans ce garde-fou,
+  /// les sons se superposent et ça devient un grésillement.
+  static const Map<SoundEffect, int> _minGapMs = {
+    SoundEffect.buttonTap: 70,
+    SoundEffect.correct: 150,
+    SoundEffect.wrong: 150,
+    SoundEffect.countdown: 250,
+  };
+
+  bool _tooSoon(SoundEffect fx) {
+    final gap = _minGapMs[fx];
+    if (gap == null) return false;
+    final last = _lastPlayed[fx];
+    final now = DateTime.now();
+    if (last != null && now.difference(last).inMilliseconds < gap) return true;
+    _lastPlayed[fx] = now;
+    return false;
+  }
+
   Future<void> playSound(SoundEffect fx) async {
     if (!_soundEnabled) return;
+    if (_tooSoon(fx)) return;
     try {
-      await _sfxPlayer.setVolume(_sfxVolume);
+      await _sfxPlayer.setVolume(_effectiveSfx);
       await _sfxPlayer.play(ap.AssetSource(_sfxPaths[fx]!));
     } catch (e) {
       // Fichier absent - silencieux, ne bloque jamais l'enfant
@@ -120,7 +169,7 @@ class AudioService extends ChangeNotifier {
   Future<void> playSoundOverlap(SoundEffect fx) async {
     if (!_soundEnabled) return;
     try {
-      await _sfxPlayer2.setVolume(_sfxVolume);
+      await _sfxPlayer2.setVolume(_effectiveSfx);
       await _sfxPlayer2.play(ap.AssetSource(_sfxPaths[fx]!));
     } catch (e) {
       debugPrint('AudioService: Fichier absent ${_sfxPaths[fx]}');
@@ -131,7 +180,7 @@ class AudioService extends ChangeNotifier {
   Future<void> playSfx(String assetPath) async {
     if (!_soundEnabled) return;
     try {
-      await _sfxPlayer.setVolume(_sfxVolume);
+      await _sfxPlayer.setVolume(_effectiveSfx);
       await _sfxPlayer.play(ap.AssetSource(assetPath));
     } catch (e) {
       debugPrint('AudioService: Fichier absent $assetPath');
@@ -199,7 +248,7 @@ class AudioService extends ChangeNotifier {
 
   Future<void> setMusicVolume(double v) async {
     _musicVolume = v;
-    await _bgPlayer.setVolume(v);
+    await _bgPlayer.setVolume(v * _sensoryGain);
     final p = await SharedPreferences.getInstance();
     await p.setDouble('music_vol', v);
     notifyListeners();

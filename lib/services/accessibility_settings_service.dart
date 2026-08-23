@@ -73,6 +73,23 @@ class AccessibilitySettingsService extends ChangeNotifier {
   /// Réduit les confettis, vibrations fortes et couleurs vives.
   bool get calmModeEnabled => _calmModeEnabled;
 
+  /// Atténuation du son décidée par le profil sensoriel.
+  ///
+  /// Jusqu'ici, « Doux » et le mode calme ne coupaient que les
+  /// animations : les effets sonores restaient à plein volume. Pour une
+  /// enfant qu'on installe en profil Doux justement parce que le bruit
+  /// la gêne, c'était le réglage le plus utile qui manquait.
+  ///
+  /// 1.0 = aucune atténuation, 0.0 = silence.
+  double get audioGain {
+    final base = switch (_profile) {
+      SensoryProfile.doux => 0.55,
+      SensoryProfile.normal => 0.85,
+      SensoryProfile.dynamique => 1.0,
+    };
+    return _calmModeEnabled ? base * 0.8 : base;
+  }
+
   /// Minuteur visuel doux pendant les exercices. Désactivé par défaut :
   /// un minuteur, même doux, peut être contre-productif pour certains
   /// profils TDAH.
